@@ -1,4 +1,5 @@
 import { Text,  View, TouchableOpacity, Image, Alert, SafeAreaView, ScrollView,Platform, ActivityIndicator, BackHandler } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './struttura/style.js';
 import { NavigationContainer,useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,17 +7,34 @@ import { WebView } from 'react-native-webview';
 import { TextInput,Switch,Surface, RadioButton, IconButton , MD3Colors } from 'react-native-paper';
 
 const Tab = createBottomTabNavigator();
+var connesso=false;
+
+async function getData(key){
+  let value = await AsyncStorage.getItem(key);
+  return value;
+}
+
+async function getLocal(navigation) {
+  let Id_User = await getData('@Id_User');
+  connesso=false;
+};
+function CollegamentoWeb({desc,url, stili=[], stilitesto=[]}) {
+  return(
+    <TouchableOpacity onPress={()=>{Linking.openURL(url)}} style={[stili]}>
+      <Text style={[{ fontSize: 16,color:'#1a0dab' }, stilitesto]}>{desc}</Text>
+    </TouchableOpacity>
+  );
+}
 
 function Accesso({ navigation }) {
-  useEffect(() => {
-    getLocal(navigation);
-  }, []);
   const [user, setuser] = useState('');
   const [pwd, setpwd] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(true);
 
   var Value = user;
   var secret_Value = pwd;
+
+  const [checkconnesso, setconnesso] = useState(connesso);
 
   return (
     <SafeAreaView style={styles.safeareaview}>
@@ -55,7 +73,7 @@ function Accesso({ navigation }) {
                     style={[{ backgroundColor: 'lightgrey' }, styles.mt15, styles.py10, styles.w100, styles.centro]}>
                     <Text style={{ fontSize: 16,color:'#116699' }}>Logout</Text>
                   </TouchableOpacity>
-                  <Divisore1 />
+                  
                   <TouchableOpacity
                     onPress={async ()=>{
                       navigation.navigate('Hugo');
@@ -74,6 +92,7 @@ function Accesso({ navigation }) {
                     onChangeText={(Value) => {
                       setuser(Value)
                     }}
+                    value={Value ?? ""}
                   />
                   <Text style={styles.mt15}>Password:</Text>
                   <TextInput
@@ -82,6 +101,7 @@ function Accesso({ navigation }) {
                     onChangeText={(secret_Value) => {
                       setpwd(secret_Value)
                     }}
+                    value={secret_Value ?? ""}
 
                     secureTextEntry={passwordVisible}
                     right={<TextInput.Icon name={passwordVisible ? "eye" : "eye-off"} onPress={() => setPasswordVisible(!passwordVisible)} />}
@@ -102,7 +122,7 @@ function Accesso({ navigation }) {
                   <CollegamentoWeb url={"https://ristostore.it/Recupero_Password_RistoGo"} desc={"Oppure recupera dati di accesso"} stili={[styles.mt15]} stilitesto={[styles.textcentro]} />
                 </View>
               }
-              <Divisore1 />
+              
               <Text style={[{ fontSize: 16, textAlign: 'center' }, styles.mt15]}>Clicca per ottenere i dati d'accesso e utilizzare il servizio di consegna RistoGo:</Text>
               <TouchableOpacity
                 onPress={()=>{Linking.openURL("https://ristostore.it/Come_Accedere_RistoGo")}}
