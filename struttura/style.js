@@ -55,6 +55,12 @@ export default StyleSheet.create({
     mt15p: {
       marginTop:"15%",
     },
+    mb15: {
+      marginBottom:15,
+    },
+    mb5: {
+      marginBottom:5,
+    },
     img:{
       width:'100%',
       resizeMode: 'contain',
@@ -62,7 +68,7 @@ export default StyleSheet.create({
     },
     container: {
       flex: 1,
-      backgroundColor: '#eee',
+      backgroundColor: '#f5f5f5',
       alignItems: 'center',
       padding:10,
       minHeight:100
@@ -97,6 +103,11 @@ export default StyleSheet.create({
       borderColor: "#00a1ae",
       borderRadius: 7,
       backgroundColor: "#eee",
+    },
+    bordomare: {
+      borderWidth: 1,
+      borderColor: "#00a1ae",
+      borderRadius: 7,
     },
     input1: {
       height: 50,
@@ -161,17 +172,20 @@ export default StyleSheet.create({
     p5:{
       padding: 5,
     },
+    h1: {
+      fontSize: 20, 
+      color: '#00a1ae'
+    },
     h2: {
-      fontSize: 20,
-      fontWeight: "bold",
+      fontSize: 16
     },
     h3: {
-      fontSize: 18,
+      fontSize: 16,
+      fontWeight: "bold",
     },
     w100: {
       alignSelf: 'stretch',
       width:'100%',
-      minWidth:200,
     },
     centro: {
       alignItems: 'center',
@@ -203,5 +217,11 @@ export default StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden'
+    },
+    surface1: {
+      padding: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
     }
   });
