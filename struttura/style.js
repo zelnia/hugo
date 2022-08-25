@@ -187,6 +187,9 @@ export default StyleSheet.create({
       alignSelf: 'stretch',
       width:'100%',
     },
+    w20: {
+      width:'20%',
+    },
     centro: {
       alignItems: 'center',
     },
@@ -220,8 +223,15 @@ export default StyleSheet.create({
     },
     surface1: {
       padding: 8,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: 'stretch',
+      justifyContent: 'space-between',
       borderRadius: 10,
-    }
+    },
+    selected: {
+      backgroundColor: '#00a1ae',
+    },
+    labelselected: {
+      color:"#fff"
+    },
+    unselected: {},
   });
