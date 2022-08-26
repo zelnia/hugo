@@ -10,7 +10,8 @@ import {CollegamentoWeb,elaboraore,richiesta,getLocal,getData} from '../struttur
 import Footer from '../struttura/Footer.js';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export default function Hugo({ navigation }) {
+export default function Hugo({ navigation, route }) {
+  var Id_Utente=route.params.Id_Utente;
   const [visible, setVisible] = React.useState(false);
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
@@ -44,15 +45,26 @@ export default function Hugo({ navigation }) {
   const [spesamax, setSpesamax] = useState(0);
 
   const [dispo, setDispo] = useState('');
+  const [indirizzi, setIndirizzi] = useState([]);
 
   function aggiornaPagina(json){
     if(typeof(json?.dati?.ore)!="undefined") {
       setDispo(elaboraore(json.dati.ore));
     }
   }
+  
   useEffect(() => {
     async function fetchData() {
       let Id_User = await getData('@Id_User');
+      let richiestaindi={
+        "Operazione":'getIndirizzi',
+        "Id_User":Id_User,
+      }
+      let listaindirizzi = await richiesta(richiestaindi,'apiHugo');
+      setIndirizzi(listaindirizzi);
+      console.log('richiestaindi', richiestaindi);
+
+      aggiornaPagina(json_res);
       let json_res = await richiesta({
         "Operazione":'AggiornaHugo',
         "iduser":Id_User,
@@ -60,7 +72,7 @@ export default function Hugo({ navigation }) {
       aggiornaPagina(json_res);
     }
     fetchData();
-  }, []);
+  }, [Id_Utente]);
 
   const MINUTE_MS = 10000;
   useEffect(() => {
@@ -108,10 +120,19 @@ export default function Hugo({ navigation }) {
               <Dialog visible={visible2} onDismiss={hideDialog2}>
                 <Dialog.Title>Scegli indirizzo</Dialog.Title>
                 <Dialog.Content>
-                  <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
-                    <RadioButton.Item label="Via Roma 31" value="0" />
-                    <RadioButton.Item label="Via Atenea 2" value="1" />
-                  </RadioButton.Group>
+                  {
+                    (typeof(indirizzi)!="undefined" && indirizzi.length) ?
+                      <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
+                        {
+                          indirizzi.map((indirizzo, index) => (
+                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value="0" key={"rindi"+index} />
+                          ))
+                        }
+                        {/* <RadioButton.Item label="Via Roma 31" value="0" />
+                        <RadioButton.Item label="Via Atenea 2" value="1" /> */}
+                      </RadioButton.Group>
+                    : null
+                  }
                   <Button  mode="outlined"  style={[ss.w100]}>Nuovo indirizzo</Button>
                   <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog2}>OK</Button>
                 </Dialog.Content>

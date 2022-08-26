@@ -8,9 +8,16 @@ async function getData(key){
   return value;
 }
 
-async function getLocal(navigation) {
+async function getLocal() {
   let Id_User = await getData('@Id_User');
-  connesso=false;
+  let dati={};
+  dati.Id_User=Id_User;
+  if(Id_User!="" && typeof(Id_User)!="undefined" && Id_User!=null){
+    dati.connesso=true;
+  } else {
+    dati.connesso=false;
+  }
+  return dati;
 };
 
 async function richiesta(oggetto, api){

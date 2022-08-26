@@ -20,7 +20,6 @@ const Tab = createBottomTabNavigator();
 const numeroversione=10001; //parametro aggiornamento
 var connesso=false;
 
-
 function Accesso({ navigation }) {
   const [user, setuser] = useState('');
   const [pwd, setpwd] = useState('');
@@ -28,6 +27,20 @@ function Accesso({ navigation }) {
 
   var Value = user;
   var secret_Value = pwd;
+
+
+  useEffect(() => {
+    async function iniz(){
+      var dati = await getLocal();
+      setconnesso(dati.connesso);
+      if(dati.connesso==true){
+        navigation.navigate('Hugo', {
+          Id_Utente:dati.Id_User
+        });
+      }
+    }
+    iniz();
+  }, []);
 
   const [checkconnesso, setconnesso] = useState(connesso);
 
@@ -50,17 +63,17 @@ function Accesso({ navigation }) {
                       try {
                         let Id_User = await getData('@Id_User');
                         richiesta({
-                          "Tipo":'LogOut',
+                          "Operazione":'LogOut',
                           "Id_User":Id_User,
-                        },'Accesso')
+                        },'apiHugo')
                         .then((json) => {console.log('json', json)});
                         await AsyncStorage.clear().then(()=>{
                           connesso=false;
                           setconnesso(connesso);
                           setuser("");
                           setpwd("");
+                          alert("Logout effettuato");
                         });
-                        alert("Logout effettuato");
                       } catch(e) {
                         // remove error
                       }
@@ -105,7 +118,28 @@ function Accesso({ navigation }) {
                     onPress={
                       () => {
                         if(Value!="" && secret_Value!=""){
-                          navigation.navigate('Hugo');
+                          let datiaccesso={
+                            "Operazione":"Accesso",
+                            "User":Value,
+                            "Pass":secret_Value,
+                          }
+                          richiesta(datiaccesso,'apiHugo').then((json) => {
+                            if(json.ok) {
+                              var Id_User=json.dati.Id;
+                              connesso=true;
+                              setconnesso(connesso);
+                              try {
+                                AsyncStorage.setItem('@Id_User', Id_User);
+                              } catch (e) {
+                                console.log(e);
+                              }
+                              navigation.navigate('Hugo', {
+                                Id_Utente: Id_User
+                              });
+                            } else {
+                              alert("Dati errati");
+                            }
+                          });
                         } else {
                           alert("Login non riuscito. Assicurati che i campi Utente, Password e Tipologia siano corretti.");
                         }
