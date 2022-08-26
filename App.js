@@ -1,37 +1,25 @@
-import {  View, TouchableOpacity, Image, Alert, SafeAreaView, ScrollView,Platform, ActivityIndicator, BackHandler } from 'react-native';
+import {  View, TouchableOpacity, Image, SafeAreaView, ScrollView,Platform } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import styles from './struttura/style.js';
-import { NavigationContainer,useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { WebView } from 'react-native-webview';
-import { TextInput,Switch,Surface, RadioButton, IconButton , MD3Colors, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
+import { TextInput, Button, Text} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+//Componenti custom
+import {ss} from './struttura/style.js';
+import {CollegamentoWeb,richiesta,getLocal,getData} from './struttura/Utils.js';
+import Profilo from './Pagine/Profilo.js';
+import History from './Pagine/History.js';
+import Registrazione from './Pagine/Registrazione.js';
+import Hugo from './Pagine/Hugo.js';
 
 
 
 const Tab = createBottomTabNavigator();
 const numeroversione=10001; //parametro aggiornamento
-const apiroot="https://ristostore.it/Hugo/";
 var connesso=false;
-const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-async function getData(key){
-  let value = await AsyncStorage.getItem(key);
-  return value;
-}
-
-async function getLocal(navigation) {
-  let Id_User = await getData('@Id_User');
-  connesso=false;
-};
-function CollegamentoWeb({desc,url, stili=[], stilitesto=[]}) {
-  return(
-    <TouchableOpacity onPress={()=>{Linking.openURL(url)}} style={[stili]}>
-      <Text style={[{ fontSize: 16,color:'#1a0dab' }, stilitesto]}>{desc}</Text>
-    </TouchableOpacity>
-  );
-}
 
 function Accesso({ navigation }) {
   const [user, setuser] = useState('');
@@ -44,19 +32,19 @@ function Accesso({ navigation }) {
   const [checkconnesso, setconnesso] = useState(connesso);
 
   return (
-    <SafeAreaView style={styles.safeareaview}>
+    <SafeAreaView style={ss.safeareaview}>
       <ScrollView>
-        <View style={styles.container}>
-          <View style={[{maxHeight:720, minWidth:300, width:"90%"}, styles.divinterno1]}>
-            <View style={[{width:"100%"},styles.w100]}>
+        <View style={ss.container}>
+          <View style={[{maxHeight:720, minWidth:300, width:"90%"}, ss.divinterno1]}>
+            <View style={[{width:"100%"},ss.w100]}>
               <View style={{minHeight:70}}>
-                <Image source={require('./assets/logoorizzontale.jpg')}  style={[styles.img]}/>
+                <Image source={require('./assets/logoorizzontale.jpg')}  style={[ss.img]}/>
               </View>
               {
 
               checkconnesso ?
                 <View>
-                  <Text style={[{textAlign: 'center'},styles.h3,styles.mt15]}>Scollegati per effettuare un altro accesso</Text>
+                  <Text style={[{textAlign: 'center'},ss.h3,ss.mt15]}>Scollegati per effettuare un altro accesso</Text>
                   <TouchableOpacity
                     onPress={async ()=>{
                       try {
@@ -77,7 +65,7 @@ function Accesso({ navigation }) {
                         // remove error
                       }
                     }}
-                    style={[{ backgroundColor: 'lightgrey' }, styles.mt15, styles.py10, styles.w100, styles.centro]}>
+                    style={[{ backgroundColor: 'lightgrey' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
                     <Text style={{ fontSize: 16,color:'#116699' }}>Logout</Text>
                   </TouchableOpacity>
                   
@@ -85,25 +73,25 @@ function Accesso({ navigation }) {
                     onPress={async ()=>{
                       navigation.navigate('Hugo');
                     }}
-                    style={[{ backgroundColor: '#00a1ae'  }, styles.p10, styles.w100, styles.centro]}>
+                    style={[{ backgroundColor: '#00a1ae'  }, ss.p10, ss.w100, ss.centro]}>
                     <Text style={{ fontSize: 20, color: '#fff' }}>Torna indietro</Text>
                   </TouchableOpacity>
                 </View>
               :
                 <View>
-                  <Text style={[{textAlign: 'center'},styles.h3,styles.mt15]}>Effettua l'accesso:</Text>
-                  <Text style={styles.mt15}>Utente:</Text>
+                  <Text style={[{textAlign: 'center'},ss.h3,ss.mt15]}>Effettua l'accesso:</Text>
+                  <Text style={ss.mt15}>Utente:</Text>
                   <TextInput
-                    style={[styles.input1,styles.w100]}
+                    style={[ss.input1,ss.w100]}
                     textAlign={'center'}
                     onChangeText={(Value) => {
                       setuser(Value)
                     }}
                     value={Value ?? ""}
                   />
-                  <Text style={styles.mt15}>Password:</Text>
+                  <Text style={ss.mt15}>Password:</Text>
                   <TextInput
-                    style={[styles.input1,styles.w100]}
+                    style={[ss.input1,ss.w100]}
                     textAlign={'center'}
                     onChangeText={(secret_Value) => {
                       setpwd(secret_Value)
@@ -123,10 +111,10 @@ function Accesso({ navigation }) {
                         }
                       }
                     }
-                    style={[{ backgroundColor: '#00a1ae' }, styles.mt15, styles.py10, styles.w100, styles.centro]}>
+                    style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
                     <Text style={{ fontSize: 20, color: '#fff' }}>Accedi</Text>
                   </TouchableOpacity>
-                  <Button   mode="contained"  style={[styles.w100, styles.mt15]}>Oppure Registrati</Button>
+                  <Button   mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
                 </View>
               }
             </View>
@@ -137,433 +125,15 @@ function Accesso({ navigation }) {
   );
 }
 
-async function richiesta(oggetto, api){
-  let formdata = new FormData();
-  for (const [key, value] of Object.entries(oggetto)) {
-    formdata.append(key, value);
-  }
-  try {
-    let res = await fetch(apiroot+api, {
-      method: 'POST',
-      headers: {
-        "X-Requested-With": "XMLHttpRequest"
-      } ,
-      body: formdata
-    });
-    res = await res.json();
-    return res;
-  } catch (e) {
-    return "errore";
-  }
-}
-
-function elaboraore(elencoore){
-  var arrayore=[];
-  for (let index = 0; index < elencoore.length; index++) {
-    var chiave=elencoore[index]["OraH"];
-    if(typeof(arrayore[elencoore[index]["OraH"]])=="undefined"){
-      let bersaglio=elencoore[index]["Ora"];
-      arrayore[chiave]=[];
-      arrayore[chiave].push(bersaglio);
-    } else {
-      let bersaglio=elencoore[index]["Ora"];
-      if(!arrayore[chiave].includes(bersaglio)){
-        arrayore[chiave].push(bersaglio);
-      }
-    }
-  }
-  let chiaviore=Object.keys(arrayore);
-  for (let index2 = 0; index2 < chiaviore.length; index2++) {
-    let bers=chiaviore[index2];
-    if(typeof(arrayore[bers])!="undefined"){
-      if(!arrayore[bers].includes(bers+":00")){
-        arrayore[bers].splice(0, 0, 'No');
-      }
-      if(!arrayore[bers].includes(bers+":15")){
-        arrayore[bers].splice(1, 0, 'No');
-      }
-      if(!arrayore[bers].includes(bers+":30")){
-        arrayore[bers].splice(2, 0, 'No');
-      }
-      if(!arrayore[bers].includes(bers+":45")){
-        arrayore[bers].splice(3, 0, 'No');
-      }
-    }
-  }
-  return Object.entries(arrayore);
-}
-
-
-function Hugo({ navigation }) {
-  const [visible, setVisible] = React.useState(false);
-  const showDialog = () => setVisible(true);
-  const hideDialog = () => setVisible(false);
-
-  const [visible2, setVisible2] = React.useState(false);
-  const showDialog2 = () => setVisible2(true);
-  const hideDialog2 = () => setVisible2(false);
-
-  const [visible3, setVisible3] = React.useState(false);
-  const showDialog3 = () => setVisible3(true);
-  const hideDialog3 = () => setVisible3(false);
-
-  const [visible4, setVisible4] = React.useState(false);
-  const showDialog4 = () => setVisible4(true);
-  const hideDialog4 = () => setVisible4(false);
-
-  const [visible5, setVisible5] = React.useState(false);
-  const showDialog5 = () => setVisible5(true);
-  const hideDialog5 = () => setVisible5(false);
-
-  // const [checked, setChecked] = React.useState(0);
-  const [indirizzo, setIndirizzo] = useState(0);
-  const [servizio, setServizio] = useState(0);
-  const [metodo_pagamento, setMetodo_Pagamento] = useState(0);
-  const [note, setNote] = useState("");
-  const [note2, setNote2] = useState("");
-  const [cosa, setCosa] = useState("");
-  const [mancia, setMancia] = useState("no");
-  const [chiamami, setChiamami] = useState(false);
-  const [sostiuisci, setSostiuisci] = useState(false);
-  const [spesamax, setSpesamax] = useState(0);
-
-  const [dispo, setDispo] = useState('');
-
-  function aggiornaPagina(json){
-    if(typeof(json?.dati?.ore)!="undefined") {
-      setDispo(elaboraore(json.dati.ore));
-    }
-  }
-  useEffect(() => {
-    async function fetchData() {
-      let Id_User = await getData('@Id_User');
-      let json_res = await richiesta({
-        "Operazione":'AggiornaHugo',
-        "iduser":Id_User,
-      },'apiHugo');
-      aggiornaPagina(json_res);
-    }
-    fetchData();
-  }, []);
-
-  const MINUTE_MS = 10000;
-  useEffect(() => {
-    const intervalloritiri = setInterval(async () => {
-      let Id_User = await getData('@Id_User');
-      let json_res = await richiesta({
-        "Operazione":'AggiornaHugo',
-        "iduser":Id_User,
-      },'apiHugo');
-      aggiornaPagina(json_res);
-    }, MINUTE_MS);
-    return () => clearInterval(intervalloritiri); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, []);
-  
-  var oggi = new Date();
-  var deltaminuti=25;
-  var adessocondelta = new Date(oggi.getTime() + deltaminuti*60000);
-  oggi.setHours( oggi.getHours() + 2 );
-
-
-  return (
-    <Provider>
-      <SafeAreaView style={styles.safeareaview}>
-        <ScrollView>
-          <View style={styles.container}>
-            <Surface style={[styles.surface1,styles.mb15,styles.centro,styles.w100]} elevation={4}>
-              <Text style={styles.h1}>Ue' Mario Ciao!</Text>
-              <Text style={styles.h2}>Cosa posso portarti oggi?</Text>
-              <Text style={styles.h2}>Dove posso accompagnarti?</Text>
-              <Text style={[styles.h2,styles.centro]}>Per piacere inserisci più dettagli possibili:</Text>
-              <Text style={styles.h2}>mi faciliteresti il compito.</Text>
-            </Surface>
-            <Button onPress={showDialog}  mode="contained"  style={[styles.w100]}>Cosa fa Hugò?</Button>
-            <Portal>
-              <Dialog visible={visible} onDismiss={hideDialog}>
-                <Dialog.Title>Cosa fa Hugò?</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa. Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC).Inserisci nelle note dove vuoi andare, numero di passeggeri, data e ora di partenza. Cliccka l'ora in cui vuoi essere chiamato, ti richiameremo per un preventivo immediato. </Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>    
-            <Button onPress={showDialog2}  mode="contained"  style={[styles.w100,styles.mt15]}>Scegli indirizzo</Button>
-            <Portal>
-              <Dialog visible={visible2} onDismiss={hideDialog2}>
-                <Dialog.Title>Scegli indirizzo</Dialog.Title>
-                <Dialog.Content>
-                  <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
-                    <RadioButton.Item label="Via Roma 31" value="0" />
-                    <RadioButton.Item label="Via Atenea 2" value="1" />
-                  </RadioButton.Group>
-                  <Button  mode="outlined"  style={[styles.w100]}>Nuovo indirizzo</Button>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog2}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>    
-            <Surface style={[styles.surface1,styles.mt15]} elevation={4}>
-              <Text style={[styles.h1,styles.mt15]}>Scegli un servizio:</Text>
-              <View style={styles.mt15}>
-                <RadioButton.Group onValueChange={servizio => setServizio(servizio)} value={servizio}>
-                  <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Ritiri e acquisti supermercati esclusi 4,99€" value="0" />
-                  <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Acquisti supermercati da 4,99 a 7,99€ (7,99 consegna veloce  4,99 dopo 4 ore)" value="1" />
-                  <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Hugo ti accompagna 11,99€" value="2" />
-                  <RadioButton.Item style={styles.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" />
-                </RadioButton.Group>
-              </View>
-            </Surface>
-            <Surface style={[styles.surface1,styles.mt15, styles.w100]} elevation={4}>
-              {/* <Text style={[styles.h1,styles.mt15]}>Indica cosa acquistare:</Text> */}
-                <TextInput
-                  multiline = {true}
-                  numberOfLines = {6}
-                  label="Indica cosa acquistare:"
-                  mode='outlined'
-                  value={cosa}
-                  onChangeText={cosa => setCosa(cosa)}
-                />
-            </Surface>
-            
-            <Button onPress={showDialog4}  mode="contained"  style={[styles.w100,styles.mt15]}>Dove acquistare</Button>
-            <Portal>
-              <Dialog visible={visible4} onDismiss={hideDialog4}>
-                <Dialog.Title>Dove acquistare</Dialog.Title>
-                <Dialog.Content>
-                  <TextInput
-                    multiline = {true}
-                    numberOfLines = {4}
-                    label="Note"
-                    value={note2}
-                    onChangeText={note2 => setNote2(note2)}
-                  />
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog4}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal> 
-            <Surface style={[styles.surface1,styles.mt15,styles.w100]} elevation={4}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width:"40%", flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{ fontWeight: 'bold' }}>Chiamami</Text>
-                  <Checkbox
-                    status={chiamami ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setChiamami(!chiamami);
-                    }}
-                  />
-                </View>
-                <View style={{ width:"60%", flexDirection: 'row', alignItems: 'center', justifyContent: "flex-end"}}>
-                  <Text>Sostituisci prodotti</Text>
-                  <Checkbox
-                    status={sostiuisci ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setSostiuisci(!sostiuisci);
-                    }}
-                  />
-                </View>
-              </View>
-              <View  style={[styles.p3,styles.w100]}>
-                <Divider />
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width:"60%"}}>
-                  <Text style={{ fontWeight: 'bold' }}>Spesa massima</Text> 
-                </View>
-                <View style={{ width:"40%"}}>
-                  <TextInput
-                    textAlign={'center'}
-                    onChangeText={(spesamax) => {
-                      setSpesamax(spesamax)
-                    }}
-                    value={spesamax ?? ""}
-                    style={{ height:32}}
-                  />
-                </View>
-              </View>
-              <View  style={[styles.p3,styles.w100]}>
-                <Divider />
-              </View>
-              <View style={[{ flexDirection: 'row' },styles.centro]}>
-                <Text style={styles.w20}>Mancia</Text> 
-                <Button onPress={() => {1 === mancia ? setMancia("no"): setMancia(1);}} style={[(1 === mancia ? styles.selected : styles.unselected),styles.w20]} labelStyle={1 === mancia ? styles.labelselected : styles.unselected} mode="outlined">1€</Button>
-                <Button  onPress={() => {2 === mancia ? setMancia("no"): setMancia(2);}} style={[(2 === mancia ? styles.selected : styles.unselected),styles.w20]} labelStyle={2 === mancia ? styles.labelselected : styles.unselected}  mode="outlined">2€</Button>
-                <Button onPress={() => {5 === mancia ? setMancia("no"): setMancia(5);}} style={[(5 === mancia ? styles.selected : styles.unselected),styles.w20]} labelStyle={5 === mancia ? styles.labelselected : styles.unselected}   mode="outlined">5€</Button>
-                <Button onPress={() => {10 === mancia ? setMancia("no"): setMancia(10);}}  style={[(10 === mancia ? styles.selected : styles.unselected),styles.w20]} labelStyle={10 === mancia ? styles.labelselected : styles.unselected}  mode="outlined">10€</Button>
-              </View>
-            </Surface>
-
-                
-            <Surface style={[styles.surface1,styles.mt15,styles.w100]} elevation={4}>
-              {
-                (typeof(dispo)!="undefined" && dispo.length) ?
-                  <View>
-                    <Text style={{ fontSize: 20 }}>Scegli un orario:</Text>
-                    <View style={styles.mt15}>
-                      {
-                        dispo.map((Ora, index) => (
-                          <View style={[{ flexDirection: 'row', justifyContent:'flex-end' }]} key={index}>
-                            {
-                              Ora[1].map((Ora2, index2) => (
-                                ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
-                                  <TouchableOpacity
-                                    key={index+"-"+index2}
-                                    onPress={
-                                      async () => {
-                                        // onPressORARIO(Ora2);
-                                      }
-                                    }
-                                    style={[{ backgroundColor: 'lightgrey', width:'25%' }, styles.p10, styles.centro,styles.bordogrigio]}
-                                  >
-                                    <Text style={{ fontSize: 18 }}>{Ora2}</Text>
-                                  </TouchableOpacity>
-                                :
-                                  
-                                  <View style={[{ backgroundColor: 'white', width:'25%' }, styles.p10, styles.centro]} 
-                                  key={index+"no"+index2}>
-                                    <Text style={{ fontSize: 18 }}>     </Text>
-                                  </View>
-                              ))
-                            }
-                          </View>
-                        ))
-                      }
-                    </View>
-                  </View>
-                :
-                  (dispo=="") ?
-                    <View><Text style={{ fontSize: 20 }}>In caricamento...</Text></View>
-                  :
-                    <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
-              }
-            </Surface>
-            <Button onPress={showDialog5}  mode="contained"  style={[styles.w100,styles.mt15]}>Metodo di pagamento</Button>
-            <Portal>
-              <Dialog visible={visible5} onDismiss={hideDialog5}>
-                <Dialog.Title>Scegli il metodo di pagamento</Dialog.Title>
-                <Dialog.Content>
-                  <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
-                    <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Carta di credito" value="0" />
-                    <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Contanti alla consegna" value="1" />
-                    <RadioButton.Item style={[styles.bordomare, styles.mb5]} label="Saldo" value="2" />
-                  </RadioButton.Group>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog5}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal> 
-            <Button onPress={showDialog3}  mode="contained"  style={[styles.w100,styles.mt15]}>Note</Button>
-            <Portal>
-              <Dialog visible={visible3} onDismiss={hideDialog3}>
-                <Dialog.Title>Inserisci note</Dialog.Title>
-                <Dialog.Content>
-                  <TextInput
-                    multiline = {true}
-                    numberOfLines = {4}
-                    label="Note"
-                    value={note}
-                    onChangeText={note => setNote(note)}
-                  />
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog3}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal> 
-            <TouchableOpacity
-              onPress={
-                () => {
-                }
-              }
-              style={[{ backgroundColor: '#00a1ae' }, styles.mt15, styles.py10, styles.w100, styles.centro]}>
-              <Text style={{ fontSize: 20, color: '#fff' }}>INVIA</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-        <Footer />
-      </SafeAreaView>
-    </Provider>
-  );
-}
-
-function Registrati({ navigation, route }) {
-  let indirizzo='https://ristostore.it/Hugo/registrati';
-
-  useEffect(() => {
-    const backAction = () => {
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () => backHandler.remove();
-  }, []);
-
-  return (
-    <SafeAreaView style={styles.safeareaview}>
-      <WebView style={styles.container} source={{ uri: indirizzo }} incognito={true} cacheEnabled={false} />
-        <TouchableOpacity
-          onPress={() => {navigation.navigate('Accesso');}}
-          style={[{ backgroundColor: 'lightgrey' }, styles.py10, styles.w100, styles.centro]}>
-          <Text style={{ fontSize: 16,color:'#116699' }}>Logout</Text>
-        </TouchableOpacity>
-    </SafeAreaView>
-  );
-}
-
-
-function Footer() {
-  const navigation = useNavigation();
-  return(
-  <View  style={[{ flexDirection: 'row' }]}>
-    <View style={[{ width: '25%'}, styles.centro]}>
-      <IconButton
-        icon="home"
-        color='#00a1ae'
-        size={35}
-        onPress={async () => {
-          navigation.navigate('Hugo');
-        }}
-      />
-    </View>
-    <View style={[{ width: '25%'}, styles.centro]}>
-      <IconButton
-        icon="account"
-        color='#00a1ae'
-        size={35}
-      />
-    </View>
-    <View style={[{ width: '25%'}, styles.centro]}>
-      <IconButton
-        icon="history"
-        color='#00a1ae'
-        size={35}
-      />
-    </View>
-    <View style={[{ width: '25%'}, styles.centro]}>
-      <IconButton
-        icon="logout"
-        color='#00a1ae'
-        size={35}
-        onPress={() => {
-          navigation.navigate('Accesso');
-        }}
-      />
-    </View>
-  </View>
-  );
-}
-
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {display: 'none'}}}>
         <Tab.Screen name="Accesso" component={Accesso} />
-        <Tab.Screen name="Registrati" component={Registrati} />
+        <Tab.Screen name="Registrati" component={Registrazione} />
         <Tab.Screen name="Hugo" component={Hugo}/>
+        <Tab.Screen name="Profilo" component={Profilo}/>
+        <Tab.Screen name="History" component={History}/>
       </Tab.Navigator>
     </NavigationContainer>
   );

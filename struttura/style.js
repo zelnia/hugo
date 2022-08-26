@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export default StyleSheet.create({
+const ss= StyleSheet.create({
     divinterno1: {
       flex: 1,
       marginVertical:30,
@@ -235,3 +235,5 @@ export default StyleSheet.create({
     },
     unselected: {},
   });
+
+  export {ss}
