@@ -32,6 +32,10 @@ export default function Hugo({ navigation, route }) {
   const showDialog5 = () => setVisible5(true);
   const hideDialog5 = () => setVisible5(false);
 
+  const [visible6, setVisible6] = React.useState(false);
+  const showDialog6 = () => setVisible6(true);
+  const hideDialog6 = () => setVisible6(false);
+
   // const [checked, setChecked] = React.useState(0);
   const [indirizzo, setIndirizzo] = useState(0);
   const [servizio, setServizio] = useState(0);
@@ -43,9 +47,19 @@ export default function Hugo({ navigation, route }) {
   const [chiamami, setChiamami] = useState(false);
   const [sostiuisci, setSostiuisci] = useState(false);
   const [spesamax, setSpesamax] = useState(0);
+  
+  //NUOVO INDIRIZZO
+  const [nuovoindirizzo, setNuovoindirizzo] = useState("");
+  const [nuovocivico, setCivico] = useState("");
+  const [nuovacitta, setNuovacitta] = useState("");
+  const [nuovaprovincia, setNuovaprovincia] = useState("");
+  const [nuovocap, setNuovcap] = useState("");
+  const [nuovotel, setNuovotel] = useState("");
+  const [nuovenoteindirizzo, setNuovenoteindirizzo] = useState("");
 
   const [dispo, setDispo] = useState('');
   const [indirizzi, setIndirizzi] = useState([]);
+  let elencoindirizzi=indirizzi;
 
   function aggiornaPagina(json){
     if(typeof(json?.dati?.ore)!="undefined") {
@@ -125,15 +139,103 @@ export default function Hugo({ navigation, route }) {
                       <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
                         {
                           indirizzi.map((indirizzo, index) => (
-                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value="0" key={"rindi"+index} />
+                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
                           ))
                         }
-                        {/* <RadioButton.Item label="Via Roma 31" value="0" />
-                        <RadioButton.Item label="Via Atenea 2" value="1" /> */}
                       </RadioButton.Group>
                     : null
                   }
-                  <Button  mode="outlined"  style={[ss.w100]}>Nuovo indirizzo</Button>
+                  <Button onPress={showDialog6}  mode="outlined"  style={[ss.w100]}>Nuovo indirizzo</Button>
+                  <Portal>
+                    <Dialog visible={visible6} onDismiss={hideDialog6}>
+                      <Dialog.Title>Inserisci un nuovo indirizzo</Dialog.Title>
+                      <Dialog.Content>
+                        <View>
+                          <TextInput 
+                            style={[ss.w100]}
+                            label="Indirizzo:"
+                            mode='outlined'
+                            value={nuovoindirizzo}
+                            onChangeText={nuovoindirizzo => setNuovoindirizzo(nuovoindirizzo)}
+                          />     
+                          <View style={{ flexDirection: 'row'}}>
+                            <TextInput 
+                              style={[ss.w50, ss.mt15]}
+                              label="Civico:"
+                              mode='outlined'
+                              value={nuovocivico}
+                              onChangeText={nuovocivico => setCivico(nuovocivico)}
+                            />     
+                            <TextInput 
+                              style={[ss.w50, ss.mt15]}
+                              label="Città:"
+                              mode='outlined'
+                              value={nuovacitta}
+                              onChangeText={nuovacitta => setNuovacitta(nuovacitta)}
+                            />   
+                          </View>  
+                          <View style={{ flexDirection: 'row'}}>
+                            <TextInput 
+                              style={[ss.w50, ss.mt15]}
+                              label="Provincia:"
+                              mode='outlined'
+                              value={nuovaprovincia}
+                              onChangeText={nuovaprovincia => setNuovaprovincia(nuovaprovincia)}
+                            />     
+                            <TextInput 
+                              style={[ss.w50, ss.mt15]}
+                              label="Cap:"
+                              mode='outlined'
+                              value={nuovocap}
+                              onChangeText={nuovocap => setNuovcap(nuovocap)}
+                            />     
+                          </View>
+                          <TextInput 
+                            style={[ss.w100, ss.mt15]}
+                            label="Telefono:"
+                            mode='outlined'
+                            value={nuovotel}
+                            onChangeText={nuovotel => setNuovotel(nuovotel)}
+                          />     
+                          <TextInput 
+                            style={[ss.w100, ss.mt15]}
+                            label="Note indirizzo:"
+                            mode='outlined'
+                            value={nuovenoteindirizzo}
+                            onChangeText={nuovenoteindirizzo => setNuovenoteindirizzo(nuovenoteindirizzo)}
+                          />   
+                        </View>  
+                        <Button 
+                          style={[ss.w100, ss.mt15]} 
+                          mode="contained" 
+                          onPress={
+                            async ()=>{
+                              let datinuovoindirizzo={
+                                "Operazione":"gestioneIndirizzo",
+                                "Nuovo":"Si",
+                                "Id_User":await getData('@Id_User'),
+                                "Via":nuovoindirizzo,
+                                "Civico":nuovocivico,
+                                "Citta":nuovacitta,
+                                "Provincia":nuovaprovincia,
+                                "Cap":nuovocap,
+                                "Note_Indirizzo":nuovenoteindirizzo,
+                                "Telefono":nuovotel,
+                              }
+                              richiesta(datinuovoindirizzo,'apiHugo').then((json) => {
+                                if(json.ok) {
+                                  setIndirizzi(json.dati);
+                                } else {
+                                  alert("Dati errati");
+                                }
+                                setVisible6(false);
+                              });
+                            }
+                          }
+                        >Inserisci</Button>
+                      </Dialog.Content>
+                    </Dialog>
+                  </Portal>
                   <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog2}>OK</Button>
                 </Dialog.Content>
               </Dialog>

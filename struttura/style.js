@@ -187,6 +187,10 @@ const ss= StyleSheet.create({
       alignSelf: 'stretch',
       width:'100%',
     },
+    w50: {
+      alignSelf: 'stretch',
+      width:'50%',
+    },
     w20: {
       width:'20%',
     },

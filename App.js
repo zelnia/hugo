@@ -148,7 +148,7 @@ function Accesso({ navigation }) {
                     style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
                     <Text style={{ fontSize: 20, color: '#fff' }}>Accedi</Text>
                   </TouchableOpacity>
-                  <Button   mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
+                  <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
                 </View>
               }
             </View>
@@ -164,7 +164,7 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {display: 'none'}}}>
         <Tab.Screen name="Accesso" component={Accesso} />
-        <Tab.Screen name="Registrati" component={Registrazione} />
+        <Tab.Screen name="Registrazione" component={Registrazione} />
         <Tab.Screen name="Hugo" component={Hugo}/>
         <Tab.Screen name="Profilo" component={Profilo}/>
         <Tab.Screen name="History" component={History}/>
