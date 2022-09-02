@@ -194,6 +194,18 @@ const ss= StyleSheet.create({
     w20: {
       width:'20%',
     },
+    w25: {
+      width:'25%',
+    },
+    w33: {
+      width:'33.33%',
+    },
+    w50: {
+      width:'50%',
+    },
+    w60: {
+      width:'60%',
+    },
     centro: {
       alignItems: 'center',
     },

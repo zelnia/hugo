@@ -44,6 +44,7 @@ export default function Hugo({ navigation, route }) {
   const [note2, setNote2] = useState("");
   const [cosa, setCosa] = useState("");
   const [mancia, setMancia] = useState("no");
+  const [auto, setAuto] = useState("no");
   const [chiamami, setChiamami] = useState(false);
   const [sostiuisci, setSostiuisci] = useState(false);
   const [spesamax, setSpesamax] = useState(0);
@@ -249,6 +250,11 @@ export default function Hugo({ navigation, route }) {
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Hugo ti accompagna 11,99€" value="2" />
                   <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" />
                 </RadioButton.Group>
+              </View>
+              <View style={[{ flexDirection: 'row', paddingStart:15 },ss.centro,ss.mt15]}>
+                <Text style={ss.w50}>E' necessario un auto per questo servizio?</Text> 
+                <Button onPress={() => {1 === auto ? setAuto("no"): setAuto(1);}} style={[(1 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === auto ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+                <Button onPress={() => {0 === auto ? setAuto("no"): setAuto(0);}} style={[(0 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={0 === auto ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
               </View>
             </Surface>
             <Surface style={[ss.surface1,ss.mt15, ss.w100]} elevation={4}>
