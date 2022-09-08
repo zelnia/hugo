@@ -12,6 +12,7 @@ import {CollegamentoWeb,richiesta,getLocal,getData} from './struttura/Utils.js';
 import Profilo from './Pagine/Profilo.js';
 import History from './Pagine/History.js';
 import Registrazione from './Pagine/Registrazione.js';
+import Richiesta_NCC from './Pagine/Richiesta_NCC.js';
 import Hugo from './Pagine/Hugo.js';
 
 
@@ -165,6 +166,7 @@ export default function App() {
       <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {display: 'none'}}}>
         <Tab.Screen name="Accesso" component={Accesso} />
         <Tab.Screen name="Registrazione" component={Registrazione} />
+        <Tab.Screen name="Richiesta NCC" component={Richiesta_NCC} />
         <Tab.Screen name="Hugo" component={Hugo}/>
         <Tab.Screen name="Profilo" component={Profilo}/>
         <Tab.Screen name="History" component={History}/>

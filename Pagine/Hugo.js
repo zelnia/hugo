@@ -107,7 +107,17 @@ export default function Hugo({ navigation, route }) {
   var adessocondelta = new Date(oggi.getTime() + deltaminuti*60000);
   oggi.setHours( oggi.getHours() + 2 );
 
-
+  function checkncc(servizio){
+    if(servizio==3){
+      navigation.navigate('Richiesta NCC');
+    }
+  }
+  // twoCalls = e => {
+  //   this.functionOne(e)
+  //   if(servizio==3){
+  //     navigation.navigate('Ricerca_NCC');
+  //   }
+  // }
   return (
     <Provider>
       <SafeAreaView style={ss.safeareaview}>
@@ -244,7 +254,8 @@ export default function Hugo({ navigation, route }) {
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
               <Text style={[ss.h1,ss.mt15]}>Scegli un servizio:</Text>
               <View style={ss.mt15}>
-                <RadioButton.Group onValueChange={servizio => setServizio(servizio)} value={servizio}>
+                {/* // servizio => setServizio(servizio) */}
+                <RadioButton.Group onValueChange={servizio => { setServizio(servizio); checkncc(servizio) }} value={servizio}>
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Ritiri e acquisti supermercati esclusi 4,99€" value="0" />
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Acquisti supermercati da 4,99 a 7,99€ (7,99 consegna veloce  4,99 dopo 4 ore)" value="1" />
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Hugo ti accompagna 11,99€" value="2" />
