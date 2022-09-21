@@ -3,20 +3,23 @@ import {useNavigation} from '@react-navigation/native';
 import Footer from '../struttura/Footer.js';
 import React, { useState, useEffect, useRef } from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
-// import DatePicker from 'react-datepicker';
-// import DateTimePicker from 'react-datetime-picker';
-import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
-
+import { TextInput,Surface, RadioButton,Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
+import SelectDropdown from 'react-native-select-dropdown'
 export default function Richiesta_NCC({ navigation, route }) {
 
   const [indirizzopartenza, setindirizzopartenza] = useState('');
   const [indirizzodestinazione, setindirizzodestinazione] = useState('');
 
-  const [dataeora, setdataeora] = useState('');
+  const [giorno, setgiorno] = useState('');
   const [tipospostamento, settipospostamento] = useState('');
   const [durataattesa, setdurataattesa] = useState('');
   const [passeggeri, setpasseggeri] = useState('');
   const [note, setnote] = useState('');
+
+  const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre","Novembre","Dicembre"];
+  const [meseselected, setmeseSelected] = useState(undefined);
+
+
 
     return (
       <Provider>
@@ -42,29 +45,40 @@ export default function Richiesta_NCC({ navigation, route }) {
                     }}
                     value={indirizzodestinazione ?? ""}
                   />
-                  {/* <DateTimePicker style={[ss.w100,ss.mt15]}
-                    label="Data e ora"
-                    onChangeText={(dataeora) => {
-                      setdataeora(dataeora)
-                    }}
-                    value={dataeora ?? ""} /> */}
-                    {/* <DatePicker
-                      selected={dataeora}
-                      onChange={(dataeora) => {
-                        setdataeora(dataeora)
-                      }}
-                      timeInputLabel="Time:"
-                      dateFormat="MM/dd/yyyy h:mm aa"
-                      showTimeInput
-                    /> */}
-                  {/* <TextInput
-                    style={[ss.w100,ss.mt15]}
-                    label="Data e ora"
-                    onChangeText={(dataeora) => {
-                      setdataeora(dataeora)
-                    }}
-                    value={dataeora ?? ""}
-                  /> */}
+                  
+                  <View style={[{ flexDirection: 'row'},ss.mt15]}>
+                    <View style={ss.w33}>
+                      <TextInput
+                        style={[ss.w100]}
+                        label="Giorno"
+                        onChangeText={(giorno) => {
+                          setgiorno(giorno)
+                        }}
+                        value={giorno ?? ""}
+                      />
+                    </View>
+                    <View style={[{ paddingTop: 5},ss.w50]}>
+                      <View style={[ss.w90]}>
+                        <SelectDropdown
+                          data={mesi}
+                          onSelect={(selectedItem, index) => {
+                            setmeseSelected(selectedItem);
+                            console.log(selectedItem, index)
+                          }}
+                          buttonTextAfterSelection={(selectedItem, index) => {
+                            // text represented after item is selected
+                            // if data array is an array of objects then return selectedItem.property to render after item is selected
+                            return selectedItem
+                          }}
+                          rowTextForSelection={(item, index) => {
+                            // text represented for each item in dropdown
+                            // if data array is an array of objects then return item.property to represent item in dropdown
+                            return item
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
                   <TextInput
                     style={[ss.w100,ss.mt15]}
                     label="Tipo di spostamento"

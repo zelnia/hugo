@@ -37,9 +37,9 @@ export default function Hugo({ navigation, route }) {
   const hideDialog6 = () => setVisible6(false);
 
   // const [checked, setChecked] = React.useState(0);
-  const [indirizzo, setIndirizzo] = useState(0);
-  const [servizio, setServizio] = useState(0);
-  const [metodo_pagamento, setMetodo_Pagamento] = useState(0);
+  const [indirizzo, setIndirizzo] = useState("no");
+  const [servizio, setServizio] = useState('no');
+  const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
   const [note, setNote] = useState("");
   const [note2, setNote2] = useState("");
   const [cosa, setCosa] = useState("");
@@ -48,7 +48,8 @@ export default function Hugo({ navigation, route }) {
   const [chiamami, setChiamami] = useState(false);
   const [sostiuisci, setSostiuisci] = useState(false);
   const [spesamax, setSpesamax] = useState(0);
-  
+  const [oraprenotazione, setora] = useState("no");
+
   //NUOVO INDIRIZZO
   const [nuovoindirizzo, setNuovoindirizzo] = useState("");
   const [nuovocivico, setCivico] = useState("");
@@ -67,7 +68,36 @@ export default function Hugo({ navigation, route }) {
       setDispo(elaboraore(json.dati.ore));
     }
   }
-  
+
+  function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione){
+    let richiestaprenotazione= {
+      "indirizzo":indirizzo,
+      "servizio":servizio,
+      "metodo_pagamento":metodo_pagamento,
+      "note":note,
+      "note2":note2,
+      "cosa":cosa,
+      "mancia":mancia,
+      "auto":auto,
+      "chiamami":chiamami,
+      "sostiuisci":sostiuisci,
+      "spesamax":spesamax,
+      "oraprenotazione":oraprenotazione
+    }
+    let checkgo=true;
+    let errore="";
+    if(indirizzo=="no"){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
+    if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
+    if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
+    if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
+    if(checkgo){
+      console.log("TUTTO OK");
+    } else {
+      alert(errore);
+    }
+    console.log('richiestaprenotazione', richiestaprenotazione);
+  }
+
   useEffect(() => {
     async function fetchData() {
       let Id_User = await getData('@Id_User');
@@ -362,14 +392,12 @@ export default function Hugo({ navigation, route }) {
                                 ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
                                   <TouchableOpacity
                                     key={index+"-"+index2}
-                                    onPress={
-                                      async () => {
-                                        // onPressORARIO(Ora2);
-                                      }
-                                    }
-                                    style={[{ backgroundColor: 'lightgrey', width:'25%' }, ss.p10, ss.centro,ss.bordogrigio]}
+                                    onPress={() => {
+                                      setora(Ora2)
+                                    }}
+                                    style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
                                   >
-                                    <Text style={{ fontSize: 18 }}>{Ora2}</Text>
+                                    <Text style={[{ fontSize: 18 }, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
                                   </TouchableOpacity>
                                 :
                                   
@@ -424,6 +452,8 @@ export default function Hugo({ navigation, route }) {
             <TouchableOpacity
               onPress={
                 () => {
+                  // console.log("test");
+                  inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione);
                 }
               }
               style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>

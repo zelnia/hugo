@@ -206,6 +206,15 @@ const ss= StyleSheet.create({
     w60: {
       width:'60%',
     },
+    w90: {
+      width:'90%',
+    },
+    bglightgrey: {
+      backgroundColor: 'lightgrey'
+    },
+    bgverdemare: {
+      backgroundColor: '#00a1ae'
+    },
     centro: {
       alignItems: 'center',
     },
