@@ -180,7 +180,8 @@ export default function Hugo({ navigation, route }) {
                       <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
                         {
                           indirizzi.map((indirizzo, index) => (
-                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
+                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} key={"rindi"+index} />
+                            // <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
                           ))
                         }
                       </RadioButton.Group>
