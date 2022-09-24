@@ -10,8 +10,10 @@ async function getData(key){
 
 async function getLocal() {
   let Id_User = await getData('@Id_User');
+  let Nominativo = await getData('@Nominativo');
   let dati={};
   dati.Id_User=Id_User;
+  dati.Nominativo=Nominativo;
   if(Id_User!="" && typeof(Id_User)!="undefined" && Id_User!=null){
     dati.connesso=true;
   } else {
@@ -20,13 +22,13 @@ async function getLocal() {
   return dati;
 };
 
-async function richiesta(oggetto, api){
+async function richiesta(oggetto, api='apiHugo',altro=false){
   let formdata = new FormData();
   for (const [key, value] of Object.entries(oggetto)) {
     formdata.append(key, value);
   }
   try {
-    let res = await fetch(apiroot+api, {
+    let res = await fetch((api && !altro?apiroot+api:altro), {
       method: 'POST',
       headers: {
         "X-Requested-With": "XMLHttpRequest"

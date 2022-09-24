@@ -3,15 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 
 //Componenti custom
 import {ss} from '../struttura/style.js';
-import {CollegamentoWeb,elaboraore,richiesta,getLocal,getData} from '../struttura/Utils.js';
+import {elaboraore,richiesta,getData} from '../struttura/Utils.js';
 import Footer from '../struttura/Footer.js';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export default function Hugo({ navigation, route }) {
   var Id_Utente=route.params.Id_Utente;
+  var Nominativo=route.params.Nominativo;
   const [visible, setVisible] = React.useState(false);
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
@@ -37,7 +39,9 @@ export default function Hugo({ navigation, route }) {
   const hideDialog6 = () => setVisible6(false);
 
   // const [checked, setChecked] = React.useState(0);
+  const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
+  const [descrizioneindirizzo, setdescrizioneindirizzo] = useState("no");
   const [servizio, setServizio] = useState('no');
   const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
   const [note, setNote] = useState("");
@@ -63,39 +67,54 @@ export default function Hugo({ navigation, route }) {
   const [indirizzi, setIndirizzi] = useState([]);
   let elencoindirizzi=indirizzi;
 
+  var richestaaggiornamento={
+    "Operazione":'AggiornaHugo',
+    "id_attivita_base":attivitabase,
+    "iduser":Id_Utente,
+  };
+
   function aggiornaPagina(json){
     if(typeof(json?.dati?.ore)!="undefined") {
       setDispo(elaboraore(json.dati.ore));
     }
   }
 
-  function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione){
-    let richiestaprenotazione= {
-      "indirizzo":indirizzo,
-      "servizio":servizio,
-      "metodo_pagamento":metodo_pagamento,
-      "note":note,
-      "note2":note2,
-      "cosa":cosa,
-      "mancia":mancia,
-      "auto":auto,
-      "chiamami":chiamami,
-      "sostiuisci":sostiuisci,
-      "spesamax":spesamax,
-      "oraprenotazione":oraprenotazione
+  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione){
+    try {
+      let richiestaprenotazione= {
+        "cliente":Id_Utente,
+        "idatti":attivitabase,
+        "indirizzo":descrizioneindirizzo,
+        "servizio":servizio,
+        "metodo_pagamento":metodo_pagamento,
+        "note":note,
+        "note2":note2,
+        "cosa":cosa,
+        "mancia":mancia,
+        "auto":auto,
+        "chiamami":chiamami,
+        "sostiuisci":sostiuisci,
+        "spesamax":spesamax,
+        "oraprenotazione":oraprenotazione
+      }
+      let checkgo=true;
+      let errore="";
+      if(indirizzo=="no"){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
+      if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
+      if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
+      if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
+      if(checkgo){
+        console.log("TUTTO OK");
+        let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
+        console.log(acquisto);
+        Linking.openURL(acquisto.PaginaAcquisto);
+      } else {
+        alert(errore);
+      }
+      console.log('richiestaprenotazione', richiestaprenotazione);
+    } catch (error) {
+      console.log('errore: ', error);
     }
-    let checkgo=true;
-    let errore="";
-    if(indirizzo=="no"){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
-    if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
-    if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
-    if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
-    if(checkgo){
-      console.log("TUTTO OK");
-    } else {
-      alert(errore);
-    }
-    console.log('richiestaprenotazione', richiestaprenotazione);
   }
 
   useEffect(() => {
@@ -107,30 +126,44 @@ export default function Hugo({ navigation, route }) {
       }
       let listaindirizzi = await richiesta(richiestaindi,'apiHugo');
       setIndirizzi(listaindirizzi);
-      console.log('richiestaindi', richiestaindi);
-
-      aggiornaPagina(json_res);
-      let json_res = await richiesta({
-        "Operazione":'AggiornaHugo',
-        "iduser":Id_User,
-      },'apiHugo');
+      let json_res = await richiesta(richestaaggiornamento);
       aggiornaPagina(json_res);
     }
     fetchData();
   }, [Id_Utente]);
+  
+  useEffect(() => {
+    if(indirizzo!="no"){
+      async function fetchData() {
+        let richiestaattivitabase={
+          "Operazione":'getAttivitaBase',
+          "Id_Indirizzo":indirizzo,
+        }
+        let jattivitabase = await richiesta(richiestaattivitabase);
+        setattivitabase(jattivitabase.id_attivita_base);
+        setdescrizioneindirizzo(jattivitabase.descrizione_indirizzo);
+        let json_res = await richiesta(richestaaggiornamento);
+        aggiornaPagina(json_res);
+      }
+      fetchData();
+    }
+  }, [indirizzo]);
 
   const MINUTE_MS = 10000;
   useEffect(() => {
     const intervalloritiri = setInterval(async () => {
-      let Id_User = await getData('@Id_User');
-      let json_res = await richiesta({
-        "Operazione":'AggiornaHugo',
-        "iduser":Id_User,
-      },'apiHugo');
+      // let Id_User = await getData('@Id_User');
+      
+      let json_res = await richiesta(richestaaggiornamento);
+      // let json_res = await richiesta({
+      //   "Operazione":'AggiornaHugo',
+      //   "id_attivita_base":attivitabase,
+      //   "iduser":Id_User,
+      // },'apiHugo');
       aggiornaPagina(json_res);
     }, MINUTE_MS);
     return () => clearInterval(intervalloritiri); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, []);
+  }, [attivitabase]);
   
   var oggi = new Date();
   var deltaminuti=25;
@@ -154,7 +187,7 @@ export default function Hugo({ navigation, route }) {
         <ScrollView>
           <View style={ss.container}>
             <Surface style={[ss.surface1,ss.mb15,ss.centro,ss.w100]} elevation={4}>
-              <Text style={ss.h1}>Ue' Mario Ciao!</Text>
+              <Text style={ss.h1}>Ue' {Nominativo} Ciao!</Text>
               <Text style={ss.h2}>Cosa posso portarti oggi?</Text>
               <Text style={ss.h2}>Dove posso accompagnarti?</Text>
               <Text style={[ss.h2,ss.centro]}>Per piacere inserisci più dettagli possibili:</Text>
@@ -180,7 +213,7 @@ export default function Hugo({ navigation, route }) {
                       <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
                         {
                           indirizzi.map((indirizzo, index) => (
-                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} key={"rindi"+index} />
+                            <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
                             // <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
                           ))
                         }
@@ -414,10 +447,13 @@ export default function Hugo({ navigation, route }) {
                     </View>
                   </View>
                 :
-                  (dispo=="") ?
-                    <View><Text style={{ fontSize: 20 }}>In caricamento...</Text></View>
+                  (attivitabase!="no") ?
+                    (dispo=="") ?
+                      <View><Text style={{ fontSize: 20 }}>In caricamento...</Text></View>
+                    :
+                      <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
                   :
-                    <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
+                  <View><Text style={{ fontSize: 20 }}>Seleziona un indirizzo per vedere le nostre disponibilità</Text></View>
               }
             </Surface>
             <Button onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento</Button>
@@ -427,8 +463,8 @@ export default function Hugo({ navigation, route }) {
                 <Dialog.Content>
                   <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
                     <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna" value="1" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" />
+                    {/* <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna" value="1" />
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" /> */}
                   </RadioButton.Group>
                   <Button  style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog5}>OK</Button>
                 </Dialog.Content>

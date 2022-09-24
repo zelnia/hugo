@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Componenti custom
 import {ss} from './struttura/style.js';
-import {CollegamentoWeb,richiesta,getLocal,getData} from './struttura/Utils.js';
+import {richiesta,getLocal,getData} from './struttura/Utils.js';
 import Profilo from './Pagine/Profilo.js';
 import History from './Pagine/History.js';
 import Registrazione from './Pagine/Registrazione.js';
@@ -36,7 +36,8 @@ function Accesso({ navigation }) {
       setconnesso(dati.connesso);
       if(dati.connesso==true){
         navigation.navigate('Hugo', {
-          Id_Utente:dati.Id_User
+          Id_Utente:dati.Id_User,
+          Nominativo:dati.Nominativo    
         });
       }
     }
@@ -127,15 +128,17 @@ function Accesso({ navigation }) {
                           richiesta(datiaccesso,'apiHugo').then((json) => {
                             if(json.ok) {
                               var Id_User=json.dati.Id;
+                              var Nominativo=json.dati.Nominativo;
                               connesso=true;
                               setconnesso(connesso);
                               try {
                                 AsyncStorage.setItem('@Id_User', Id_User);
+                                AsyncStorage.setItem('@Nominativo', Nominativo);
                               } catch (e) {
                                 console.log(e);
                               }
                               navigation.navigate('Hugo', {
-                                Id_Utente: Id_User
+                                Id_Utente: Id_User,Nominativo:Nominativo
                               });
                             } else {
                               alert("Dati errati");
