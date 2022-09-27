@@ -323,7 +323,7 @@ export default function Hugo({ navigation, route }) {
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Ritiri e acquisti supermercati esclusi 4,99€" value="0" />
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Acquisti supermercati da 4,99 a 7,99€ (7,99 consegna veloce  4,99 dopo 4 ore)" value="1" />
                   <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Hugo ti accompagna 11,99€" value="2" />
-                  <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" />
+                  {/* <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" /> */}
                 </RadioButton.Group>
               </View>
               <View style={[{ flexDirection: 'row', paddingStart:15 },ss.centro,ss.mt15]}>

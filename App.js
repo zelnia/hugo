@@ -86,7 +86,15 @@ function Accesso({ navigation }) {
                   
                   <TouchableOpacity
                     onPress={async ()=>{
-                      navigation.navigate('Hugo');
+                      try {
+                        let idutente= await getData("@Id_User");
+                        let nom= await getData("@Nominativo");
+                        navigation.navigate('Hugo',{
+                          Id_Utente: idutente,Nominativo:nom
+                        });
+                      } catch (error) {
+                        console.log('error', error);
+                      }
                     }}
                     style={[{ backgroundColor: '#00a1ae'  }, ss.p10, ss.w100, ss.centro]}>
                     <Text style={{ fontSize: 20, color: '#fff' }}>Torna indietro</Text>

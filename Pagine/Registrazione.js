@@ -4,6 +4,7 @@ import Footer from '../struttura/Footer.js';
 import React, { useState, useEffect, useRef } from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
+import {richiesta,getLocal,getData} from '../struttura/Utils.js';
 
 export default function Registrazione({ navigation, route }) {
 
@@ -40,6 +41,45 @@ export default function Registrazione({ navigation, route }) {
   const [citta2, setcitta2] = useState('');
   const [provincia2, setprovincia2] = useState('');
   const [cap2, setcap2] = useState('');
+
+
+  async function inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,Note_Indirizzo,telefono){
+    try {
+      let richiestaregistrazione= {
+        "Operazione":'Registrazione',
+        "nome":nome,
+        "email":email,
+        "pwd":pwd,
+        "indirizzo":indirizzo,
+        "civico":civico,
+        "citta":citta,
+        "provincia":provincia,
+        "cap":cap,
+        "note":note,
+        "Note_Indirizzo":Note_Indirizzo,
+        "telefono":telefono
+      }
+      let checkgo=true;
+      let errore="";
+      if(indirizzo==""){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
+      if(citta==""){checkgo=false,errore+="Per favore scegli un citta. \r\n"}
+      if(email==""){checkgo=false,errore+="Per favore scegli un email. \r\n"}
+      if(checkgo){
+        console.log("TUTTO OK");
+        let Reguistrazione=await richiesta(richiestaregistrazione);
+        if(Reguistrazione.risposta=="registrazione_avvenuta"){
+          alert("Registrazione riuscita");
+          navigation.navigate('Accesso')
+        }
+        console.log(Reguistrazione);
+      } else {
+        alert(errore);
+      }
+      console.log('richiestaregistrazione', richiestaregistrazione);
+    } catch (error) {
+      console.log('errore: ', error);
+    }
+  }
 
     return (
       <Provider>
@@ -153,7 +193,7 @@ export default function Registrazione({ navigation, route }) {
                     }}
                     value={telefono ?? ""}
                   />
-                  <Button mode="outlined"  style={[ss.w100,ss.mt15]}>Invia sms di conferma</Button>
+                  {/* <Button mode="outlined"  style={[ss.w100,ss.mt15]}>Invia sms di conferma</Button>
                   <TextInput
                     style={[ss.w100,ss.mt15]}
                     label="Codice conferma"
@@ -161,8 +201,8 @@ export default function Registrazione({ navigation, route }) {
                       setconferma(conferma)
                     }}
                     value={conferma ?? ""}
-                  />
-                  <Button onPress={showDialog}  mode="outlined"  style={[ss.w100,ss.mt15]}>Dati fatturazione</Button>
+                  /> */}
+                  {/* <Button onPress={showDialog}  mode="outlined"  style={[ss.w100,ss.mt15]}>Dati fatturazione</Button>
                   <Portal>
                     <Dialog visible={visible} onDismiss={hideDialog}>
                       <Dialog.Title>Dati fatturazione</Dialog.Title>
@@ -238,8 +278,10 @@ export default function Registrazione({ navigation, route }) {
                         <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog}>OK</Button>
                       </Dialog.Content>
                     </Dialog>
-                  </Portal> 
-                  <Button mode="contained"  style={[ss.w100,ss.mt15]}>Registrati</Button>
+                  </Portal>  */}
+                  <Button mode="contained"  style={[ss.w100,ss.mt15]}
+                   onPress={() => {inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,note,telefono);}}
+                  >Registrati</Button>
                   <Button icon='arrow-left' onPress={() => {navigation.navigate('Accesso');}} style={[ss.w100,ss.mt15]}>Oppure torna indietro</Button>
                 </View>
               </Surface>

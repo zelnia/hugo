@@ -7,7 +7,7 @@ export default function Footer() {
     const navigation = useNavigation();
     return(
     <View  style={[{ flexDirection: 'row' }]}>
-      <View style={[{ width: '25%'}, ss.centro]}>
+      {/* <View style={[{ width: '25%'}, ss.centro]}>
         <IconButton
           icon="home"
           color='#00a1ae'
@@ -16,8 +16,8 @@ export default function Footer() {
             navigation.navigate('Hugo');
           }}
         />
-      </View>
-      <View style={[{ width: '25%'}, ss.centro]}>
+      </View> */}
+      {/* <View style={[{ width: '25%'}, ss.centro]}>
         <IconButton
           icon="account"
           color='#00a1ae'
@@ -36,7 +36,7 @@ export default function Footer() {
             navigation.navigate('History');
           }}
         />
-      </View>
+      </View> */}
       <View style={[{ width: '25%'}, ss.centro]}>
         <IconButton
           icon="logout"
