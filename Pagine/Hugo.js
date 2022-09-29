@@ -498,7 +498,7 @@ export default function Hugo({ navigation, route }) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        <Footer />
+        <Footer no="home" />
       </SafeAreaView>
     </Provider>
   );

@@ -1,5 +1,7 @@
-import {TouchableOpacity,Text} from 'react-native';
+import {TouchableOpacity,View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Surface, Text } from 'react-native-paper';
+import {ss} from '../struttura/style.js';
 
 const apiroot="https://ristostore.it/Hugo/";
 
@@ -86,4 +88,31 @@ function CollegamentoWeb({desc,url, stili=[], stilitesto=[]}) {
   );
 }
 
-export {CollegamentoWeb,elaboraore,richiesta,getLocal,getData}
+function Grassetto(props) {
+  return(
+      <Text style={[{ fontWeight : 'bold' }, props.stilitesto]}>{props.children}</Text>
+  );
+}
+Grassetto.defaultProps = {etichstilitestoetta: []};
+
+function EtichettaSurface(props) {
+
+  return(
+    <Surface style={[ss.surface1,ss.w100, props.stilisurf]} elevation={4}>
+        {
+          props.etichetta ?
+            <View style={{ flexDirection: 'row'}}>
+              <Text style={[ss.w50]}>{props.etichetta}</Text>
+              <Grassetto stilitesto={[ss.w50]}>{props.children}</Grassetto>
+            </View>
+          :
+            <View>
+              <Grassetto stilitesto={[ss.textcentro]}>{props.children}</Grassetto>
+            </View>
+        }
+    </Surface>
+  );
+}
+EtichettaSurface.defaultProps = {etichetta: false, stilisurf:[ss.mt15]};
+
+export {CollegamentoWeb,elaboraore,richiesta,getLocal,getData,Grassetto,EtichettaSurface}
