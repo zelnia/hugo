@@ -449,7 +449,7 @@ export default function Hugo({ navigation, route }) {
                 :
                   (attivitabase!="no") ?
                     (dispo=="") ?
-                      <View><Text style={{ fontSize: 20 }}>In caricamento...</Text></View>
+                      <View><Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi.</Text></View>
                     :
                       <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
                   :
