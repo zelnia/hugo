@@ -98,19 +98,26 @@ Grassetto.defaultProps = {etichstilitestoetta: []};
 function EtichettaSurface(props) {
 
   return(
-    <Surface style={[ss.surface1,ss.w100, props.stilisurf]} elevation={4}>
-        {
-          props.etichetta ?
-            <View style={{ flexDirection: 'row'}}>
-              <Text style={[ss.w50]}>{props.etichetta}</Text>
-              <Grassetto stilitesto={[ss.w50]}>{props.children}</Grassetto>
-            </View>
-          :
-            <View>
-              <Grassetto stilitesto={[ss.textcentro]}>{props.children}</Grassetto>
-            </View>
-        }
-    </Surface>
+    <View style={ss.w100}>
+      {
+        (props.children!=null && props.children!="") ?
+          <Surface style={[ss.surface1,ss.w100, props.stilisurf]} elevation={4}>
+            {
+              props.etichetta ?
+                <View style={{ flexDirection: 'row'}}>
+                  <Text style={[ss.w50]}>{props.etichetta}</Text>
+                  <Grassetto stilitesto={[ss.w50]}>{props.children}</Grassetto>
+                </View>
+              :
+              <View>
+                <Grassetto stilitesto={[ss.textcentro]}>{props.children}</Grassetto>
+              </View>
+            }
+          </Surface>
+        :
+          null
+      }
+    </View>
   );
 }
 EtichettaSurface.defaultProps = {etichetta: false, stilisurf:[ss.mt15]};
