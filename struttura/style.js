@@ -145,6 +145,12 @@ const ss= StyleSheet.create({
       borderRadius: 5,
       color:"#fff"
     },
+    mt5:{
+      marginTop: 5,
+    },
+    mt50:{
+      marginTop: 50,
+    },
     mt15:{
       marginTop: 15,
     },
@@ -217,6 +223,7 @@ const ss= StyleSheet.create({
     },
     centro: {
       alignItems: 'center',
+      marginHorizontal:'auto'
     },
     item: {
       backgroundColor: "#f7ead7",
