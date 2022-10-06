@@ -202,7 +202,7 @@ export default function Hugo({ navigation, route }) {
                   <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog}>OK</Button>
                 </Dialog.Content>
               </Dialog>
-            </Portal>    
+            </Portal>
             <Button  onPress={showDialog2}  mode="contained"  style={[ss.w100,ss.mt15]}>Scegli indirizzo</Button>
             <Portal>
               <Dialog visible={visible2} onDismiss={hideDialog2}>
