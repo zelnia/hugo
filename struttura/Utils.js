@@ -1,4 +1,4 @@
-import {TouchableOpacity,View} from 'react-native';
+import {TouchableOpacity,View,Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Surface, Text } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
@@ -42,6 +42,12 @@ async function richiesta(oggetto, api='apiHugo',altro=false){
   } catch (e) {
     return e;
   }
+}
+
+function calcolaAltezza(w, h, m=0){
+  const win = Dimensions.get('window');
+  const ratio = (win.width-m) / w;
+  return h*(ratio)
 }
 
 function elaboraore(elencoore){
@@ -122,4 +128,4 @@ function EtichettaSurface(props) {
 }
 EtichettaSurface.defaultProps = {etichetta: false, stilisurf:[ss.mt15]};
 
-export {CollegamentoWeb,elaboraore,richiesta,getLocal,getData,Grassetto,EtichettaSurface}
+export {CollegamentoWeb,elaboraore,richiesta,getLocal,getData,Grassetto,EtichettaSurface,calcolaAltezza}

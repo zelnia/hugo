@@ -11,6 +11,7 @@ import {ss} from './struttura/style.js';
 import {richiesta,getLocal,getData} from './struttura/Utils.js';
 import Profilo from './Pagine/Profilo.js';
 import History from './Pagine/History.js';
+import Preautorizzazione from './Pagine/Preautorizzazione.js';
 import Registrazione from './Pagine/Registrazione.js';
 import Richiesta_NCC from './Pagine/Richiesta_NCC.js';
 import Hugo from './Pagine/Hugo.js';
@@ -152,6 +153,7 @@ function Accesso({ navigation }) {
                                 try {
                                   AsyncStorage.setItem('@Id_User', Id_User);
                                   AsyncStorage.setItem('@Nominativo', Nominativo);
+                                  AsyncStorage.setItem('@Email', Email);
                                 } catch (e) {
                                   console.log(e);
                                 }
@@ -201,6 +203,7 @@ export default function App() {
         <Tab.Screen name="Hugo" component={Hugo}/>
         <Tab.Screen name="Profilo" component={Profilo}/>
         <Tab.Screen name="History" component={History}/>
+        <Tab.Screen name="Preautorizzazione" component={Preautorizzazione}/>
       </Tab.Navigator>
     </NavigationContainer>
   );

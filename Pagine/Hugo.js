@@ -1,13 +1,13 @@
-import {  View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import {  View, TouchableOpacity, SafeAreaView, ScrollView,Image  } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
+import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox,IconButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 
 //Componenti custom
 import {ss} from '../struttura/style.js';
-import {elaboraore,richiesta,getData} from '../struttura/Utils.js';
+import {elaboraore,richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import Footer from '../struttura/Footer.js';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -38,7 +38,34 @@ export default function Hugo({ navigation, route }) {
   const showDialog6 = () => setVisible6(true);
   const hideDialog6 = () => setVisible6(false);
 
+  const [visible7, setVisible7] = React.useState(false);
+  const showDialog7 = () => setVisible7(true);
+  const hideDialog7 = () => setVisible7(false);
+  const [testoinfo, settestoinfo] = useState("");
+
+
+
+
+  function Info({tinfo,stili}){
+    return (
+      <IconButton
+        icon="information"
+        color='#00a1ae'
+        size={20}
+        style={stili}
+        onPress={async () => {
+          settestoinfo(tinfo);
+          console.log("u "+testoinfo);
+          setVisible7(true);
+        }}
+      />
+    )
+  }
+
   // const [checked, setChecked] = React.useState(0);
+  const arrayservizi=[4.90,6.50,14.99,0,14.99,4.90,4.90];
+  const [costogestioneincassi, setcostogestioneincassi] = useState(1);
+  const [totale, settotale] = useState(0);
   const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
   const [descrizioneindirizzo, setdescrizioneindirizzo] = useState("no");
@@ -47,12 +74,15 @@ export default function Hugo({ navigation, route }) {
   const [note, setNote] = useState("");
   const [note2, setNote2] = useState("");
   const [cosa, setCosa] = useState("");
-  const [mancia, setMancia] = useState("no");
+  const [mancia, setMancia] = useState(0);
   const [auto, setAuto] = useState("no");
+  const [opzioniauto, setopzioniauto] = useState("GOrider");
   const [chiamami, setChiamami] = useState(false);
   const [sostiuisci, setSostiuisci] = useState(false);
   const [spesamax, setSpesamax] = useState(0);
   const [oraprenotazione, setora] = useState("no");
+  const [coupon, setcoupon] = useState("");
+  const [duratasosta, setduratasosta] = useState(30);
 
   //NUOVO INDIRIZZO
   const [nuovoindirizzo, setNuovoindirizzo] = useState("");
@@ -66,12 +96,19 @@ export default function Hugo({ navigation, route }) {
   const [dispo, setDispo] = useState('');
   const [indirizzi, setIndirizzi] = useState([]);
   let elencoindirizzi=indirizzi;
-
-  var richestaaggiornamento={
+  
+  const [richestaaggiornamento, setrichestaaggiornamento] = useState({
     "Operazione":'AggiornaHugo',
     "id_attivita_base":attivitabase,
+    "servizio":servizio,
     "iduser":Id_Utente,
-  };
+  });
+  // var richestaaggiornamento={
+  //   "Operazione":'AggiornaHugo',
+  //   "id_attivita_base":attivitabase,
+  //   "servizio":servizio,
+  //   "iduser":Id_Utente,
+  // };
 
   function aggiornaPagina(json){
     if(typeof(json?.dati?.ore)!="undefined") {
@@ -79,7 +116,7 @@ export default function Hugo({ navigation, route }) {
     }
   }
 
-  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione){
+  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon, oraprenotazione){
     try {
       let richiestaprenotazione= {
         "cliente":Id_Utente,
@@ -95,6 +132,7 @@ export default function Hugo({ navigation, route }) {
         "chiamami":chiamami,
         "sostiuisci":sostiuisci,
         "spesamax":spesamax,
+        "coupon":coupon,
         "oraprenotazione":oraprenotazione
       }
       let checkgo=true;
@@ -103,11 +141,57 @@ export default function Hugo({ navigation, route }) {
       if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
       if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
       if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
+      console.log("metodo_pagamento");
+      console.log(metodo_pagamento);
       if(checkgo){
         console.log("TUTTO OK");
-        let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
-        console.log(acquisto);
-        Linking.openURL(acquisto.PaginaAcquisto);
+        switch (metodo_pagamento) {
+          case 0:
+            let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
+            console.log(acquisto);
+            Linking.openURL(acquisto.PaginaAcquisto);
+            break;
+          case "0":
+              let acquisto2=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
+              console.log(acquisto2);
+              Linking.openURL(acquisto2.PaginaAcquisto);
+              break;
+          case "1":
+            let Preautorizzazione = await getData('@Preautorizzazione');
+            let idpagamento = await getData('@idpagamento');
+            console.log('Preautorizzazione', Preautorizzazione);
+            if(Preautorizzazione=="si"){
+              richiestaprenotazione["Operazione"]="AcquistoConPre";
+              richiestaprenotazione["idpagamento"]=idpagamento;
+              let AcquistoConPre=await richiesta(richiestaprenotazione);
+              console.log(AcquistoConPre);
+              if(AcquistoConPre.Risposta=="inserimento_ritiro_riuscito"){
+                alert("Inserimento Riuscito");
+                navigation.navigate('History');
+              }
+              if(typeof(AcquistoConPre.Errore)!=="undefined"){
+                alert(AcquistoConPre.Errore);
+              }
+            } else {
+              alert("Per favore configura la tua carta");
+              navigation.navigate('Preautorizzazione');
+            }
+            break;
+          case 2:
+            richiestaprenotazione["Operazione"]="AcquistoConSaldo";
+            let AcquistoConSaldo=await richiesta(richiestaprenotazione);
+            console.log(AcquistoConSaldo);
+            if(AcquistoConSaldo.Risposta=="inserimento_ritiro_riuscito"){
+              alert("Inserimento Riuscito");
+            }
+            if(AcquistoConSaldo.Errore!=="undefined"){
+              alert(AcquistoConSaldo.Errore);
+            }
+            break;
+        
+          default:
+            break;
+        }
       } else {
         alert(errore);
       }
@@ -142,12 +226,14 @@ export default function Hugo({ navigation, route }) {
         let jattivitabase = await richiesta(richiestaattivitabase);
         setattivitabase(jattivitabase.id_attivita_base);
         setdescrizioneindirizzo(jattivitabase.descrizione_indirizzo);
+        richestaaggiornamento.id_attivita_base=jattivitabase.id_attivita_base;
         let json_res = await richiesta(richestaaggiornamento);
         aggiornaPagina(json_res);
       }
       fetchData();
     }
-  }, [indirizzo]);
+    settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax));
+  }, [indirizzo,servizio,spesamax]);
 
   const MINUTE_MS = 10000;
   useEffect(() => {
@@ -170,17 +256,146 @@ export default function Hugo({ navigation, route }) {
   var adessocondelta = new Date(oggi.getTime() + deltaminuti*60000);
   oggi.setHours( oggi.getHours() + 2 );
 
-  function checkncc(servizio){
-    if(servizio==3){
-      navigation.navigate('Richiesta NCC');
+  
+  const [checkdomani, setcheckdomani] = useState(false);
+  const [testooggidomani, settestooggidomani] = useState("per oggi");
+
+  function checkservizio(servizio){
+    setcheckdomani(false);
+    settestooggidomani("per oggi");
+    switch (servizio) {
+      case '1':
+        setcheckdomani(true);
+        settestooggidomani("per domani");
+        break;
+      case '3':
+        navigation.navigate('Richiesta NCC');
+        break; 
+      default:
+        break;
+    }
+    setServizio(servizio);
+    richestaaggiornamento.servizio=servizio;
+    async ()=> {
+      let json_res = await richiesta(richestaaggiornamento);
+      aggiornaPagina(json_res);
     }
   }
-  // twoCalls = e => {
-  //   this.functionOne(e)
-  //   if(servizio==3){
-  //     navigation.navigate('Ricerca_NCC');
-  //   }
-  // }
+
+  function OpzioniAuto(props) {
+    if(auto==1){
+      return (
+        <View style={[ss.w100,ss.mt15]}>
+          <Divider />
+          <View style={[ss.w100, ss.mt15]}>
+            <Text style={[ss.centro]}>Vuoi usare la tua auto o quella del GOrider?</Text> 
+          </View>
+          <View style={[{ flexDirection: 'row'},ss.mt15,ss.w100]}>
+            <Button onPress={() => {setopzioniauto("GOrider")}} style={[("GOrider" === opzioniauto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"GOrider" === opzioniauto ? ss.labelselected : ss.unselected} mode="outlined">GOrider</Button>
+            <Button onPress={() => {setopzioniauto("Personale");}} style={[("Personale" === opzioniauto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"Personale" === opzioniauto ? ss.labelselected : ss.unselected}   mode="outlined">Personale</Button>
+          </View>
+        </View>
+      );
+    }
+  }
+
+  function MostraOpzioniServizio(props) {
+    if(servizio=="no"){
+      return (
+        <></>
+      );
+    }
+    if(servizio==4){
+      return (
+        <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+          <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Opzioni servizio:</Text> 
+          <View style={{alignItems: 'center' }}>
+            <Text style={[ss.mt10]}>Durata sosta in minuti:</Text> 
+            <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+                <Button onPress={() => {setduratasosta(30);}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
+                <Button onPress={() => {setduratasosta(60);}} style={[(60 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={60 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">60</Button>
+                <Button onPress={() => {setduratasosta(90);}} style={[(90 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={90 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">90</Button>
+                <Button onPress={() => {setduratasosta(120);}} style={[(120 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={120 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">120</Button>
+            </View>
+            <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+                <Button onPress={() => {setduratasosta(150);}} style={[(150 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={150 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">150</Button>
+                <Button onPress={() => {setduratasosta(180);}} style={[(180 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={180 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">180</Button>
+                <Button onPress={() => {setduratasosta(210);}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
+                <Button onPress={() => {setduratasosta(240);}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
+            </View>
+          </View>
+        </Surface>
+      );
+    }
+    if((servizio==0 || servizio==1 || servizio==5)){
+      return (
+        <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
+          <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
+          <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {6}
+              label="Indica cosa acquistare:"
+              mode='outlined'
+              value={cosa}
+              onChangeText={cosa => setCosa(cosa)}
+            />
+          </Surface>
+          <View style={[{ flexDirection: 'row',alignItems: 'center'},ss.mauto,ss.mt10]}>
+            <Info tinfo="Se il prodotto di una marca specificata non è disponibile Hugò provvederà a sostituirlo con il prodotto più simile di un'altra marca" />
+            <Text style={{ fontWeight: 'bold' }}>Sostituisci prodotti</Text>
+            <Checkbox
+              status={sostiuisci ? 'checked' : 'unchecked'}
+              onPress={() => {
+                setSostiuisci(!sostiuisci);
+              }}
+            />
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width:"60%", flexDirection: 'row'}}>
+              <Info tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: l'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
+              La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Spesa massima</Text> 
+            </View>
+            <View style={{ width:"40%"}}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(spesamax) => {
+                  setSpesamax(spesamax)
+                }}
+                value={spesamax ?? ""}
+                style={{ height:32}}
+              />
+            </View>
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row',width:"60%"}}>
+              <Info tinfo="Imndica un codice coupon per risparmiare ulteriormente" />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+            </View>
+            <View style={{ width:"40%"}}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(coupon) => {
+                  setcoupon(coupon)
+                }}
+                value={coupon ?? ""}
+                style={{ height:32}}
+              />
+            </View>
+          </View>
+        </Surface>
+      );
+    }
+  }
+
+
   return (
     <Provider>
       <SafeAreaView style={ss.safeareaview}>
@@ -316,35 +531,69 @@ export default function Hugo({ navigation, route }) {
               </Dialog>
             </Portal>    
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-              <Text style={[ss.h1,ss.mt15]}>Scegli un servizio:</Text>
+              
+              <View style={{ flexDirection: 'row'}}>
+                <Text style={[ss.h1,ss.mt15]}>Scegli un servizio:</Text>
+              </View>
               <View style={ss.mt15}>
-                {/* // servizio => setServizio(servizio) */}
-                <RadioButton.Group onValueChange={servizio => { setServizio(servizio); checkncc(servizio) }} value={servizio}>
-                  <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Ritiri e acquisti supermercati esclusi 4,99€" value="0" />
-                  <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Acquisti supermercati da 4,99 a 7,99€ (7,99 consegna veloce  4,99 dopo 4 ore)" value="1" />
-                  <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Hugo ti accompagna 11,99€" value="2" />
+                {/* // servizio => setServizio(servizio) setServizio(servizio); */}
+                <RadioButton.Group onValueChange={servizio => {checkservizio(servizio);}} value={servizio}>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò ti ritira per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa ritirare e dove farlo." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={"Ritiro "+arrayservizi[6].toFixed(2)+"€"} value="6" />
+                    </View>
+                  </View>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò ti ritira o acquista per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa deve ritirare o acquistare. Se vuoi indicagli anche dove acquistare." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={"Acquisti "+arrayservizi[0].toFixed(2)+"€"} value="0" />
+                    </View>
+                  </View>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati con un massimo di 5 prodotti e un limite per le bevande di 1 cassa." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Acquisti supermercati con consegna veloce max 5 prodotti "+arrayservizi[5].toFixed(2)+"€"} value="5" />
+                    </View>
+                  </View>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati. Nota bene: le quantità sono illimitate tranne che per le bevande con un massimo di 2 casse. " stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Acquisti supermercati con consegna domani "+arrayservizi[1].toFixed(2)+"€"} value="1" />
+                    </View>
+                  </View>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio non prevede la sosta)." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Hugo ti accompagna senza sosta "+arrayservizi[2].toFixed(2)+"€"} value="2" />
+                    </View>
+                  </View>
+                  <View style={[{ flexDirection: 'row'},ss.w100]}>
+                    <View style={{ width:"5%"}}>
+                      <Info tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio prevede la sosta con un supplemento, scegli quante ore deve aspettarti)." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                    </View>
+                    <View style={{ width:"95%"}}>
+                      <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Hugo ti accompagna con sosta "+arrayservizi[4].toFixed(2)+"€"} value="4" />
+                    </View>
+                  </View>
+
                   {/* <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" /> */}
                 </RadioButton.Group>
               </View>
-              <View style={[{ flexDirection: 'row', paddingStart:15 },ss.centro,ss.mt15]}>
-                <Text style={ss.w50}>E' necessario un auto per questo servizio?</Text> 
-                <Button onPress={() => {1 === auto ? setAuto("no"): setAuto(1);}} style={[(1 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === auto ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
-                <Button onPress={() => {0 === auto ? setAuto("no"): setAuto(0);}} style={[(0 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={0 === auto ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
-              </View>
-            </Surface>
-            <Surface style={[ss.surface1,ss.mt15, ss.w100]} elevation={4}>
-              {/* <Text style={[styles.h1,styles.mt15]}>Indica cosa acquistare:</Text> */}
-                <TextInput
-                  multiline = {true}
-                  numberOfLines = {6}
-                  label="Indica cosa acquistare:"
-                  mode='outlined'
-                  value={cosa}
-                  onChangeText={cosa => setCosa(cosa)}
-                />
             </Surface>
             
-            <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Dove acquistare</Button>
+            <MostraOpzioniServizio />
+            <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Dove andare</Button>
             <Portal>
               <Dialog visible={visible4} onDismiss={hideDialog4}>
                 <Dialog.Title>Dove acquistare</Dialog.Title>
@@ -361,54 +610,35 @@ export default function Hugo({ navigation, route }) {
               </Dialog>
             </Portal> 
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width:"40%", flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{ fontWeight: 'bold' }}>Chiamami</Text>
-                  <Checkbox
-                    status={chiamami ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setChiamami(!chiamami);
-                    }}
-                  />
-                </View>
-                <View style={{ width:"60%", flexDirection: 'row', alignItems: 'center', justifyContent: "flex-end"}}>
-                  <Text>Sostituisci prodotti</Text>
-                  <Checkbox
-                    status={sostiuisci ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setSostiuisci(!sostiuisci);
-                    }}
-                  />
-                </View>
+              <View style={[{flexDirection: 'row', alignItems: 'center'},ss.w100,ss.textcentro]}>
+                <Info tinfo="Hugà ti chiamerà in caso di dubbi, prodotto mancante o per chiederti ulteriori dettagli." />
+                <Text style={{ fontWeight: 'bold' }}>Chiamami</Text>
+                <Checkbox
+                  status={chiamami ? 'checked' : 'unchecked'}
+                  onPress={() => {
+                    setChiamami(!chiamami);
+                  }}
+                />
               </View>
               <View  style={[ss.p3,ss.w100]}>
                 <Divider />
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width:"60%"}}>
-                  <Text style={{ fontWeight: 'bold' }}>Spesa massima</Text> 
-                </View>
-                <View style={{ width:"40%"}}>
-                  <TextInput
-                    textAlign={'center'}
-                    onChangeText={(spesamax) => {
-                      setSpesamax(spesamax)
-                    }}
-                    value={spesamax ?? ""}
-                    style={{ height:32}}
-                  />
-                </View>
-              </View>
-              <View  style={[ss.p3,ss.w100]}>
-                <Divider />
-              </View>
-              <View style={[{ flexDirection: 'row' },ss.centro]}>
+              <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
                 <Text style={ss.w20}>Mancia</Text> 
                 <Button onPress={() => {1 === mancia ? setMancia("no"): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
                 <Button  onPress={() => {2 === mancia ? setMancia("no"): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
                 <Button onPress={() => {5 === mancia ? setMancia("no"): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
                 <Button onPress={() => {10 === mancia ? setMancia("no"): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
               </View>
+              <View  style={[ss.p3,ss.w100]}>
+                <Divider />
+              </View>
+              <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+                <Text style={[ss.w50,ss.pe5]}>E' necessaria un auto per questo servizio?</Text> 
+                <Button onPress={() => {1 === auto ? setAuto("no"): setAuto(1);}} style={[(1 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === auto ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+                <Button onPress={() => {0 === auto ? setAuto("no"): setAuto(0);}} style={[(0 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={0 === auto ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
+              </View>
+              <OpzioniAuto /> 
             </Surface>
 
                 
@@ -416,29 +646,49 @@ export default function Hugo({ navigation, route }) {
               {
                 (typeof(dispo)!="undefined" && dispo.length) ?
                   <View>
-                    <Text style={{ fontSize: 20 }}>Scegli un orario:</Text>
-                    <View style={ss.mt15}>
+                    <View style={{ flexDirection: 'row'}}>
+                      <Info tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
+                      <Text style={[{ fontSize: 20 },ss.mt5]}>Scegli un orario {testooggidomani}:</Text>
+                    </View>
+                    <View>
                       {
                         dispo.map((Ora, index) => (
                           <View style={[{ flexDirection: 'row', justifyContent:'flex-end' }]} key={index}>
                             {
                               Ora[1].map((Ora2, index2) => (
-                                ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
-                                  <TouchableOpacity
-                                    key={index+"-"+index2}
-                                    onPress={() => {
-                                      setora(Ora2)
-                                    }}
-                                    style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
-                                  >
-                                    <Text style={[{ fontSize: 18 }, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
-                                  </TouchableOpacity>
+                                ! checkdomani ?
+                                  ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
+                                    <TouchableOpacity
+                                      key={index+"-"+index2}
+                                      onPress={() => {
+                                        setora(Ora2)
+                                      }}
+                                      style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
+                                    >
+                                      <Text style={[{ fontSize: 18 }, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
+                                    </TouchableOpacity>
+                                  :
+                                    <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
+                                    key={index+"no"+index2}>
+                                      <Text style={{ fontSize: 18 }}>     </Text>
+                                    </View>
                                 :
-                                  
-                                  <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
-                                  key={index+"no"+index2}>
-                                    <Text style={{ fontSize: 18 }}>     </Text>
-                                  </View>
+                                  (Ora2!="No") ?
+                                    <TouchableOpacity
+                                      key={index+"-"+index2}
+                                      onPress={() => {
+                                        setora(Ora2)
+                                      }}
+                                      style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
+                                    >
+                                      <Text style={[{ fontSize: 18 }, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
+                                    </TouchableOpacity>
+                                  :
+                                    <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
+                                    key={index+"no"+index2}>
+                                      <Text style={{ fontSize: 18 }}>     </Text>
+                                    </View>
+
                               ))
                             }
                           </View>
@@ -463,8 +713,8 @@ export default function Hugo({ navigation, route }) {
                 <Dialog.Content>
                   <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
                     <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
-                    {/* <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna" value="1" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" /> */}
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna" value="1" />
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" /> 
                   </RadioButton.Group>
                   <Button  style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog5}>OK</Button>
                 </Dialog.Content>
@@ -486,6 +736,11 @@ export default function Hugo({ navigation, route }) {
                 </Dialog.Content>
               </Dialog>
             </Portal> 
+            <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+              <Text style={ss.h2}>Totale: </Text>
+              <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{totale.toFixed(2)}</Text>
+              <Text style={ss.h2}> €</Text>
+            </Surface>
             <TouchableOpacity
               onPress={
                 () => {
@@ -496,7 +751,23 @@ export default function Hugo({ navigation, route }) {
               style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
               <Text style={{ fontSize: 20, color: '#fff' }}>INVIA</Text>
             </TouchableOpacity>
+            <Image
+              style={[{height: calcolaAltezza(630,430,60)}, ss.w100, ss.mt15]} 
+              source={{
+                uri: 'https://ristostore.it/lib/bootstrap/css/Immagini/bannerhugo.jpg',
+              }}
+            />
           </View>
+          <Portal>
+            <Dialog visible={visible7} onDismiss={hideDialog7}>
+              <Dialog.Title>Info</Dialog.Title>
+              <Dialog.Content>
+                <Text>
+                  {testoinfo}
+                </Text>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
         </ScrollView>
         <Footer no="home" />
       </SafeAreaView>

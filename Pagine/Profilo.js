@@ -1,5 +1,6 @@
 import {ss} from '../struttura/style.js';
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-native-paper';
 import Footer from '../struttura/Footer.js';
 import { Surface, Text, Divider } from 'react-native-paper';
 import {SafeAreaView, ScrollView, View} from 'react-native';
@@ -22,7 +23,7 @@ export default function Profilo({ navigation, route }) {
       setindirizzi(JSON.parse(datiutente.Indirizzi));
     }
     fetchData();
-  }, [utente]);
+  }, []);
 
     return (
       <SafeAreaView style={ss.safeareaview}>
@@ -51,6 +52,9 @@ export default function Profilo({ navigation, route }) {
                 </Surface>
               ))
             }
+          </View>
+          <View style={[ss.centro]}>
+            <Button onPress={async () => {navigation.navigate('Preautorizzazione');}}  mode="contained"  style={[ss.w100]}>Imposta Preautorizzazione</Button>
           </View>
         </ScrollView>
         <Footer no="profilo"/>

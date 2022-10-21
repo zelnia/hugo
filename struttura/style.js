@@ -66,6 +66,9 @@ const ss= StyleSheet.create({
       resizeMode: 'contain',
       flex: 1
     },
+    cardField:{
+      height: 50,
+    },
     container: {
       flex: 1,
       backgroundColor: '#f5f5f5',
@@ -145,11 +148,17 @@ const ss= StyleSheet.create({
       borderRadius: 5,
       color:"#fff"
     },
+    mx0:{
+      marginHorizontal: 0,
+    },
     mt5:{
       marginTop: 5,
     },
     mt50:{
       marginTop: 50,
+    },
+    mt10:{
+      marginTop: 10,
     },
     mt15:{
       marginTop: 15,
@@ -162,6 +171,12 @@ const ss= StyleSheet.create({
     },
     px15:{
       paddingHorizontal: 15,
+    },
+    px5:{
+      paddingHorizontal: 5,
+    },
+    pe5:{
+      paddingEnd: 5,
     },
     py10:{
       paddingVertical: 10,
@@ -178,8 +193,12 @@ const ss= StyleSheet.create({
     p5:{
       padding: 5,
     },
+    hextra: {
+      fontSize: 36, 
+      color: '#00a1ae'
+    },
     h1: {
-      fontSize: 20, 
+      fontSize: 22, 
       color: '#00a1ae'
     },
     h2: {
@@ -241,7 +260,8 @@ const ss= StyleSheet.create({
       color:"#fff"
     },
     textcentro: {
-      textAlign:"center"
+      textAlign:"center",
+      justifyContent:"center"
     },
     loading: {
       position: 'absolute',
@@ -257,6 +277,10 @@ const ss= StyleSheet.create({
       padding: 8,
       alignItems: 'stretch',
       justifyContent: 'space-between',
+      borderRadius: 10,
+    },
+    surface2: {
+      padding: 8,
       borderRadius: 10,
     },
     selected: {

@@ -38,7 +38,16 @@
       "eas": {
         "projectId": "e420a5af-b795-43df-851a-b4c8d549a672"
       }
-    }
+    },    
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "com.ristoapps.hugo",
+          "enableGooglePay": true
+        }
+      ]
+    ]
   },
   "name": "Hugò Personal Shopper"
 }
