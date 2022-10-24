@@ -21,7 +21,7 @@ import LogIn from './Pagine/LogIn.js';
 
 
 const Tab = createBottomTabNavigator();
-const numeroversione=10001; //parametro aggiornamento
+const numeroversione=10005; //parametro aggiornamento
 var connesso=false;
 
 function Accesso({ navigation }) {
