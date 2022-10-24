@@ -55,10 +55,34 @@ export default function Hugo({ navigation, route }) {
         style={stili}
         onPress={async () => {
           settestoinfo(tinfo);
-          console.log("u "+testoinfo);
           setVisible7(true);
         }}
       />
+    )
+  }
+  function RadioServizio({id,etichetta,info,costo}){
+    return (
+      <View style={[{ flexDirection: 'row'},ss.w100]}>
+        <View style={{ width:"5%"}}>
+          <Info tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        </View>
+        <View style={{ width:"95%"}}>
+          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta+" "+costo.toFixed(2)+"€"} value={id} />
+        </View>
+    </View>
+    )
+  }
+
+  function RadioMetodo({id,etichetta,info}){
+    return (
+      <View style={[{ flexDirection: 'row'},ss.w100]}>
+        <View style={{ width:"5%"}}>
+          <Info tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        </View>
+        <View style={{ width:"95%"}}>
+          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta} value={id} />
+        </View>
+      </View>
     )
   }
 
@@ -82,7 +106,7 @@ export default function Hugo({ navigation, route }) {
   const [spesamax, setSpesamax] = useState(0);
   const [oraprenotazione, setora] = useState("no");
   const [coupon, setcoupon] = useState("");
-  const [duratasosta, setduratasosta] = useState(30);
+  const [duratasosta, setduratasosta] = useState(0);
 
   //NUOVO INDIRIZZO
   const [nuovoindirizzo, setNuovoindirizzo] = useState("");
@@ -95,6 +119,7 @@ export default function Hugo({ navigation, route }) {
 
   const [dispo, setDispo] = useState('');
   const [indirizzi, setIndirizzi] = useState([]);
+  const [listaservizi, setlistaservizi] = useState([]);
   let elencoindirizzi=indirizzi;
   
   const [richestaaggiornamento, setrichestaaggiornamento] = useState({
@@ -141,30 +166,23 @@ export default function Hugo({ navigation, route }) {
       if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
       if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
       if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
-      console.log("metodo_pagamento");
-      console.log(metodo_pagamento);
       if(checkgo){
-        console.log("TUTTO OK");
         switch (metodo_pagamento) {
           case 0:
             let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
-            console.log(acquisto);
             Linking.openURL(acquisto.PaginaAcquisto);
             break;
           case "0":
               let acquisto2=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
-              console.log(acquisto2);
               Linking.openURL(acquisto2.PaginaAcquisto);
               break;
           case "1":
             let Preautorizzazione = await getData('@Preautorizzazione');
             let idpagamento = await getData('@idpagamento');
-            console.log('Preautorizzazione', Preautorizzazione);
             if(Preautorizzazione=="si"){
               richiestaprenotazione["Operazione"]="AcquistoConPre";
               richiestaprenotazione["idpagamento"]=idpagamento;
               let AcquistoConPre=await richiesta(richiestaprenotazione);
-              console.log(AcquistoConPre);
               if(AcquistoConPre.Risposta=="inserimento_ritiro_riuscito"){
                 alert("Inserimento Riuscito");
                 navigation.navigate('History');
@@ -180,7 +198,6 @@ export default function Hugo({ navigation, route }) {
           case 2:
             richiestaprenotazione["Operazione"]="AcquistoConSaldo";
             let AcquistoConSaldo=await richiesta(richiestaprenotazione);
-            console.log(AcquistoConSaldo);
             if(AcquistoConSaldo.Risposta=="inserimento_ritiro_riuscito"){
               alert("Inserimento Riuscito");
             }
@@ -195,7 +212,6 @@ export default function Hugo({ navigation, route }) {
       } else {
         alert(errore);
       }
-      console.log('richiestaprenotazione', richiestaprenotazione);
     } catch (error) {
       console.log('errore: ', error);
     }
@@ -204,12 +220,12 @@ export default function Hugo({ navigation, route }) {
   useEffect(() => {
     async function fetchData() {
       let Id_User = await getData('@Id_User');
-      let richiestaindi={
-        "Operazione":'getIndirizzi',
-        "Id_User":Id_User,
-      }
+      let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+      let richiestaservizi={"Operazione":'getServizi',"Id_User":Id_User}
       let listaindirizzi = await richiesta(richiestaindi,'apiHugo');
       setIndirizzi(listaindirizzi);
+      let elencoservizi = await richiesta(richiestaservizi,'apiHugo');
+      setlistaservizi(elencoservizi);
       let json_res = await richiesta(richestaaggiornamento);
       aggiornaPagina(json_res);
     }
@@ -232,8 +248,8 @@ export default function Hugo({ navigation, route }) {
       }
       fetchData();
     }
-    settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax));
-  }, [indirizzo,servizio,spesamax]);
+    settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5));
+  }, [indirizzo,servizio,spesamax,duratasosta]);
 
   const MINUTE_MS = 10000;
   useEffect(() => {
@@ -263,13 +279,17 @@ export default function Hugo({ navigation, route }) {
   function checkservizio(servizio){
     setcheckdomani(false);
     settestooggidomani("per oggi");
+    setduratasosta(0);
     switch (servizio) {
-      case '1':
+      case 1:
         setcheckdomani(true);
         settestooggidomani("per domani");
         break;
-      case '3':
+      case 3:
         navigation.navigate('Richiesta NCC');
+        break; 
+      case 4:
+        setduratasosta(30);
         break; 
       default:
         break;
@@ -323,6 +343,11 @@ export default function Hugo({ navigation, route }) {
                 <Button onPress={() => {setduratasosta(210);}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
                 <Button onPress={() => {setduratasosta(240);}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
             </View>
+            <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+              <Text style={ss.h2}>Costo sosta: </Text>
+              <Text style={[{ fontWeight: 'bold' }, ss.h2]}>{(duratasosta/30*5).toFixed(2)}</Text>
+              <Text style={ss.h2}> €</Text>
+            </Surface>
           </View>
         </Surface>
       );
@@ -393,6 +418,23 @@ export default function Hugo({ navigation, route }) {
         </Surface>
       );
     }
+    if((servizio==6)){
+      return (
+        <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
+          <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
+          <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {6}
+              label="Indica cosa ritirare:"
+              mode='outlined'
+              value={cosa}
+              onChangeText={cosa => setCosa(cosa)}
+            />
+          </Surface>
+        </Surface>
+      );
+    }
   }
 
 
@@ -401,13 +443,16 @@ export default function Hugo({ navigation, route }) {
       <SafeAreaView style={ss.safeareaview}>
         <ScrollView>
           <View style={ss.container}>
-            <Surface style={[ss.surface1,ss.mb15,ss.centro,ss.w100]} elevation={4}>
-              <Text style={ss.h1}>Ue' {Nominativo} Ciao!</Text>
-              <Text style={ss.h2}>Cosa posso portarti oggi?</Text>
-              <Text style={ss.h2}>Dove posso accompagnarti?</Text>
-              <Text style={[ss.h2,ss.centro]}>Per piacere inserisci più dettagli possibili:</Text>
-              <Text style={ss.h2}>mi faciliteresti il compito.</Text>
-            </Surface>
+            <View style={[{ flexDirection: 'row',alignItems:"center"},ss.w100]}>
+              <Image source={require('../assets/omino.png')} style={[{height: calcolaAltezza(300,453,10,25)},ss.w25]}  />
+              <Surface style={[ss.surface1,ss.mb15,ss.centro,ss.w75]} elevation={4}>
+                <Text style={ss.h1}>{Nominativo} Ciao!</Text>
+                <Text style={ss.h2}>Cosa posso portarti oggi?</Text>
+                <Text style={ss.h2}>Dove posso accompagnarti?</Text>
+                <Text style={[ss.h2,ss.textcentro]}>Per piacere inserisci più dettagli possibili:</Text>
+                <Text style={ss.h2}>mi faciliteresti il compito.</Text>
+              </Surface>
+            </View>
             <Button onPress={showDialog}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
             <Portal>
               <Dialog visible={visible} onDismiss={hideDialog}>
@@ -418,7 +463,7 @@ export default function Hugo({ navigation, route }) {
                 </Dialog.Content>
               </Dialog>
             </Portal>
-            <Button  onPress={showDialog2}  mode="contained"  style={[ss.w100,ss.mt15]}>Scegli indirizzo</Button>
+            <Button  onPress={showDialog2}  mode="contained"  style={[ss.w100,ss.mt15]}>Scegli indirizzo di consegna</Button>
             <Portal>
               <Dialog visible={visible2} onDismiss={hideDialog2}>
                 <Dialog.Title>Scegli indirizzo</Dialog.Title>
@@ -538,6 +583,16 @@ export default function Hugo({ navigation, route }) {
               <View style={ss.mt15}>
                 {/* // servizio => setServizio(servizio) setServizio(servizio); */}
                 <RadioButton.Group onValueChange={servizio => {checkservizio(servizio);}} value={servizio}>
+                  {
+                    listaservizi.map((s, index) => (
+                      s["attivo"] ?
+                        <RadioServizio info={s["info"]} id={index} etichetta={s["etichetta"]} costo={s["costo"]} key={"ser"+index}/>
+                      :
+                        null
+                    ))
+                  }
+                </RadioButton.Group>
+                {/* <RadioButton.Group onValueChange={servizio => {checkservizio(servizio);}} value={servizio}>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
                       <Info tinfo="Hugò ti ritira per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa ritirare e dove farlo." stili={[ss.mt15,ss.w100,ss.mx0]} />
@@ -548,7 +603,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò ti ritira o acquista per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa deve ritirare o acquistare. Se vuoi indicagli anche dove acquistare." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info tinfo="Hugò acquista per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa deve ritirare o acquistare. Se vuoi indicagli anche dove acquistare." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={"Acquisti "+arrayservizi[0].toFixed(2)+"€"} value="0" />
@@ -587,16 +642,16 @@ export default function Hugo({ navigation, route }) {
                     </View>
                   </View>
 
-                  {/* <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" /> */}
-                </RadioButton.Group>
+                  <RadioButton.Item style={ss.bordomare} label="Servizio Taxi con conducente NCC su richiesta" value="3" /> 
+                </RadioButton.Group> */}
               </View>
             </Surface>
             
             <MostraOpzioniServizio />
-            <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Dove andare</Button>
+            <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Se vuoi indicami dove andare</Button>
             <Portal>
               <Dialog visible={visible4} onDismiss={hideDialog4}>
-                <Dialog.Title>Dove acquistare</Dialog.Title>
+                <Dialog.Title>Se vuoi indicami dove andare</Dialog.Title>
                 <Dialog.Content>
                   <TextInput
                     multiline = {true}
@@ -686,7 +741,7 @@ export default function Hugo({ navigation, route }) {
                                   :
                                     <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
                                     key={index+"no"+index2}>
-                                      <Text style={{ fontSize: 18 }}>     </Text>
+                                      <Text style={{ fontSize: 18 }}>   </Text>
                                     </View>
 
                               ))
@@ -706,20 +761,6 @@ export default function Hugo({ navigation, route }) {
                   <View><Text style={{ fontSize: 20 }}>Seleziona un indirizzo per vedere le nostre disponibilità</Text></View>
               }
             </Surface>
-            <Button onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento</Button>
-            <Portal>
-              <Dialog visible={visible5} onDismiss={hideDialog5}>
-                <Dialog.Title>Scegli il metodo di pagamento</Dialog.Title>
-                <Dialog.Content>
-                  <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna" value="1" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" /> 
-                  </RadioButton.Group>
-                  <Button  style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog5}>OK</Button>
-                </Dialog.Content>
-              </Dialog>
-            </Portal> 
             <Button onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note</Button>
             <Portal>
               <Dialog visible={visible3} onDismiss={hideDialog3}>
@@ -741,10 +782,27 @@ export default function Hugo({ navigation, route }) {
               <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{totale.toFixed(2)}</Text>
               <Text style={ss.h2}> €</Text>
             </Surface>
+            
+            <Button onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento</Button>
+            <Portal>
+              <Dialog visible={visible5} onDismiss={hideDialog5}>
+                <Dialog.Title>Scegli il metodo di pagamento</Dialog.Title>
+                <Dialog.Content>
+                  <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
+                    {/* <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna con preautorizzazione" value="1" />
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" />  */}
+                    <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" />
+                    <RadioMetodo id="1" etichetta="Contanti alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
+                    <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
+                  </RadioButton.Group>
+                  <Button  style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog5}>OK</Button>
+                </Dialog.Content>
+              </Dialog>
+            </Portal> 
             <TouchableOpacity
               onPress={
                 () => {
-                  // console.log("test");
                   inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione);
                 }
               }

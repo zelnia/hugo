@@ -65,17 +65,14 @@ export default function Registrazione({ navigation, route }) {
       if(citta==""){checkgo=false,errore+="Per favore scegli un citta. \r\n"}
       if(email==""){checkgo=false,errore+="Per favore scegli un email. \r\n"}
       if(checkgo){
-        console.log("TUTTO OK");
         let Reguistrazione=await richiesta(richiestaregistrazione);
         if(Reguistrazione.risposta=="registrazione_avvenuta"){
           alert("Registrazione riuscita");
           navigation.navigate('Accesso')
         }
-        console.log(Reguistrazione);
       } else {
         alert(errore);
       }
-      console.log('richiestaregistrazione', richiestaregistrazione);
     } catch (error) {
       console.log('errore: ', error);
     }

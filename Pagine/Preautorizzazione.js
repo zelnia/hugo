@@ -4,6 +4,7 @@ import { Button,TextInput } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
 import {richiesta,getData} from '../struttura/Utils.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Footer from '../struttura/Footer.js';
 
 export default function Preautorizzazione({ navigation, route }) {
     const [nominativo, setnominativo] = useState('');
@@ -36,9 +37,7 @@ export default function Preautorizzazione({ navigation, route }) {
             if(mscadenza==""){checkgo=false,errore+="Per inserisci il mese di scadenza. \r\n"}
             if(ascadenza==""){checkgo=false,errore+="Per inserisci l'anno di scadenza. \r\n"}
             if(checkgo){
-                console.log("TUTTO OK");
                 let Preautorizzazione=await richiesta(richiestapreauth);
-                console.log(Preautorizzazione);
                 if(Preautorizzazione.Risposta=="Dati_Registrati"){
                     alert("Preautorizzazione effettuata");
                     try {
@@ -58,7 +57,6 @@ export default function Preautorizzazione({ navigation, route }) {
             } else {
                 alert(errore);
             }
-            console.log('richiestapreauth', richiestapreauth);
         } catch (error) {
           console.log('errore: ', error);
         }
@@ -107,6 +105,7 @@ export default function Preautorizzazione({ navigation, route }) {
                 value={ascadenza ?? ""}
             />
             <Button onPress={() => registracarta(nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
+            <Footer no="profilo"/>
         </View>
     );
 }

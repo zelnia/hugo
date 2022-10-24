@@ -44,17 +44,17 @@ async function richiesta(oggetto, api='apiHugo',altro=false){
   }
 }
 
-function calcolaAltezza(w, h, m=0){
+function calcolaAltezza(w, h, m=0,p=100){
   const win = Dimensions.get('window');
-  const ratio = (win.width-m) / w;
+  const ratio = ((win.width/100*p)-m) / w;
   return h*(ratio)
 }
 
 function elaboraore(elencoore){
-  var arrayore=[];
+  let arrayore=[];
   for (let index = 0; index < elencoore.length; index++) {
-    var chiave=elencoore[index]["OraH"];
-    if(typeof(arrayore[elencoore[index]["OraH"]])=="undefined"){
+    var chiave=(elencoore[index]["OraH"].charAt(0)=="0"?elencoore[index]["OraH"].substring(1):elencoore[index]["OraH"]);
+    if(typeof(arrayore[chiave])=="undefined"){
       let bersaglio=elencoore[index]["Ora"];
       arrayore[chiave]=[];
       arrayore[chiave].push(bersaglio);

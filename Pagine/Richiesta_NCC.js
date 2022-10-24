@@ -63,7 +63,6 @@ export default function Richiesta_NCC({ navigation, route }) {
                           data={mesi}
                           onSelect={(selectedItem, index) => {
                             setmeseSelected(selectedItem);
-                            console.log(selectedItem, index)
                           }}
                           buttonTextAfterSelection={(selectedItem, index) => {
                             // text represented after item is selected

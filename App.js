@@ -15,6 +15,8 @@ import Preautorizzazione from './Pagine/Preautorizzazione.js';
 import Registrazione from './Pagine/Registrazione.js';
 import Richiesta_NCC from './Pagine/Richiesta_NCC.js';
 import Hugo from './Pagine/Hugo.js';
+import LogOut from './Pagine/LogOut.js';
+import LogIn from './Pagine/LogIn.js';
 
 
 
@@ -79,13 +81,14 @@ function Accesso({ navigation }) {
                             "Operazione":'LogOut',
                             "Id_User":Id_User,
                           },'apiHugo')
-                          .then((json) => {console.log('json', json)});
-                          await AsyncStorage.clear().then(()=>{
-                            connesso=false;
-                            setconnesso(connesso);
-                            setuser("");
-                            setpwd("");
-                            alert("Logout effettuato");
+                          .then(async (json) => {
+                            await AsyncStorage.clear().then(()=>{
+                              connesso=false;
+                              setconnesso(connesso);
+                              setuser("");
+                              setpwd("");
+                              alert("Logout effettuato");
+                            });
                           });
                         } catch(e) {
                           // remove error
@@ -153,7 +156,7 @@ function Accesso({ navigation }) {
                                 try {
                                   AsyncStorage.setItem('@Id_User', Id_User);
                                   AsyncStorage.setItem('@Nominativo', Nominativo);
-                                  AsyncStorage.setItem('@Email', Email);
+                                  AsyncStorage.setItem('@Email', Id_User);
                                 } catch (e) {
                                   console.log(e);
                                 }
@@ -204,6 +207,8 @@ export default function App() {
         <Tab.Screen name="Profilo" component={Profilo}/>
         <Tab.Screen name="History" component={History}/>
         <Tab.Screen name="Preautorizzazione" component={Preautorizzazione}/>
+        <Tab.Screen name="LogOut" component={LogOut}/>
+        <Tab.Screen name="LogIn" component={LogIn}/>
       </Tab.Navigator>
     </NavigationContainer>
   );
