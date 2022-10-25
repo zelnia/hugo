@@ -43,7 +43,6 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "com.ristoapps.hugo",
           "enableGooglePay": true
         }
       ]
