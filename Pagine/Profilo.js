@@ -6,11 +6,14 @@ import { Surface, Text, Divider } from 'react-native-paper';
 import {SafeAreaView, ScrollView, View,Alert} from 'react-native';
 import {richiesta,getData,Grassetto,EtichettaSurface} from '../struttura/Utils.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 
 export default function Profilo({ navigation, route }) {
 
   const [utente, setutente] = useState([]);
   const [indirizzi, setindirizzi] = useState([]);
+
+  
 
   const alertCancella = () => Alert.alert(
     "Cancellazione utente",
@@ -36,6 +39,35 @@ export default function Profilo({ navigation, route }) {
                 alert("Logout effettuato");
                 navigation.navigate('LogIn');
               });
+            });
+          } catch(e) {
+            // remove error
+          }
+        } 
+      }
+    ]
+  );
+  const alertCancellaPreautorizzazione = () => Alert.alert(
+    "Cancellazione Preautorizzazione",
+    "Questa operazone cancelleràla preautorizzazione per il tuo utente. Sei sicuro?",
+    [
+      {
+        text: "No",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel"
+      },
+      { 
+        text: "OK", 
+        onPress: async () => {
+          let Id_User = await getData('@Id_User');
+          let richiestacancellapreautorizzazione={
+            "Operazione":'cancellaPreautorizzazione',
+            "Id_User":Id_User,
+          }
+          try {
+            richiesta(richiestacancellapreautorizzazione,'apiHugo')
+            .then(async (json) => {
+              alert("Operazione effettuata");
             });
           } catch(e) {
             // remove error
@@ -103,12 +135,21 @@ export default function Profilo({ navigation, route }) {
               <Text  style={[ss.textcentro]}>Nessun indirizzo in memoria.</Text>
             }
           </View>
-          <View style={[ss.centro,ss.w100,ss.mb15]}>
+          <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
+            <Button color="#00a1ae" onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100]}>Ricarica il saldo</Button>
+          </View>
+          <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
             <Button onPress={async () => {navigation.navigate('Preautorizzazione');}}  mode="contained"  style={[ss.w100]}>Imposta Preautorizzazione</Button>
           </View>
+          <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
+            <Button onPress={alertCancellaPreautorizzazione}  mode="outlined"  style={[ss.w100]}>Cancella preautorizzazione</Button>
+          </View>
           <Divider />
-          <View style={[ss.centro,ss.w100]}>
-            <Button onPress={alertCancella}  mode="contained"  style={[ss.w100]}>Cancella utente</Button>
+          <View style={[ss.centro,ss.w100,ss.px5]}>
+            <Button color="#ffc107" onPress={alertCancella}  mode="contained"  style={[ss.w100]}>Cancella utente</Button>
+          </View>
+          <View style={[ss.centro,ss.w100,ss.mt15,ss.px5]}>
+            <Button color="#00a1ae" onPress={()=>{Linking.openURL('https://hugopersonalshopper.it/candidatura.html');}}  mode="outlined"  style={[ss.w100]}>Diventa un Hugò</Button>
           </View>
         </ScrollView>
         <Footer no="profilo"/>

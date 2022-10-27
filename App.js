@@ -1,10 +1,11 @@
-import {  View, TouchableOpacity, Image, SafeAreaView, ScrollView,Platform } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import {  View, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { WebView } from 'react-native-webview';
+// import { WebView } from 'react-native-webview';
 import { TextInput, Button, Text,Paragraph,Portal, Dialog,Provider} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 
 //Componenti custom
 import {ss} from './struttura/style.js';
@@ -17,11 +18,12 @@ import Richiesta_NCC from './Pagine/Richiesta_NCC.js';
 import Hugo from './Pagine/Hugo.js';
 import LogOut from './Pagine/LogOut.js';
 import LogIn from './Pagine/LogIn.js';
+import RicaricaSaldo from './Pagine/RicaricaSaldo.js';
 
 
 
 const Tab = createBottomTabNavigator();
-const numeroversione=10006; //parametro aggiornamento
+const numeroversione=10009; //parametro aggiornamento
 var connesso=false;
 
 function Accesso({ navigation }) {
@@ -176,6 +178,9 @@ function Accesso({ navigation }) {
                       <Text style={{ fontSize: 20, color: '#fff' }}>Accedi</Text>
                     </TouchableOpacity>
                     <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
+                    <View style={[ss.centro,ss.w100,ss.mt15]}>
+                      <Button color="#00a1ae" onPress={()=>{Linking.openURL('https://hugopersonalshopper.it/candidatura.html');}}  mode="outlined"  style={[ss.w100]}>Diventa un Hugò</Button>
+                    </View>
                   </View>
                 }
               </View>
@@ -209,6 +214,7 @@ export default function App() {
         <Tab.Screen name="Preautorizzazione" component={Preautorizzazione}/>
         <Tab.Screen name="LogOut" component={LogOut}/>
         <Tab.Screen name="LogIn" component={LogIn}/>
+        <Tab.Screen name="RicaricaSaldo" component={RicaricaSaldo}/>
       </Tab.Navigator>
     </NavigationContainer>
   );

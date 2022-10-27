@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hugò Personal Shopper",
     "slug": "hugo",
-    "version": "1.0.6",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ristoapps.hugo",
-      "buildNumber": "1.0.6"
+      "buildNumber": "1.0.9",
+      "infoPlist": {
+        "NSCameraUsageDescription": "To scan cards through Stripe"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +31,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ristoapps.hugo",
-      "versionCode": 106
+      "versionCode": 109
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,15 +41,7 @@
       "eas": {
         "projectId": "e420a5af-b795-43df-851a-b4c8d549a672"
       }
-    },    
-    "plugins": [
-      [
-        "@stripe/stripe-react-native",
-        {
-          "enableGooglePay": true
-        }
-      ]
-    ]
+    }
   },
   "name": "Hugò Personal Shopper"
 }

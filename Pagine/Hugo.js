@@ -1,8 +1,8 @@
 import {  View, TouchableOpacity, SafeAreaView, ScrollView,Image  } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+// import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox,IconButton} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 
 //Componenti custom
@@ -10,6 +10,140 @@ import {ss} from '../struttura/style.js';
 import {elaboraore,richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import Footer from '../struttura/Footer.js';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+// function Info({tinfo,stili}){
+const Info = ({tinfo,stili}) => {
+  return (
+    <IconButton
+      icon="information"
+      color='#00a1ae'
+      size={20}
+      style={stili}
+      onPress={async () => {
+        settestoinfo(tinfo);
+        setVisible7(true);
+      }}
+    />
+  )
+}
+
+const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta}) => { 
+  if(servizio=="no"){
+    return (
+      <></>
+    );
+  }
+  if(servizio==4){
+    return (
+      <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+        <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Opzioni servizio:</Text> 
+        <View style={{alignItems: 'center' }}>
+          <Text style={[ss.mt10]}>Durata sosta in minuti:</Text> 
+          <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+              <Button onPress={() => {setduratasosta(30);}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
+              <Button onPress={() => {setduratasosta(60);}} style={[(60 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={60 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">60</Button>
+              <Button onPress={() => {setduratasosta(90);}} style={[(90 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={90 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">90</Button>
+              <Button onPress={() => {setduratasosta(120);}} style={[(120 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={120 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">120</Button>
+          </View>
+          <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+              <Button onPress={() => {setduratasosta(150);}} style={[(150 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={150 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">150</Button>
+              <Button onPress={() => {setduratasosta(180);}} style={[(180 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={180 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">180</Button>
+              <Button onPress={() => {setduratasosta(210);}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
+              <Button onPress={() => {setduratasosta(240);}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
+          </View>
+          <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+            <Text style={ss.h2}>Costo sosta: </Text>
+            <Text style={[{ fontWeight: 'bold' }, ss.h2]}>{(duratasosta/30*5).toFixed(2)}</Text>
+            <Text style={ss.h2}> €</Text>
+          </Surface>
+        </View>
+      </Surface>
+    );
+  }
+  if((servizio==0 || servizio==1 || servizio==5)){
+    return (
+      <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
+        <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
+        <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+          <TextInput
+            multiline = {true}
+            numberOfLines = {6}
+            label="Indica cosa acquistare:"
+            mode='outlined'
+            value={cosa}
+            onChangeText={cosa => setCosa(cosa)}
+          />
+        </Surface>
+        <View style={[{ flexDirection: 'row',alignItems: 'center'},ss.mauto,ss.mt10]}>
+          <Info tinfo="Se il prodotto di una marca specificata non è disponibile Hugò provvederà a sostituirlo con il prodotto più simile di un'altra marca" />
+          <Text style={{ fontWeight: 'bold' }}>Sostituisci prodotti</Text>
+          <Checkbox
+            status={sostiuisci ? 'checked' : 'unchecked'}
+            onPress={() => {
+              setSostiuisci(!sostiuisci);
+            }}
+          />
+        </View>
+        <View  style={[ss.p3,ss.w100]}>
+          <Divider />
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ width:"60%", flexDirection: 'row'}}>
+            <Info tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: l'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
+            La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Spesa massima</Text> 
+          </View>
+          <View style={{ width:"40%"}}>
+            <TextInput
+              textAlign={'center'}
+              onChangeText={(spesamax) => {
+                setSpesamax(spesamax)
+              }}
+              value={spesamax ?? ""}
+              style={{ height:32}}
+            />
+          </View>
+        </View>
+        <View  style={[ss.p3,ss.w100]}>
+          <Divider />
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row',width:"60%"}}>
+            <Info tinfo="Imndica un codice coupon per risparmiare ulteriormente" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+          </View>
+          <View style={{ width:"40%"}}>
+            <TextInput
+              textAlign={'center'}
+              onChangeText={(coupon) => {
+                setcoupon(coupon)
+              }}
+              value={coupon ?? ""}
+              style={{ height:32}}
+            />
+          </View>
+        </View>
+      </Surface>
+    );
+  }
+  if((servizio==6)){
+    return (
+      <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
+        <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
+        <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+          <TextInput
+            multiline = {true}
+            numberOfLines = {6}
+            label="Indica cosa ritirare:"
+            mode='outlined'
+            value={cosa}
+            onChangeText={cosa => setCosa(cosa)}
+          />
+        </Surface>
+      </Surface>
+    );
+  }
+}
 
 export default function Hugo({ navigation, route }) {
   var Id_Utente=route.params.Id_Utente;
@@ -46,20 +180,7 @@ export default function Hugo({ navigation, route }) {
 
 
 
-  function Info({tinfo,stili}){
-    return (
-      <IconButton
-        icon="information"
-        color='#00a1ae'
-        size={20}
-        style={stili}
-        onPress={async () => {
-          settestoinfo(tinfo);
-          setVisible7(true);
-        }}
-      />
-    )
-  }
+  
   function RadioServizio({id,etichetta,info,costo}){
     return (
       <View style={[{ flexDirection: 'row'},ss.w100]}>
@@ -231,6 +352,7 @@ export default function Hugo({ navigation, route }) {
     }
     fetchData();
   }, [Id_Utente]);
+  // }, [Id_Utente]);
   
   useEffect(() => {
     if(indirizzo!="no"){
@@ -251,21 +373,24 @@ export default function Hugo({ navigation, route }) {
     settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5));
   }, [indirizzo,servizio,spesamax,duratasosta]);
 
-  const MINUTE_MS = 10000;
-  useEffect(() => {
-    const intervalloritiri = setInterval(async () => {
-      // let Id_User = await getData('@Id_User');
+  // const MINUTE_MS = 10000;
+  // useEffect(() => {
+  //   const intervalloritiri = setInterval(async () => {
+  //     // let Id_User = await getData('@Id_User');
       
-      let json_res = await richiesta(richestaaggiornamento);
-      // let json_res = await richiesta({
-      //   "Operazione":'AggiornaHugo',
-      //   "id_attivita_base":attivitabase,
-      //   "iduser":Id_User,
-      // },'apiHugo');
-      aggiornaPagina(json_res);
-    }, MINUTE_MS);
-    return () => clearInterval(intervalloritiri); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, [attivitabase]);
+  //     let json_res = await richiesta(richestaaggiornamento);
+  //     // let json_res = await richiesta({
+  //     //   "Operazione":'AggiornaHugo',
+  //     //   "id_attivita_base":attivitabase,
+  //     //   "iduser":Id_User,
+  //     // },'apiHugo');
+  //     aggiornaPagina(json_res);
+  //     console.log("testA");
+  //   }, MINUTE_MS);
+    
+  //   console.log("test3");
+  //   return () => clearInterval(intervalloritiri); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  // }, [attivitabase]);
   
   var oggi = new Date();
   var deltaminuti=25;
@@ -319,123 +444,8 @@ export default function Hugo({ navigation, route }) {
     }
   }
 
-  function MostraOpzioniServizio(props) {
-    if(servizio=="no"){
-      return (
-        <></>
-      );
-    }
-    if(servizio==4){
-      return (
-        <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-          <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Opzioni servizio:</Text> 
-          <View style={{alignItems: 'center' }}>
-            <Text style={[ss.mt10]}>Durata sosta in minuti:</Text> 
-            <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
-                <Button onPress={() => {setduratasosta(30);}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
-                <Button onPress={() => {setduratasosta(60);}} style={[(60 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={60 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">60</Button>
-                <Button onPress={() => {setduratasosta(90);}} style={[(90 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={90 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">90</Button>
-                <Button onPress={() => {setduratasosta(120);}} style={[(120 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={120 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">120</Button>
-            </View>
-            <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
-                <Button onPress={() => {setduratasosta(150);}} style={[(150 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={150 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">150</Button>
-                <Button onPress={() => {setduratasosta(180);}} style={[(180 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={180 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">180</Button>
-                <Button onPress={() => {setduratasosta(210);}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
-                <Button onPress={() => {setduratasosta(240);}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
-            </View>
-            <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-              <Text style={ss.h2}>Costo sosta: </Text>
-              <Text style={[{ fontWeight: 'bold' }, ss.h2]}>{(duratasosta/30*5).toFixed(2)}</Text>
-              <Text style={ss.h2}> €</Text>
-            </Surface>
-          </View>
-        </Surface>
-      );
-    }
-    if((servizio==0 || servizio==1 || servizio==5)){
-      return (
-        <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
-          <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
-          <Surface style={[ss.surface1, ss.w100]} elevation={4}>
-            <TextInput
-              multiline = {true}
-              numberOfLines = {6}
-              label="Indica cosa acquistare:"
-              mode='outlined'
-              value={cosa}
-              onChangeText={cosa => setCosa(cosa)}
-            />
-          </Surface>
-          <View style={[{ flexDirection: 'row',alignItems: 'center'},ss.mauto,ss.mt10]}>
-            <Info tinfo="Se il prodotto di una marca specificata non è disponibile Hugò provvederà a sostituirlo con il prodotto più simile di un'altra marca" />
-            <Text style={{ fontWeight: 'bold' }}>Sostituisci prodotti</Text>
-            <Checkbox
-              status={sostiuisci ? 'checked' : 'unchecked'}
-              onPress={() => {
-                setSostiuisci(!sostiuisci);
-              }}
-            />
-          </View>
-          <View  style={[ss.p3,ss.w100]}>
-            <Divider />
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width:"60%", flexDirection: 'row'}}>
-              <Info tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: l'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
-              La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
-              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Spesa massima</Text> 
-            </View>
-            <View style={{ width:"40%"}}>
-              <TextInput
-                textAlign={'center'}
-                onChangeText={(spesamax) => {
-                  setSpesamax(spesamax)
-                }}
-                value={spesamax ?? ""}
-                style={{ height:32}}
-              />
-            </View>
-          </View>
-          <View  style={[ss.p3,ss.w100]}>
-            <Divider />
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row',width:"60%"}}>
-              <Info tinfo="Imndica un codice coupon per risparmiare ulteriormente" />
-              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
-            </View>
-            <View style={{ width:"40%"}}>
-              <TextInput
-                textAlign={'center'}
-                onChangeText={(coupon) => {
-                  setcoupon(coupon)
-                }}
-                value={coupon ?? ""}
-                style={{ height:32}}
-              />
-            </View>
-          </View>
-        </Surface>
-      );
-    }
-    if((servizio==6)){
-      return (
-        <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
-          <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
-          <Surface style={[ss.surface1, ss.w100]} elevation={4}>
-            <TextInput
-              multiline = {true}
-              numberOfLines = {6}
-              label="Indica cosa ritirare:"
-              mode='outlined'
-              value={cosa}
-              onChangeText={cosa => setCosa(cosa)}
-            />
-          </Surface>
-        </Surface>
-      );
-    }
-  }
+  // function MostraOpzioniServizio() {
+  
 
 
   return (
@@ -647,7 +657,20 @@ export default function Hugo({ navigation, route }) {
               </View>
             </Surface>
             
-            <MostraOpzioniServizio />
+            <MostraOpzioniServizio 
+              servizio={servizio} 
+              cosa={cosa} 
+              setCosa={setCosa} 
+              Info={Info} 
+              sostiuisci={sostiuisci} 
+              setSostiuisci={setSostiuisci} 
+              spesamax={spesamax} 
+              setSpesamax={setSpesamax} 
+              coupon={coupon} 
+              setcoupon={setcoupon} 
+              duratasosta={duratasosta} 
+              setduratasosta={setduratasosta} 
+            />
             <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Se vuoi indicami dove andare</Button>
             <Portal>
               <Dialog visible={visible4} onDismiss={hideDialog4}>
@@ -791,8 +814,8 @@ export default function Hugo({ navigation, route }) {
                   <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
                     {/* <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
                     <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Contanti alla consegna con preautorizzazione" value="1" />
-                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" />  */}
-                    <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" />
+                    <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" />
+                    <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" />  */}
                     <RadioMetodo id="1" etichetta="Contanti alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
                     <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
                   </RadioButton.Group>

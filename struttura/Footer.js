@@ -7,7 +7,7 @@ import { getData } from './Utils.js';
 export default function Footer({no="no"}) {
     const navigation = useNavigation();
     return(
-    <View  style={[{ flexDirection: 'row' }]}>
+    <View  style={[{ flexDirection: 'row' },ss.w100,ss.textcentro]}>
       {
         no!="home" ?
           <View style={[{ width: '25%'}, ss.centro]}>

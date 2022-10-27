@@ -3,10 +3,10 @@ import { View,Text,SafeAreaView,ScrollView } from 'react-native';
 import { Button,TextInput } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
 import {richiesta,getData} from '../struttura/Utils.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../struttura/Footer.js';
 
-export default function Preautorizzazione({ navigation, route }) {
+export default function RicaricaSaldo({ navigation }) {
+    const [importo, setimporto] = useState('');
     const [nominativo, setnominativo] = useState('');
     const [ncarta, setncarta] = useState('');
     const [cvc, setcvc] = useState('');
@@ -14,13 +14,14 @@ export default function Preautorizzazione({ navigation, route }) {
     const [ascadenza, setascadenza] = useState('');
 
 
-    async function registracarta (nominativo, ncarta, cvc, mscadenza, ascadenza){
+    async function effettuaricarica (importo, nominativo, ncarta, cvc, mscadenza, ascadenza){
         try {
             let Id_User = await getData('@Id_User');
             let Nominativo2 = await getData('@Nominativo');
             let Email = await getData('@Email');
-            let richiestapreauth= {
-                "Operazione":"richiestapreauth",
+            let richiestaricaricasaldo= {
+                "Operazione":"richiestaricaricasaldo",
+                "importo":importo,
                 "Id_User":Id_User,
                 "Email":Email,
                 "nominativo":nominativo,
@@ -31,28 +32,22 @@ export default function Preautorizzazione({ navigation, route }) {
             }
             let checkgo=true;
             let errore="";
+            if(importo==""){checkgo=false,errore+="Per favore inserisci un importo. \r\n"}
             if(nominativo==""){checkgo=false,errore+="Per favore inserisci un nominativo. \r\n"}
             if(ncarta==""){checkgo=false,errore+="Per favore inserisci il numero di carta. \r\n"}
             if(cvc==""){checkgo=false,errore+="Per favore inserisci il cvc. \r\n"}
             if(mscadenza==""){checkgo=false,errore+="Per inserisci il mese di scadenza. \r\n"}
             if(ascadenza==""){checkgo=false,errore+="Per inserisci l'anno di scadenza. \r\n"}
             if(checkgo){
-                let Preautorizzazione=await richiesta(richiestapreauth);
-                if(Preautorizzazione.Risposta=="Dati_Registrati"){
-                    alert("Preautorizzazione effettuata");
-                    try {
-                        AsyncStorage.setItem('@Preautorizzazione', "si");
-                        AsyncStorage.setItem('@stripecustomer', Preautorizzazione.idcustomer);
-                        AsyncStorage.setItem('@idpagamento', Preautorizzazione.idpagamento);
-                      } catch (e) {
-                        console.log(e);
-                      }
-                      navigation.navigate('Hugo', {
+                let Ricaricasaldo=await richiesta(richiestaricaricasaldo);
+                if(Ricaricasaldo.Risposta=="Ricarica_effettuata"){
+                    alert("Ricarica effettuata");
+                    navigation.navigate('Hugo', {
                         Id_Utente: Id_User,Nominativo:Nominativo2
-                      });
+                    });
                 }
-                if(typeof(Preautorizzazione.Errore)!=="undefined"){
-                    alert(Preautorizzazione.Errore);
+                if(typeof(Ricaricasaldo.Errore)!=="undefined"){
+                    alert(Ricaricasaldo.Errore);
                 }
             } else {
                 alert(errore);
@@ -62,11 +57,19 @@ export default function Preautorizzazione({ navigation, route }) {
         }
     }
 
-    return (        
+    return (
         <SafeAreaView style={ss.safeareaview}>
             <ScrollView>
                 <View style={ss.container}>
-                    <Text  style={[ss.h1,ss.textcentro,ss.mt15]}>Inserisci i dati della tua carta di credito:</Text>
+                    <Text  style={[ss.h1,ss.textcentro,ss.mt15]}>Ricarica il tuo saldo:</Text>
+                    <TextInput
+                        style={[ss.w100,ss.mt15]}
+                        label="Importo"
+                        onChangeText={(importo) => {
+                            setimporto(importo)
+                        }}
+                        value={importo ?? ""}
+                    />
                     <TextInput
                         style={[ss.w100,ss.mt15]}
                         label="Nominativo"
@@ -107,10 +110,10 @@ export default function Preautorizzazione({ navigation, route }) {
                         }}
                         value={ascadenza ?? ""}
                     />
-                    <Button onPress={() => registracarta(nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
-                    <Footer no="profilo"/>
+                    <Button onPress={() => effettuaricarica(nominativo,importo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
                 </View>
             </ScrollView>
+            <Footer no="profilo"/>
         </SafeAreaView>
     );
 }
