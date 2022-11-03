@@ -9,6 +9,7 @@ import * as Linking from 'expo-linking';
 
 //Componenti custom
 import {ss} from './struttura/style.js';
+import {CosafaInterno} from './struttura/Altre_Componenti.js';
 import {richiesta,getLocal,getData} from './struttura/Utils.js';
 import Profilo from './Pagine/Profilo.js';
 import History from './Pagine/History.js';
@@ -23,7 +24,6 @@ import RicaricaSaldo from './Pagine/RicaricaSaldo.js';
 
 
 const Tab = createBottomTabNavigator();
-const numeroversione=10009; //parametro aggiornamento
 var connesso=false;
 
 function Accesso({ navigation }) {
@@ -56,9 +56,11 @@ function Accesso({ navigation }) {
       }
     }
     iniz();
-  }, []);
+  }, [visible]);
 
   const [checkconnesso, setconnesso] = useState(connesso);
+
+
 
   return (
     <Provider>
@@ -185,11 +187,14 @@ function Accesso({ navigation }) {
                 }
               </View>
             </View>
+            {/* <Cosafa visibilita={visible} /> */}
             <Portal>
               <Dialog visible={visible} onDismiss={hideDialog}>
                 <Dialog.Title>Cosa fa Hugò?</Dialog.Title>
                 <Dialog.Content>
-                  <Paragraph>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa. Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC).Inserisci nelle note dove vuoi andare, numero di passeggeri, data e ora di partenza. Cliccka l'ora in cui vuoi essere chiamato, ti richiameremo per un preventivo immediato. </Paragraph>
+                  <CosafaInterno />
+                  {/* <Paragraph style={ss.giustificato}>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa (Farmaci, spesa, pasticcini, etc.).</Paragraph> */}
+                  {/* <Paragraph style={ss.giustificato}>Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC, attivo solo in alcune città).</Paragraph> */}
                   <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog}>OK</Button>
                 </Dialog.Content>
               </Dialog>

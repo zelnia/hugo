@@ -143,6 +143,9 @@ const ss= StyleSheet.create({
       padding: 10,
       textAlign:"center"
     },
+    giustificato:{
+      textAlign:'justify'
+    },
     btnprimary:{
       backgroundColor:"#0d6efd",
       borderRadius: 5,

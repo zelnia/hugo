@@ -1,4 +1,4 @@
-import {  View, TouchableOpacity, SafeAreaView, ScrollView,Image  } from 'react-native';
+import {  Platform, View, TouchableOpacity, SafeAreaView, ScrollView,Image ,Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 // import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox,IconButton} from 'react-native-paper';
@@ -9,10 +9,14 @@ import * as Linking from 'expo-linking';
 import {ss} from '../struttura/style.js';
 import {elaboraore,richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import Footer from '../struttura/Footer.js';
+import {CosafaInterno} from '../struttura/Altre_Componenti.js';
+// import {Cosafa,Info2} from '../struttura/Altre_Componenti.js';
+// import { Link } from '@react-navigation/native';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const numeroversione=10012; //parametro aggiornamento
 
 // function Info({tinfo,stili}){
-const Info = ({tinfo,stili}) => {
+const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
   return (
     <IconButton
       icon="information"
@@ -27,7 +31,7 @@ const Info = ({tinfo,stili}) => {
   )
 }
 
-const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta}) => { 
+const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,indirizzoalternativo,setindirizzoalternativo,validaCoupon}) => { 
   if(servizio=="no"){
     return (
       <></>
@@ -36,8 +40,42 @@ const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,se
   if(servizio==4){
     return (
       <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-        <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Opzioni servizio:</Text> 
+        <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
         <View style={{alignItems: 'center' }}>
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o dove devo passarti a prendere" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Se vuoi indicami dove prenderti</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {4}
+              label="Luogo"
+              mode='outlined'
+              value={indirizzoalternativo}
+              onChangeText={indirizzoalternativo => setindirizzoalternativo(indirizzoalternativo)}
+            />
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo dove vuoi essere accompagnato" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Se vuoi indicami dove essere accompagnato</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {4}
+              label="Luogo"
+              mode='outlined'
+              value={note2}
+              onChangeText={note2 => setNote2(note2)}
+            />
+          </View>
           <Text style={[ss.mt10]}>Durata sosta in minuti:</Text> 
           <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
               <Button onPress={() => {setduratasosta(30);}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
@@ -60,22 +98,86 @@ const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,se
       </Surface>
     );
   }
+  if(servizio==2){
+    return (
+      <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+        <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
+        <View style={{alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il punto di ritiro" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Indicami il luogo dove prenderti se diverso da quello suggerito</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {4}
+              label="Luogo"
+              mode='outlined'
+              value={indirizzoalternativo}
+              onChangeText={indirizzoalternativo => setindirizzoalternativo(indirizzoalternativo)}
+            />
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo dove vuoi essere accompagnato" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Se vuoi indicami dove essere accompagnato</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {4}
+              label="Luogo"
+              mode='outlined'
+              value={note2}
+              onChangeText={note2 => setNote2(note2)}
+            />
+          </View>
+        </View>
+      </Surface>
+    );
+  }
   if((servizio==0 || servizio==1 || servizio==5)){
     return (
       <Surface style={[ss.surface1,ss.mt15,ss.centro,ss.w100]} elevation={4}>
         <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
         <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica cosa acquistare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Se vuoi indicami cosa acquistare *</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {6}
+              label="Indica cosa acquistare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):"
+              mode='outlined'
+              value={cosa}
+              onChangeText={cosa => setCosa(cosa)}
+            />
+          </View>
+        </Surface>
+        <View  style={[ss.p3,ss.w100]}>
+          <Divider />
+        </View>
+        
+        <Surface style={[ss.surface1, ss.w100]} elevation={4}>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il negozio dove vuoi che acquisti o ritiri quanto indicato" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Se vuoi indicami dove acquistare *</Text> 
+          </View>
           <TextInput
             multiline = {true}
-            numberOfLines = {6}
-            label="Indica cosa acquistare:"
+            numberOfLines = {4}
             mode='outlined'
-            value={cosa}
-            onChangeText={cosa => setCosa(cosa)}
+            label="Indica il luogo"
+            value={note2}
+            onChangeText={note2 => setNote2(note2)}
           />
         </Surface>
         <View style={[{ flexDirection: 'row',alignItems: 'center'},ss.mauto,ss.mt10]}>
-          <Info tinfo="Se il prodotto di una marca specificata non è disponibile Hugò provvederà a sostituirlo con il prodotto più simile di un'altra marca" />
+          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Se il prodotto di una marca specificata non è disponibile Hugò provvederà a sostituirlo con il prodotto più simile di un'altra marca" />
           <Text style={{ fontWeight: 'bold' }}>Sostituisci prodotti</Text>
           <Checkbox
             status={sostiuisci ? 'checked' : 'unchecked'}
@@ -89,9 +191,9 @@ const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,se
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ width:"60%", flexDirection: 'row'}}>
-            <Info tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: l'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: l'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
             La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
-            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Spesa massima</Text> 
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Spesa massima * :</Text> 
           </View>
           <View style={{ width:"40%"}}>
             <TextInput
@@ -109,14 +211,15 @@ const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,se
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row',width:"60%"}}>
-            <Info tinfo="Imndica un codice coupon per risparmiare ulteriormente" />
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica un codice coupon per risparmiare ulteriormente" />
             <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
           </View>
           <View style={{ width:"40%"}}>
             <TextInput
               textAlign={'center'}
               onChangeText={(coupon) => {
-                setcoupon(coupon)
+                setcoupon(coupon);
+                validaCoupon(coupon);
               }}
               value={coupon ?? ""}
               style={{ height:32}}
@@ -138,6 +241,21 @@ const MostraOpzioniServizio = ({servizio,cosa,Info,sostiuisci,spesamax,coupon,se
             mode='outlined'
             value={cosa}
             onChangeText={cosa => setCosa(cosa)}
+          />
+        </Surface>
+         
+        <Surface style={[ss.surface1, ss.w100, ss.mt10]} elevation={4}>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il negozio dove vuoi che ritiri quanto indicato" />
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Indicami dove ritirare *</Text> 
+          </View>
+          <TextInput
+            multiline = {true}
+            numberOfLines = {4}
+            mode='outlined'
+            label="Indica il luogo"
+            value={note2}
+            onChangeText={note2 => setNote2(note2)}
           />
         </Surface>
       </Surface>
@@ -184,10 +302,10 @@ export default function Hugo({ navigation, route }) {
   function RadioServizio({id,etichetta,info,costo}){
     return (
       <View style={[{ flexDirection: 'row'},ss.w100]}>
-        <View style={{ width:"5%"}}>
-          <Info tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        <View style={{ width:"10%"}}>
+          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
-        <View style={{ width:"95%"}}>
+        <View style={{ width:"90%"}}>
           <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta+" "+costo.toFixed(2)+"€"} value={id} />
         </View>
     </View>
@@ -197,10 +315,10 @@ export default function Hugo({ navigation, route }) {
   function RadioMetodo({id,etichetta,info}){
     return (
       <View style={[{ flexDirection: 'row'},ss.w100]}>
-        <View style={{ width:"5%"}}>
-          <Info tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        <View style={{ width:"10%"}}>
+          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
-        <View style={{ width:"95%"}}>
+        <View style={{ width:"90%"}}>
           <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta} value={id} />
         </View>
       </View>
@@ -211,6 +329,7 @@ export default function Hugo({ navigation, route }) {
   const arrayservizi=[4.90,6.50,14.99,0,14.99,4.90,4.90];
   const [costogestioneincassi, setcostogestioneincassi] = useState(1);
   const [totale, settotale] = useState(0);
+  const [saldo, setSaldo] = useState(0);
   const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
   const [descrizioneindirizzo, setdescrizioneindirizzo] = useState("no");
@@ -218,6 +337,7 @@ export default function Hugo({ navigation, route }) {
   const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
   const [note, setNote] = useState("");
   const [note2, setNote2] = useState("");
+  const [indirizzoalternativo, setindirizzoalternativo] = useState("");
   const [cosa, setCosa] = useState("");
   const [mancia, setMancia] = useState(0);
   const [auto, setAuto] = useState("no");
@@ -227,6 +347,7 @@ export default function Hugo({ navigation, route }) {
   const [spesamax, setSpesamax] = useState(0);
   const [oraprenotazione, setora] = useState("no");
   const [coupon, setcoupon] = useState("");
+  const [scontocoupon, setscontocoupon] = useState(0);
   const [duratasosta, setduratasosta] = useState(0);
 
   //NUOVO INDIRIZZO
@@ -259,10 +380,16 @@ export default function Hugo({ navigation, route }) {
   function aggiornaPagina(json){
     if(typeof(json?.dati?.ore)!="undefined") {
       setDispo(elaboraore(json.dati.ore));
+      setSaldo(parseFloat(json.altro.Saldo));
     }
   }
+  async function apriwa(){
+    Linking.openURL("https://wa.me/+393333256236");
+  }
 
-  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon, oraprenotazione){
+
+
+  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione){
     try {
       let richiestaprenotazione= {
         "cliente":Id_Utente,
@@ -279,13 +406,23 @@ export default function Hugo({ navigation, route }) {
         "sostiuisci":sostiuisci,
         "spesamax":spesamax,
         "coupon":coupon,
+        "scontocoupon":scontocoupon,
+        "indirizzoalternativo":indirizzoalternativo,
         "oraprenotazione":oraprenotazione
       }
       let checkgo=true;
       let errore="";
       if(indirizzo=="no"){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
       if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
-      if(metodo_pagamento=="no"){checkgo=false,errore+="Per favore scegli un metodo di pagamento. \r\n"}
+      if(servizio==0 || servizio==1 || servizio==5){
+        if(spesamax<1){
+          checkgo=false,errore+="Per favore imposta la spesa massima. \r\n"
+        }
+      }
+      if(metodo_pagamento=="no"){
+        checkgo=false,
+        errore+="Per favore scegli un metodo di pagamento. \r\n"
+      }
       if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
       if(checkgo){
         switch (metodo_pagamento) {
@@ -341,11 +478,37 @@ export default function Hugo({ navigation, route }) {
   useEffect(() => {
     async function fetchData() {
       let Id_User = await getData('@Id_User');
+      let richiestacheckaggiornamento={"Operazione":'checkVersione'}
+      let checkAggiornamento = await richiesta(richiestacheckaggiornamento);
+      // console.log('checkAggiornamento', checkAggiornamento);
+      if(checkAggiornamento.versione>numeroversione){
+        Alert.alert(
+          "Aggiornamento disponibile",
+          "C'è un nuovo aggiornamento disponibile. Vuoi scaricarlo?",
+          [
+            {
+              text: "No",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel"
+            },
+            { 
+              text: "OK", 
+              onPress: () => {
+                if(Platform.OS === 'ios'){
+                  Linking.openURL("https://apps.apple.com/us/app/hug%C3%B2-personal-shopper/id6443560017");
+                } else if(Platform.OS === 'android'){
+                  Linking.openURL("https://play.google.com/store/apps/details?id=com.ristoapps.hugo");
+                }
+              } 
+            }
+          ]
+        );
+      }
       let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
-      let richiestaservizi={"Operazione":'getServizi',"Id_User":Id_User}
-      let listaindirizzi = await richiesta(richiestaindi,'apiHugo');
+      let listaindirizzi = await richiesta(richiestaindi);
       setIndirizzi(listaindirizzi);
-      let elencoservizi = await richiesta(richiestaservizi,'apiHugo');
+      let richiestaservizi={"Operazione":'getServizi2',"Id_User":Id_User}
+      let elencoservizi = await richiesta(richiestaservizi);
       setlistaservizi(elencoservizi);
       let json_res = await richiesta(richestaaggiornamento);
       aggiornaPagina(json_res);
@@ -370,8 +533,15 @@ export default function Hugo({ navigation, route }) {
       }
       fetchData();
     }
-    settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5));
-  }, [indirizzo,servizio,spesamax,duratasosta]);
+    let costoserv=0;
+    listaservizi.forEach(element => {
+      if(element["id"]==servizio){
+        return costoserv=element["costo"];
+      }
+    });
+    settotale((servizio!="no"?costoserv:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5)-scontocoupon+mancia);
+    // settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5)-scontocoupon);
+  }, [indirizzo,servizio,spesamax,duratasosta,scontocoupon,mancia]);
 
   // const MINUTE_MS = 10000;
   // useEffect(() => {
@@ -445,9 +615,26 @@ export default function Hugo({ navigation, route }) {
   }
 
   // function MostraOpzioniServizio() {
-  
-
-
+  async function validaCoupon(cod_coupon){
+    console.log('cod_coupon', cod_coupon);
+    if(cod_coupon.length>4){
+      let richiestavalidazione={
+        "Operazione":'validaCoupon',
+        "cod_coupon":cod_coupon,
+      }
+      let coupon = await richiesta(richiestavalidazione);
+      
+      if(typeof(coupon)!==null, coupon["tipo"]=="Corretto"){
+        setscontocoupon(parseFloat(coupon["Importo"]));
+        alert("Coupon validato");
+      } else {
+        setscontocoupon(0);
+      }
+    }
+  }
+  const ssettogglevisibilita = () => {
+    visible?setVisible(false):setVisible(true);
+};
   return (
     <Provider>
       <SafeAreaView style={ss.safeareaview}>
@@ -456,31 +643,53 @@ export default function Hugo({ navigation, route }) {
             <View style={[{ flexDirection: 'row',alignItems:"center"},ss.w100]}>
               <Image source={require('../assets/omino.png')} style={[{height: calcolaAltezza(300,453,10,25)},ss.w25]}  />
               <Surface style={[ss.surface1,ss.mb15,ss.centro,ss.w75]} elevation={4}>
-                <Text style={ss.h1}>{Nominativo} Ciao!</Text>
+                <Text style={ss.h1}>Ciao {Nominativo}!</Text>
                 <Text style={ss.h2}>Cosa posso portarti oggi?</Text>
                 <Text style={ss.h2}>Dove posso accompagnarti?</Text>
                 <Text style={[ss.h2,ss.textcentro]}>Per piacere inserisci più dettagli possibili:</Text>
                 <Text style={ss.h2}>mi faciliteresti il compito.</Text>
               </Surface>
             </View>
-            <Button onPress={showDialog}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
+            <Button  color="#00a1ae" onPress={ssettogglevisibilita}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
+            {/* <Cosafa visibilita={visible} /> */}
             <Portal>
               <Dialog visible={visible} onDismiss={hideDialog}>
                 <Dialog.Title>Cosa fa Hugò?</Dialog.Title>
                 <Dialog.Content>
-                  <Paragraph>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa. Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC).Inserisci nelle note dove vuoi andare, numero di passeggeri, data e ora di partenza. Cliccka l'ora in cui vuoi essere chiamato, ti richiameremo per un preventivo immediato. </Paragraph>
+                  <CosafaInterno />
+                  {/* <Paragraph style={ss.giustificato}>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa (Farmaci, spesa, pasticcini, etc.).</Paragraph> */}
+                  {/* <Paragraph style={ss.giustificato}>Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC, attivo solo in alcune città).</Paragraph> */}
                   <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog}>OK</Button>
                 </Dialog.Content>
               </Dialog>
             </Portal>
-            <Button  onPress={showDialog2}  mode="contained"  style={[ss.w100,ss.mt15]}>Scegli indirizzo di consegna</Button>
+            <Button icon="phone" color="#00a1ae" onPress={apriwa}  mode="outlined"  style={[ss.w100]}>Se vuoi chiamami per info</Button>
+            <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+              <Text style={[{ fontWeight: 'bold' }, ss.textcentro]}> Le opzioni contrassegnate con un asterisco * sono obbligatorie.</Text> 
+            </Surface>
+            
+            {/* <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100,ss.mt15]}>Scegli un indirizzo di consegna *</Button> */}
             <Portal>
               <Dialog visible={visible2} onDismiss={hideDialog2}>
                 <Dialog.Title>Scegli indirizzo</Dialog.Title>
                 <Dialog.Content>
                   {
                     (typeof(indirizzi)!="undefined" && indirizzi.length) ?
-                      <RadioButton.Group onValueChange={indirizzo => setIndirizzo(indirizzo)} value={indirizzo}>
+                      <RadioButton.Group onValueChange={
+                        indirizzo => {
+                          setIndirizzo(indirizzo);
+                          if(indirizzoalternativo==""){
+                            indirizzi.forEach(element => {
+                              if(element["Id"]==indirizzo){
+                                setindirizzoalternativo(element["Via"]+" "+element["Civico"]+" "+element["Citta"]);
+                                return;
+                              }
+                            });
+                          }
+                          // console.log('indirizzo', indirizzo);
+                          // console.log('indirizzi', indirizzi);
+                        }
+                      } value={indirizzo}>
                         {
                           indirizzi.map((indirizzo, index) => (
                             <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]} key={"rindi"+index} />
@@ -588,7 +797,7 @@ export default function Hugo({ navigation, route }) {
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
               
               <View style={{ flexDirection: 'row'}}>
-                <Text style={[ss.h1,ss.mt15]}>Scegli un servizio:</Text>
+                <Text style={[ss.h1,ss.mt15]}>Scegli un servizio *:</Text>
               </View>
               <View style={ss.mt15}>
                 {/* // servizio => setServizio(servizio) setServizio(servizio); */}
@@ -596,7 +805,7 @@ export default function Hugo({ navigation, route }) {
                   {
                     listaservizi.map((s, index) => (
                       s["attivo"] ?
-                        <RadioServizio info={s["info"]} id={index} etichetta={s["etichetta"]} costo={s["costo"]} key={"ser"+index}/>
+                        <RadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"ser"+s["id"]}/>
                       :
                         null
                     ))
@@ -605,7 +814,7 @@ export default function Hugo({ navigation, route }) {
                 {/* <RadioButton.Group onValueChange={servizio => {checkservizio(servizio);}} value={servizio}>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò ti ritira per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa ritirare e dove farlo." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò ti ritira per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa ritirare e dove farlo." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={"Ritiro "+arrayservizi[6].toFixed(2)+"€"} value="6" />
@@ -613,7 +822,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò acquista per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa deve ritirare o acquistare. Se vuoi indicagli anche dove acquistare." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò acquista per te qualsiasi cosa tu voglia (frutta, sigarette, pannolini, gelati, etc). Scrivi nelle note cosa deve ritirare o acquistare. Se vuoi indicagli anche dove acquistare." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={"Acquisti "+arrayservizi[0].toFixed(2)+"€"} value="0" />
@@ -621,7 +830,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati con un massimo di 5 prodotti e un limite per le bevande di 1 cassa." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati con un massimo di 5 prodotti e un limite per le bevande di 1 cassa." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Acquisti supermercati con consegna veloce max 5 prodotti "+arrayservizi[5].toFixed(2)+"€"} value="5" />
@@ -629,7 +838,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati. Nota bene: le quantità sono illimitate tranne che per le bevande con un massimo di 2 casse. " stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò acquista qualsiasi prodotto all'interno di tutti i supermercati o ipermercati. Nota bene: le quantità sono illimitate tranne che per le bevande con un massimo di 2 casse. " stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Acquisti supermercati con consegna domani "+arrayservizi[1].toFixed(2)+"€"} value="1" />
@@ -637,7 +846,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio non prevede la sosta)." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio non prevede la sosta)." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Hugo ti accompagna senza sosta "+arrayservizi[2].toFixed(2)+"€"} value="2" />
@@ -645,7 +854,7 @@ export default function Hugo({ navigation, route }) {
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.w100]}>
                     <View style={{ width:"5%"}}>
-                      <Info tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio prevede la sosta con un supplemento, scegli quante ore deve aspettarti)." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                      <Info setVisible7={setVisible7} tinfo="Hugò ti accompagna da un punto ad un altro della città con la sua auto o con la tua. Ti accompagna a fare la spesa, per una visita medica o ovunque tu voglia (il servizio prevede la sosta con un supplemento, scegli quante ore deve aspettarti)." stili={[ss.mt15,ss.w100,ss.mx0]} />
                     </View>
                     <View style={{ width:"95%"}}>
                       <RadioButton.Item style={[ss.bordomare, ss.mb5]} label={"Hugo ti accompagna con sosta "+arrayservizi[4].toFixed(2)+"€"} value="4" />
@@ -656,77 +865,14 @@ export default function Hugo({ navigation, route }) {
                 </RadioButton.Group> */}
               </View>
             </Surface>
-            
-            <MostraOpzioniServizio 
-              servizio={servizio} 
-              cosa={cosa} 
-              setCosa={setCosa} 
-              Info={Info} 
-              sostiuisci={sostiuisci} 
-              setSostiuisci={setSostiuisci} 
-              spesamax={spesamax} 
-              setSpesamax={setSpesamax} 
-              coupon={coupon} 
-              setcoupon={setcoupon} 
-              duratasosta={duratasosta} 
-              setduratasosta={setduratasosta} 
-            />
-            <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Se vuoi indicami dove andare</Button>
-            <Portal>
-              <Dialog visible={visible4} onDismiss={hideDialog4}>
-                <Dialog.Title>Se vuoi indicami dove andare</Dialog.Title>
-                <Dialog.Content>
-                  <TextInput
-                    multiline = {true}
-                    numberOfLines = {4}
-                    label="Note"
-                    value={note2}
-                    onChangeText={note2 => setNote2(note2)}
-                  />
-                  <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog4}>OK</Button>
-                </Dialog.Content>
-              </Dialog>
-            </Portal> 
-            <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-              <View style={[{flexDirection: 'row', alignItems: 'center'},ss.w100,ss.textcentro]}>
-                <Info tinfo="Hugà ti chiamerà in caso di dubbi, prodotto mancante o per chiederti ulteriori dettagli." />
-                <Text style={{ fontWeight: 'bold' }}>Chiamami</Text>
-                <Checkbox
-                  status={chiamami ? 'checked' : 'unchecked'}
-                  onPress={() => {
-                    setChiamami(!chiamami);
-                  }}
-                />
-              </View>
-              <View  style={[ss.p3,ss.w100]}>
-                <Divider />
-              </View>
-              <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
-                <Text style={ss.w20}>Mancia</Text> 
-                <Button onPress={() => {1 === mancia ? setMancia("no"): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
-                <Button  onPress={() => {2 === mancia ? setMancia("no"): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
-                <Button onPress={() => {5 === mancia ? setMancia("no"): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
-                <Button onPress={() => {10 === mancia ? setMancia("no"): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
-              </View>
-              <View  style={[ss.p3,ss.w100]}>
-                <Divider />
-              </View>
-              <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
-                <Text style={[ss.w50,ss.pe5]}>E' necessaria un auto per questo servizio?</Text> 
-                <Button onPress={() => {1 === auto ? setAuto("no"): setAuto(1);}} style={[(1 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === auto ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
-                <Button onPress={() => {0 === auto ? setAuto("no"): setAuto(0);}} style={[(0 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={0 === auto ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
-              </View>
-              <OpzioniAuto /> 
-            </Surface>
-
-                
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
               {
                 (typeof(dispo)!="undefined" && dispo.length) ?
                   <View>
-                    <View style={{ flexDirection: 'row'}}>
-                      <Info tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
-                      <Text style={[{ fontSize: 20 },ss.mt5]}>Scegli un orario {testooggidomani}:</Text>
+                    <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                    <View style={[{ flexDirection: 'row'}, ss.mt10]}>
+                      <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
+                      <Text style={[{ fontSize: 20 },ss.mt5]}>Scegli un orario {testooggidomani} *:</Text>
                     </View>
                     <View>
                       {
@@ -777,14 +923,91 @@ export default function Hugo({ navigation, route }) {
                 :
                   (attivitabase!="no") ?
                     (dispo=="") ?
-                      <View><Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi.</Text></View>
+                      <View>
+                        <Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi.</Text>
+                        <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                      </View>
                     :
                       <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
                   :
-                  <View><Text style={{ fontSize: 20 }}>Seleziona un indirizzo per vedere le nostre disponibilità</Text></View>
+                  <View>
+                    <Text style={[{ fontSize: 20 }, ss.textcentro]}>Seleziona un indirizzo per vedere le nostre disponibilità</Text>
+                    <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Scegli un indirizzo di consegna *</Button>
+                  </View>
               }
             </Surface>
-            <Button onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note</Button>
+            <MostraOpzioniServizio 
+              servizio={servizio} 
+              setVisible7={setVisible7} 
+              cosa={cosa} 
+              setCosa={setCosa} 
+              Info={Info} 
+              settestoinfo={settestoinfo}
+              sostiuisci={sostiuisci} 
+              setSostiuisci={setSostiuisci} 
+              spesamax={spesamax} 
+              setSpesamax={setSpesamax} 
+              coupon={coupon} 
+              setcoupon={setcoupon} 
+              duratasosta={duratasosta} 
+              setduratasosta={setduratasosta} 
+              indirizzoalternativo={indirizzoalternativo} 
+              setindirizzoalternativo={setindirizzoalternativo} 
+              note2={note2} 
+              setNote2={setNote2} 
+              validaCoupon={validaCoupon} 
+            />
+            {/* <Button onPress={showDialog4}  mode="contained"  style={[ss.w100,ss.mt15]}>Se vuoi indicami dove andare</Button>
+            <Portal>
+              <Dialog visible={visible4} onDismiss={hideDialog4}>
+                <Dialog.Title>Se vuoi indicami dove andare</Dialog.Title>
+                <Dialog.Content>
+                  <TextInput
+                    multiline = {true}
+                    numberOfLines = {4}
+                    label="Note"
+                    value={note2}
+                    onChangeText={note2 => setNote2(note2)}
+                  />
+                  <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog4}>OK</Button>
+                </Dialog.Content>
+              </Dialog>
+            </Portal>  */}
+            <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+              <View style={[{flexDirection: 'row', alignItems: 'center'},ss.w100,ss.textcentro]}>
+                <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Hugò ti chiamerà prima di effettuare il servizio richiesto per chiederti ulteriori dettagli" />
+                <Text style={{ fontWeight: 'bold' }}>Hugò ti chiama</Text>
+                <Checkbox
+                  status={chiamami ? 'checked' : 'unchecked'}
+                  onPress={() => {
+                    setChiamami(!chiamami);
+                  }}
+                />
+              </View>
+              <View  style={[ss.p3,ss.w100]}>
+                <Divider />
+              </View>
+              <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+                <Text style={ss.w20}>Mancia</Text> 
+                <Button onPress={() => {1 === mancia ? setMancia("no"): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
+                <Button  onPress={() => {2 === mancia ? setMancia("no"): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
+                <Button onPress={() => {5 === mancia ? setMancia("no"): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
+                <Button onPress={() => {10 === mancia ? setMancia("no"): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w20]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
+              </View>
+              <View  style={[ss.p3,ss.w100]}>
+                <Divider />
+              </View>
+              <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+                <Text style={[ss.w50,ss.pe5]}>E' necessaria un auto per questo servizio?</Text> 
+                <Button onPress={() => {1 === auto ? setAuto("no"): setAuto(1);}} style={[(1 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === auto ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+                <Button onPress={() => {0 === auto ? setAuto("no"): setAuto(0);}} style={[(0 === auto ? ss.selected : ss.unselected),ss.w25]} labelStyle={0 === auto ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
+              </View>
+              <OpzioniAuto /> 
+            </Surface>
+
+                
+            
+            <Button color="#00a1ae" onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
             <Portal>
               <Dialog visible={visible3} onDismiss={hideDialog3}>
                 <Dialog.Title>Inserisci note</Dialog.Title>
@@ -806,10 +1029,10 @@ export default function Hugo({ navigation, route }) {
               <Text style={ss.h2}> €</Text>
             </Surface>
             
-            <Button onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento</Button>
+            <Button color="#00a1ae" onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
             <Portal>
               <Dialog visible={visible5} onDismiss={hideDialog5}>
-                <Dialog.Title>Scegli il metodo di pagamento</Dialog.Title>
+                <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
                 <Dialog.Content>
                   <RadioButton.Group onValueChange={metodo_pagamento => setMetodo_Pagamento(metodo_pagamento)} value={metodo_pagamento}>
                     {/* <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Carta di credito" value="0" />
@@ -817,8 +1040,25 @@ export default function Hugo({ navigation, route }) {
                     <RadioButton.Item style={[ss.bordomare, ss.mb5]} label="Saldo" value="2" />
                     <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" />  */}
                     <RadioMetodo id="1" etichetta="Contanti alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
-                    <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
+                    {
+                      saldo!="" && saldo>0 ?
+                        <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
+                      : null 
+                    }
                   </RadioButton.Group>
+                  {
+                    saldo!="" && saldo>0 ?
+                      <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                        <Text style={ss.h2}>Il tuo saldo è: </Text>
+                        <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{saldo.toFixed(2)}</Text>
+                        <Text style={ss.h2}> €</Text>
+                      </Surface>
+                    : 
+                      <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                        <Text style={[ss.h2,,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
+                        <Button color="#00a1ae" onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
+                      </Surface>
+                  }
                   <Button  style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog5}>OK</Button>
                 </Dialog.Content>
               </Dialog>
@@ -826,7 +1066,7 @@ export default function Hugo({ navigation, route }) {
             <TouchableOpacity
               onPress={
                 () => {
-                  inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, oraprenotazione);
+                  inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, indirizzoalternativo,coupon, oraprenotazione);
                 }
               }
               style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>

@@ -32,6 +32,7 @@ export default function RicaricaSaldo({ navigation }) {
             }
             let checkgo=true;
             let errore="";
+            // console.log('richiestaricaricasaldo', richiestaricaricasaldo);
             if(importo==""){checkgo=false,errore+="Per favore inserisci un importo. \r\n"}
             if(nominativo==""){checkgo=false,errore+="Per favore inserisci un nominativo. \r\n"}
             if(ncarta==""){checkgo=false,errore+="Per favore inserisci il numero di carta. \r\n"}
@@ -40,6 +41,7 @@ export default function RicaricaSaldo({ navigation }) {
             if(ascadenza==""){checkgo=false,errore+="Per inserisci l'anno di scadenza. \r\n"}
             if(checkgo){
                 let Ricaricasaldo=await richiesta(richiestaricaricasaldo);
+                // console.log(Ricaricasaldo);
                 if(Ricaricasaldo.Risposta=="Ricarica_effettuata"){
                     alert("Ricarica effettuata");
                     navigation.navigate('Hugo', {
@@ -110,7 +112,7 @@ export default function RicaricaSaldo({ navigation }) {
                         }}
                         value={ascadenza ?? ""}
                     />
-                    <Button onPress={() => effettuaricarica(nominativo,importo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
+                    <Button onPress={() => effettuaricarica(importo,nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
                 </View>
             </ScrollView>
             <Footer no="profilo"/>

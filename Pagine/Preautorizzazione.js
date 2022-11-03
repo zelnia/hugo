@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View,Text,SafeAreaView,ScrollView } from 'react-native';
+import { View,Text,SafeAreaView,ScrollView,Image } from 'react-native';
 import { Button,TextInput } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
-import {richiesta,getData} from '../struttura/Utils.js';
+import {richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../struttura/Footer.js';
 
@@ -108,6 +108,9 @@ export default function Preautorizzazione({ navigation, route }) {
                         value={ascadenza ?? ""}
                     />
                     <Button onPress={() => registracarta(nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
+                    
+                    <Image source={require('../assets/stripeecarte.png')} style={[{height: calcolaAltezza(551,218,20)},ss.w100, ss.mt10]}  />   
+                    
                     <Footer no="profilo"/>
                 </View>
             </ScrollView>
