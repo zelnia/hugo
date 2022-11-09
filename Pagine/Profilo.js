@@ -6,6 +6,7 @@ import { Surface, Text, Divider } from 'react-native-paper';
 import {SafeAreaView, ScrollView, View,Alert} from 'react-native';
 import {richiesta,getData,Grassetto,EtichettaSurface} from '../struttura/Utils.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
 
 export default function Profilo({ navigation, route }) {
@@ -47,6 +48,39 @@ export default function Profilo({ navigation, route }) {
       }
     ]
   );
+  function alertCancellaIndirizzo (Id_Indirizzo) {
+    Alert.alert(
+      "Cancellazione Indirizzo",
+      "Quest operazone cancellerà il tuo Indirizzo dai nostri server e non sarà possibile annullarla. Sei sicuro?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { 
+          text: "OK", 
+          onPress: async () => {
+            let Id_User = await getData('@Id_User');
+            let richiestacancellaindirizzo={
+              "Operazione":'cancellaindirizzo',
+              "Id_Indirizzo":Id_Indirizzo,
+              "Id_User":Id_User,
+            }
+            try {
+              richiesta(richiestacancellaindirizzo,'apiHugo')
+              .then(async (json) => {
+                setindirizzi(json);
+              });
+            } catch(e) {
+              // remove error
+            }
+          } 
+        }
+      ]
+    );
+  } 
+    
   const alertCancellaPreautorizzazione = () => Alert.alert(
     "Cancellazione Preautorizzazione",
     "Questa operazone cancelleràla preautorizzazione per il tuo utente. Sei sicuro?",
@@ -78,31 +112,40 @@ export default function Profilo({ navigation, route }) {
   );
 
 
+   //  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
 
-  useEffect(() => {
-    async function fetchData() {
-      let Id_User = await getData('@Id_User');
-      if(typeof(Id_User)!==null){
-        let richiestautente={
-          "Operazione":'getUtente',
-          "Id_User":Id_User,
+      async function fetchData() {
+        let Id_User = await getData('@Id_User');
+        if(typeof(Id_User)!==null){
+          let richiestautente={
+            "Operazione":'getUtente',
+            "Id_User":Id_User,
+          }
+          let datiutente = await richiesta(richiestautente,'apiHugo');
+          setutente(datiutente);
+          let richiestaindirizzi={
+            "Operazione":'getIndirizzi',
+            "Id_User":Id_User,
+          }
+          let datiindirizzi = await richiesta(richiestaindirizzi,'apiHugo');
+          if(typeof(datiindirizzi)!==null){
+            if (isActive) {
+              setindirizzi(datiindirizzi);
+            }
+          }
+        } else {
+          navigation.navigate('Accesso');
         }
-        let datiutente = await richiesta(richiestautente,'apiHugo');
-        setutente(datiutente);
-        let richiestaindirizzi={
-          "Operazione":'getIndirizzi',
-          "Id_User":Id_User,
-        }
-        let datiindirizzi = await richiesta(richiestaindirizzi,'apiHugo');
-        if(typeof(datiindirizzi)!==null){
-          setindirizzi(datiindirizzi);
-        }
-      } else {
-        navigation.navigate('Accesso');
       }
-    }
-    fetchData();
-  }, []);
+      fetchData();
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
     return (
       <SafeAreaView style={ss.safeareaview}>
@@ -115,25 +158,6 @@ export default function Profilo({ navigation, route }) {
             <EtichettaSurface etichetta="Codice Amico:">{utente.Codice_Amico}</EtichettaSurface>
             <EtichettaSurface etichetta="Telefono:">{utente.Telefono}</EtichettaSurface>
             <EtichettaSurface etichetta="Saldo:">{utente.Saldo}</EtichettaSurface>
-          </View>
-          <View style={[ss.p10]}>
-            <Text  style={[ss.h1,ss.textcentro]}>Indirizzi:</Text>
-            {
-              indirizzi!==null ?
-                indirizzi.map((indirizzo, index) => (
-                  <Surface key={"indrizzo_"+index} style={[ss.bordogrigio,ss.p10, ss.mt10]}>
-                    <Grassetto>Indirizzo {index+1}</Grassetto>
-                    <Divider />
-                    <EtichettaSurface etichetta="Via:" stilisurf={[ss.mt5]}>{indirizzo.Via}</EtichettaSurface>
-                    <EtichettaSurface etichetta="Civico:">{indirizzo.Civico}</EtichettaSurface>
-                    <EtichettaSurface etichetta="Cap:">{indirizzo.Cap}</EtichettaSurface>
-                    <EtichettaSurface etichetta="Città:">{indirizzo.Citta}</EtichettaSurface>
-                    <EtichettaSurface etichetta="Provincia:">{indirizzo.Provincia}</EtichettaSurface>
-                  </Surface>
-                ))
-              :
-              <Text  style={[ss.textcentro]}>Nessun indirizzo in memoria.</Text>
-            }
           </View>
           <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
             <Button color="#00a1ae" onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100]}>Ricarica il saldo</Button>
@@ -150,6 +174,26 @@ export default function Profilo({ navigation, route }) {
           </View>
           <View style={[ss.centro,ss.w100,ss.mt15,ss.px5]}>
             <Button color="#00a1ae" onPress={()=>{Linking.openURL('https://hugopersonalshopper.it/candidatura.html');}}  mode="outlined"  style={[ss.w100]}>Diventa un Hugò</Button>
+          </View>
+          <View style={[ss.p10]}>
+            <Text  style={[ss.h1,ss.textcentro]}>Indirizzi:</Text>
+            {
+              indirizzi!==null ?
+                indirizzi.map((indirizzo, index) => (
+                  <Surface key={"indrizzo_"+index} style={[ss.bordogrigio,ss.p10, ss.mt10]}>
+                    <Grassetto>Indirizzo {index+1}</Grassetto>
+                    <Divider />
+                    <EtichettaSurface etichetta="Via:" stilisurf={[ss.mt5]}>{indirizzo.Via}</EtichettaSurface>
+                    <EtichettaSurface etichetta="Civico:">{indirizzo.Civico}</EtichettaSurface>
+                    <EtichettaSurface etichetta="Cap:">{indirizzo.Cap}</EtichettaSurface>
+                    <EtichettaSurface etichetta="Città:">{indirizzo.Citta}</EtichettaSurface>
+                    <EtichettaSurface etichetta="Provincia:">{indirizzo.Provincia}</EtichettaSurface>
+                    <Button color="#ffc107"  onPress={()=>{alertCancellaIndirizzo(indirizzo.Id)}} mode="contained"  style={[ss.w100, ss.mt10]}>Cancella indirizzo</Button>
+                  </Surface>
+                ))
+              :
+              <Text  style={[ss.textcentro]}>Nessun indirizzo in memoria.</Text>
+            }
           </View>
         </ScrollView>
         <Footer no="profilo"/>

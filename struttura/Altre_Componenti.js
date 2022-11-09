@@ -6,7 +6,9 @@ import { Button, Paragraph,Portal, Dialog,IconButton} from 'react-native-paper';
 function CosafaInterno() {
     return(
         <>
-            <Paragraph style={ss.giustificato}>Hugò è il tuo personal shopper può ritirare acquistare e consegnare qualsiasi cosa (Farmaci, spesa, pasticcini, etc.).</Paragraph>
+            <Paragraph style={ss.giustificato}>Hugò è un app di servizi: Hugò può essere il tuo personal shopper.</Paragraph>
+            <Paragraph style={ss.giustificato}>Può ritirare acquistare e consegnare qualsiasi cosa (Farmaci, spesa, pasticcini, etc.).</Paragraph>
+            <Paragraph style={ss.giustificato}>Può comprare anche una pizza e consegnartela a domicilio.</Paragraph>
             <Paragraph style={ss.giustificato}>Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC, attivo solo in alcune città).</Paragraph>
             {/* <Paragraph style={ss.giustificato}>Inserisci nelle note dove vuoi andare, numero di passeggeri, data e ora di partenza. Cliccka l'ora in cui vuoi essere chiamato, ti richiameremo per un preventivo immediato. </Paragraph> */}
         </>

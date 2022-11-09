@@ -43,7 +43,7 @@ export default function Registrazione({ navigation, route }) {
   const [cap2, setcap2] = useState('');
 
 
-  async function inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,Note_Indirizzo,telefono){
+  async function inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,Note_Indirizzo,telefono,codiceamico){
     try {
       let richiestaregistrazione= {
         "Operazione":'Registrazione',
@@ -57,7 +57,8 @@ export default function Registrazione({ navigation, route }) {
         "cap":cap,
         "note":note,
         "Note_Indirizzo":Note_Indirizzo,
-        "telefono":telefono
+        "telefono":telefono,
+        "codiceamico":codiceamico
       }
       let checkgo=true;
       let errore="";
@@ -116,14 +117,6 @@ export default function Registrazione({ navigation, route }) {
                   />
                   <TextInput
                     style={[ss.w100,ss.mt15]}
-                    label="Codice amico"
-                    onChangeText={(codiceamico) => {
-                      setcodiceamico(codiceamico)
-                    }}
-                    value={codiceamico ?? ""}
-                  />
-                  <TextInput
-                    style={[ss.w100,ss.mt15]}
                     label="Indirizzo"
                     onChangeText={(indirizzo) => {
                       setindirizzo(indirizzo)
@@ -132,15 +125,16 @@ export default function Registrazione({ navigation, route }) {
                   />
                   <View style={{ flexDirection: 'row'}}>
                     <TextInput
-                      style={[ss.w50,ss.mt15]}
+                      style={[ss.w49,ss.mt15]}
                       label="Civico"
                       onChangeText={(civico) => {
                         setcivico(civico)
                       }}
                       value={civico ?? ""}
                     />
+                    <View style={ss.w2}></View>
                     <TextInput
-                      style={[ss.w50,ss.mt15]}
+                      style={[ss.w49,ss.mt15]}
                       label="Citta"
                       onChangeText={(citta) => {
                         setcitta(citta)
@@ -150,15 +144,16 @@ export default function Registrazione({ navigation, route }) {
                   </View>
                   <View style={{ flexDirection: 'row'}}>
                     <TextInput
-                      style={[ss.w50,ss.mt15]}
+                      style={[ss.w49,ss.mt15]}
                       label="Provincia"
                       onChangeText={(provincia) => {
                         setprovincia(provincia)
                       }}
                       value={provincia ?? ""}
                     />
+                    <View style={ss.w2}></View>
                     <TextInput
-                      style={[ss.w50,ss.mt15]}
+                      style={[ss.w49,ss.mt15]}
                       label="Cap"
                       onChangeText={(cap) => {
                         setcap(cap)
@@ -189,6 +184,16 @@ export default function Registrazione({ navigation, route }) {
                       settelefono(telefono)
                     }}
                     value={telefono ?? ""}
+                  />
+                  <Text style={[ss.textcentro, ss.mt10,ss.h2]}>Hai un codice amico?</Text>
+                  <Text style={[ss.textcentro]}>Indicalo per guadagnare subito 2 euro nel tuo saldo!</Text>
+                  <TextInput
+                    style={[ss.w100,ss.mt15]}
+                    label="Codice Amico"
+                    onChangeText={(codiceamico) => {
+                      setcodiceamico(codiceamico)
+                    }}
+                    value={codiceamico ?? ""}
                   />
                   {/* <Button mode="outlined"  style={[ss.w100,ss.mt15]}>Invia sms di conferma</Button>
                   <TextInput
@@ -277,7 +282,7 @@ export default function Registrazione({ navigation, route }) {
                     </Dialog>
                   </Portal>  */}
                   <Button mode="contained"  style={[ss.w100,ss.mt15]}
-                   onPress={() => {inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,note,telefono);}}
+                   onPress={() => {inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,note,telefono,codiceamico);}}
                   >Registrati</Button>
                   <Button icon='arrow-left' onPress={() => {navigation.navigate('Accesso');}} style={[ss.w100,ss.mt15]}>Oppure torna indietro</Button>
                 </View>

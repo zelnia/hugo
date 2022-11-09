@@ -34,6 +34,9 @@ const ss= StyleSheet.create({
       borderColor: "#ccc",
       borderRadius: 4,
     },
+    row: {
+      flexDirection:"row"
+    },
     mx25:{
       marginHorizontal:25,
     },
@@ -154,6 +157,9 @@ const ss= StyleSheet.create({
     mx0:{
       marginHorizontal: 0,
     },
+    me5:{
+      marginEnd: 5,
+    },
     mt5:{
       marginTop: 5,
     },
@@ -205,7 +211,7 @@ const ss= StyleSheet.create({
       color: '#00a1ae'
     },
     h2: {
-      fontSize: 16
+      fontSize: 20
     },
     h3: {
       fontSize: 16,
@@ -228,6 +234,12 @@ const ss= StyleSheet.create({
     w33: {
       width:'33.33%',
     },
+    w2: {
+      width:'2%',
+    },
+    w49: {
+      width:'49%',
+    },
     w50: {
       width:'50%',
     },
@@ -249,6 +261,9 @@ const ss= StyleSheet.create({
     centro: {
       alignItems: 'center',
       marginHorizontal:'auto'
+    },
+    gra: {
+      fontWeight:"bold"
     },
     item: {
       backgroundColor: "#f7ead7",

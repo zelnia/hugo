@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View,Text,SafeAreaView,ScrollView,Image } from 'react-native';
-import { Button,TextInput } from 'react-native-paper';
+import { Button,Surface,TextInput } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
 import {richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,7 +66,7 @@ export default function Preautorizzazione({ navigation, route }) {
         <SafeAreaView style={ss.safeareaview}>
             <ScrollView>
                 <View style={ss.container}>
-                    <Text  style={[ss.h1,ss.textcentro,ss.mt15]}>Inserisci i dati della tua carta di credito:</Text>
+                    <Text  style={[ss.h1,ss.textcentro,ss.mt15]}>Inserisci i dati della tua carta di credito o debito:</Text>
                     <TextInput
                         style={[ss.w100,ss.mt15]}
                         label="Nominativo"
@@ -91,25 +91,32 @@ export default function Preautorizzazione({ navigation, route }) {
                         }}
                         value={cvc ?? ""}
                     />
-                    <TextInput
-                        style={[ss.w100,ss.mt15]}
-                        label="Mese scadenza"
-                        onChangeText={(mscadenza) => {
-                            setmscadenza(mscadenza)
-                        }}
-                        value={mscadenza ?? ""}
-                    />
-                    <TextInput
-                        style={[ss.w100,ss.mt15]}
-                        label="Anno scadenza"
-                        onChangeText={(ascadenza) => {
-                            setascadenza(ascadenza)
-                        }}
-                        value={ascadenza ?? ""}
-                    />
+                    <View style={[ss.w100,ss.row]}>
+                        <TextInput
+                            style={[ss.w49,ss.mt15]}
+                            label="Mese scadenza"
+                            onChangeText={(mscadenza) => {
+                                setmscadenza(mscadenza)
+                            }}
+                            value={mscadenza ?? ""}
+                        />
+                        <View style={ss.w2}></View>
+                        <TextInput
+                            style={[ss.w49,ss.mt15]}
+                            label="Anno scadenza"
+                            onChangeText={(ascadenza) => {
+                                setascadenza(ascadenza)
+                            }}
+                            value={ascadenza ?? ""}
+                        />
+                    </View>
+                    <Surface style={[ss.surface1,ss.mt15,ss.w100,ss.p10]} elevation={4}>
+                        <Text style={{textAlign:"justify"}}>Fornendo i dati della tua carta , consenti ad Hugò di preautorizzare o addebitare su di essa i futuri pagamenti in base a quanto previsto dai termini e condizioni.</Text>
+                        <Text style={{textAlign:"justify"}}>N.b.: Ad ogni transazione, hai la sempre la possibilità di cancellare i tuoi dati con il tasto cancella preautorizzazione nel tuo profilo.</Text>
+                    </Surface>
                     <Button onPress={() => registracarta(nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
                     
-                    <Image source={require('../assets/stripeecarte.png')} style={[{height: calcolaAltezza(551,218,20)},ss.w100, ss.mt10]}  />   
+                    <Image source={require('../assets/stripeecarte.png')} style={[{height: calcolaAltezza(363,143,20)},ss.w100, ss.mt10]}  />   
                     
                     <Footer no="profilo"/>
                 </View>

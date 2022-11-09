@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View,Text,SafeAreaView,ScrollView } from 'react-native';
+import { View,Text,SafeAreaView,ScrollView,Image } from 'react-native';
 import { Button,TextInput } from 'react-native-paper';
 import {ss} from '../struttura/style.js';
-import {richiesta,getData} from '../struttura/Utils.js';
+import {richiesta,getData,calcolaAltezza} from '../struttura/Utils.js';
 import Footer from '../struttura/Footer.js';
 
 export default function RicaricaSaldo({ navigation }) {
@@ -113,6 +113,9 @@ export default function RicaricaSaldo({ navigation }) {
                         value={ascadenza ?? ""}
                     />
                     <Button onPress={() => effettuaricarica(importo,nominativo,ncarta,cvc,mscadenza,ascadenza)} mode="contained"  style={[ss.w100,ss.mt15]}>Invia</Button>
+                      
+                    <Image source={require('../assets/stripeecarte.png')} style={[{height: calcolaAltezza(363,143,20)},ss.w100, ss.mt10]}  />   
+                    
                 </View>
             </ScrollView>
             <Footer no="profilo"/>
