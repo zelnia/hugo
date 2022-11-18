@@ -2,7 +2,7 @@ import {  Platform, View, TouchableOpacity, SafeAreaView, ScrollView,Image ,Aler
 import React, { useState, useEffect } from 'react';
 // import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox,IconButton,Modal} from 'react-native-paper';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 
 //Componenti custom
@@ -20,6 +20,7 @@ const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
   return (
     <IconButton
       icon="information"
+      // color='#6200ee'
       color='#00a1ae'
       size={20}
       style={stili}
@@ -359,7 +360,7 @@ export default function Hugo({ navigation, route }) {
           <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
         <View style={{ width:"90%"}}>
-          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta+" "+costo.toFixed(2)+"€"} value={id} />
+          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta+(costo>0?" "+costo.toFixed(2)+"€":"")} value={id} />
         </View>
     </View>
     )
@@ -517,7 +518,6 @@ export default function Hugo({ navigation, route }) {
             break;
           case 2:
             richiestaprenotazione["Operazione"]="AcquistoConSaldo";
-            console.log('richiestaprenotazione', richiestaprenotazione);
             let AcquistoConSaldo=await richiesta(richiestaprenotazione);
             if(AcquistoConSaldo.Risposta=="inserimento_ritiro_riuscito"){
               setSaldo(parseFloat(AcquistoConSaldo.Saldo));
@@ -589,12 +589,26 @@ export default function Hugo({ navigation, route }) {
       }
       let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
       let listaindirizzi = await richiesta(richiestaindi);
-      setIndirizzi(listaindirizzi);
+      // setIndirizzi(listaindirizzi);
       let richiestaservizi={"Operazione":'getServizi2',"Id_User":Id_User}
       let elencoservizi = await richiesta(richiestaservizi);
       setlistaservizi(elencoservizi);
-      let json_res = await richiesta(richestaaggiornamento);
-      aggiornaPagina(json_res);
+
+      let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+      if(UltimoIndirizzo!==null){
+        setIndirizzo(UltimoIndirizzo);
+      } else {
+        // console.log('listaindirizzi[0].Id', listaindirizzi[0].Id);
+        // setIndirizzo(listaindirizzi[0].Id);
+        if(listaindirizzi.length==1){
+          setIndirizzo(listaindirizzi[0].Id);
+        }
+      }
+      
+      if(typeof(richestaaggiornamento.id_attivita_base)!=="undefined" && richestaaggiornamento.id_attivita_base !="undefined" && richestaaggiornamento.id_attivita_base !="no"){
+        let json_res = await richiesta(richestaaggiornamento);
+        aggiornaPagina(json_res);
+      }
     }
     fetchData();
   }, [Id_Utente]);
@@ -615,9 +629,11 @@ export default function Hugo({ navigation, route }) {
           "Id_Indirizzo":indirizzo,
         }
         let jattivitabase = await richiesta(richiestaattivitabase);
-        setattivitabase(jattivitabase.id_attivita_base);
-        setdescrizioneindirizzo(jattivitabase.descrizione_indirizzo);
-        richestaaggiornamento.id_attivita_base=jattivitabase.id_attivita_base;
+        if(typeof(jattivitabase.id_attivita_base)!=="undefined" && jattivitabase.id_attivita_base !="undefined" && jattivitabase.id_attivita_base !="no"){
+          setattivitabase(jattivitabase.id_attivita_base);
+          setdescrizioneindirizzo(jattivitabase.descrizione_indirizzo);
+          richestaaggiornamento.id_attivita_base=jattivitabase.id_attivita_base;
+        }
         let json_res = await richiesta(richestaaggiornamento);
         aggiornaPagina(json_res);
       }
@@ -647,10 +663,8 @@ export default function Hugo({ navigation, route }) {
   //     //   "iduser":Id_User,
   //     // },'apiHugo');
   //     aggiornaPagina(json_res);
-  //     console.log("testA");
   //   }, MINUTE_MS);
     
-  //   console.log("test3");
   //   return () => clearInterval(intervalloritiri); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   // }, [attivitabase]);
   
@@ -683,9 +697,11 @@ export default function Hugo({ navigation, route }) {
     }
     setServizio(servizio);
     richestaaggiornamento.servizio=servizio;
-    async ()=> {
-      let json_res = await richiesta(richestaaggiornamento);
-      aggiornaPagina(json_res);
+    if(typeof(richestaaggiornamento.id_attivita_base)!=="undefined" && richestaaggiornamento.id_attivita_base !="undefined" && richestaaggiornamento.id_attivita_base !="no"){
+      async ()=> {
+        let json_res = await richiesta(richestaaggiornamento);
+        aggiornaPagina(json_res);
+      }
     }
   }
 
@@ -748,7 +764,8 @@ export default function Hugo({ navigation, route }) {
                 <Text style={ss.h2}>mi faciliteresti il compito.</Text>
               </Surface>
             </View>
-            <Button  color="#00a1ae" onPress={ssettogglevisibilita}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
+            <Button onPress={ssettogglevisibilita}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
+            {/*  color="#00a1ae"  */}
             {/* <Cosafa visibilita={visible} /> */}
             <Portal>
               <Dialog visible={visible} onDismiss={hideDialog}>
@@ -761,7 +778,8 @@ export default function Hugo({ navigation, route }) {
                 </Dialog.Content>
               </Dialog>
             </Portal>
-            <Button icon="phone" color="#00a1ae" onPress={apriwa}  mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
+            <Button icon="phone" onPress={apriwa}  mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
+            {/*  color="#00a1ae"  */}
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
               <Text style={[{ fontWeight: 'bold' }, ss.textcentro]}> Le opzioni contrassegnate con un asterisco * sono obbligatorie.</Text> 
             </Surface>
@@ -775,6 +793,7 @@ export default function Hugo({ navigation, route }) {
                     (typeof(indirizzi)!="undefined" && indirizzi.length) ?
                       <RadioButton.Group onValueChange={
                         indirizzo => {
+                          AsyncStorage.setItem('@UltimoIndirizzo', indirizzo);
                           setIndirizzo(indirizzo);
                           setVisible2(false);
                           // if(indirizzoalternativo==""){
@@ -785,8 +804,6 @@ export default function Hugo({ navigation, route }) {
                           //     }
                           //   });
                           // }
-                          // console.log('indirizzo', indirizzo);
-                          // console.log('indirizzi', indirizzi);
                         }
                       } value={indirizzo}>
                         {
@@ -878,6 +895,13 @@ export default function Hugo({ navigation, route }) {
                               richiesta(datinuovoindirizzo,'apiHugo').then((json) => {
                                 if(json.ok) {
                                   setIndirizzi(json.dati);
+                                  setNuovoindirizzo("");
+                                  setCivico("");
+                                  setNuovacitta("");
+                                  setNuovaprovincia("");
+                                  setNuovcap("");
+                                  setNuovotel("");
+                                  setNuovenoteindirizzo("");
                                 } else {
                                   alert("Dati errati");
                                 }
@@ -916,7 +940,22 @@ export default function Hugo({ navigation, route }) {
                   {
                     (typeof(dispo)!="undefined" && dispo.length) ?
                       <View>
-                        <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                        <Button  
+                        // color="#00a1ae" 
+                        onPress={
+                          async () => {
+                            let Id_User = await getData('@Id_User');
+                            let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+                            let listaindirizzi = await richiesta(richiestaindi);
+                            setIndirizzi(listaindirizzi);
+                            showDialog2();
+                          }
+                        }  
+                        mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                        <View style={[ss.my10,ss.w100]}>
+                          <Text style={[{ fontSize: 20 },ss.mt5,ss.textcentro]}>{descrizioneindirizzo}</Text>
+                        </View>
+                        <Divider />
                         <View style={[{ flexDirection: 'row'}, ss.mt10]}>
                           <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
                           <Text style={[{ fontSize: 20 },ss.mt5]}>Scegli un orario {testooggidomani}*</Text>
@@ -971,15 +1010,37 @@ export default function Hugo({ navigation, route }) {
                       (attivitabase!="no") ?
                         (dispo=="") ?
                           <View>
-                            <Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi.</Text>
-                            <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                            <Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text>
+                            <Button  
+                            // color="#00a1ae" 
+                            onPress={
+                              async () => {
+                                let Id_User = await getData('@Id_User');
+                                let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+                                let listaindirizzi = await richiesta(richiestaindi);
+                                setIndirizzi(listaindirizzi);
+                                showDialog2();
+                              }
+                            }  
+                            mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
                           </View>
                         :
-                          <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita</Text></View>
+                          <View><Text style={{ fontSize: 20 }}>Nessuna disponibilita. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text></View>
                       :
                         <View>
                           <Text style={[{ fontSize: 20 }, ss.textcentro]}>Seleziona un servizio e un indirizzo per vedere le nostre disponibilità di consegna.</Text>
-                          <Button  color="#00a1ae" onPress={showDialog2}  mode="contained"  style={[ss.w100, ss.mt10]}>Scegli un indirizzo di consegna *</Button>
+                          <Button  
+                            //color="#00a1ae"
+                            onPress={
+                              async () => {
+                                let Id_User = await getData('@Id_User');
+                                let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+                                let listaindirizzi = await richiesta(richiestaindi);
+                                setIndirizzi(listaindirizzi);
+                                showDialog2();
+                              }
+                            }  
+                            mode="contained"  style={[ss.w100, ss.mt10]}>Scegli un indirizzo di consegna *</Button>
                         </View>
                   }
                 </Surface>
@@ -1041,9 +1102,12 @@ export default function Hugo({ navigation, route }) {
 
                       
                   
-                  <Button color="#00a1ae" onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
+                  <Button 
+                  //color="#00a1ae" 
+                  onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
                   <Portal>
-                    <Modal visible={visible3} onDismiss={hideDialog3}  style={[{justifyContent:"start"}, ss.p10]} contentContainerStyle={[{backgroundColor:"#fff"}, ss.p25]}>
+                    {/* style={[{justifyContent:"start"}, ss.p10]} */}
+                    <Modal visible={visible3} onDismiss={hideDialog3}  style={[ss.p10]} contentContainerStyle={[{backgroundColor:"#fff"}, ss.p25]}>
                       <Text style={ss.h2}>Inserisci note</Text>
                       <TextInput
                         multiline = {true}
@@ -1062,7 +1126,9 @@ export default function Hugo({ navigation, route }) {
                     <Text style={ss.h2}> €</Text>
                   </Surface>
                   
-                  <Button color="#00a1ae" onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
+                  <Button 
+                  //color="#00a1ae" 
+                  onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
                   <Portal>
                     <Dialog visible={visible5} onDismiss={hideDialog5}>
                       <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
@@ -1105,7 +1171,9 @@ export default function Hugo({ navigation, route }) {
                           : 
                             <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                               <Text style={[ss.h2,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
-                              <Button color="#00a1ae" onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
+                              <Button 
+                              // color="#00a1ae" 
+                              onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
                             </Surface>
                         }
                       </Dialog.Content>

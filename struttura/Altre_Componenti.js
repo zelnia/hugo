@@ -1,6 +1,7 @@
 import {ss} from './style.js';
 import React, { useEffect } from 'react';
 import { Button, Paragraph,Portal, Dialog,IconButton} from 'react-native-paper';
+import * as Linking from 'expo-linking';
 
 
 function CosafaInterno() {
@@ -11,6 +12,7 @@ function CosafaInterno() {
             <Paragraph style={ss.giustificato}>Può comprare anche una pizza e consegnartela a domicilio.</Paragraph>
             <Paragraph style={ss.giustificato}>Può accompagnarti dove tu vorrai (in città) e se devi spostarti fuori città Hugò è anche un servizio taxi con conducente (NCC, attivo solo in alcune città).</Paragraph>
             {/* <Paragraph style={ss.giustificato}>Inserisci nelle note dove vuoi andare, numero di passeggeri, data e ora di partenza. Cliccka l'ora in cui vuoi essere chiamato, ti richiameremo per un preventivo immediato. </Paragraph> */}
+            <Button icon="video" color="#00a1ae" onPress={()=>{Linking.openURL("https://www.youtube.com/watch?v=K4e_9qXC4_I");}}  mode="outlined"  style={[ss.w100]}>Hai dubbi? Guarda la nostra video guida!</Button>
         </>
     );
 }

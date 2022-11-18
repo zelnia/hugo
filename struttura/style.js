@@ -106,13 +106,15 @@ const ss= StyleSheet.create({
     },
     bordogrigio: {
       borderWidth: 1,
-      borderColor: "#00a1ae",
+      borderColor: "#6200ee",
+      // borderColor: "#00a1ae",
       borderRadius: 7,
       backgroundColor: "#eee",
     },
     bordomare: {
       borderWidth: 1,
-      borderColor: "#00a1ae",
+      borderColor: "#6200ee",
+      // borderColor: "#00a1ae",
       borderRadius: 7,
     },
     input1: {
@@ -204,11 +206,13 @@ const ss= StyleSheet.create({
     },
     hextra: {
       fontSize: 36, 
+      // color: '#6200ee'
       color: '#00a1ae'
     },
     h1: {
       fontSize: 22, 
-      color: '#00a1ae'
+      color: '#6200ee'
+      // color: '#00a1ae'
     },
     h2: {
       fontSize: 20
@@ -256,7 +260,8 @@ const ss= StyleSheet.create({
       backgroundColor: 'lightgrey'
     },
     bgverdemare: {
-      backgroundColor: '#00a1ae'
+      backgroundColor: '#6200ee'
+      // backgroundColor: '#00a1ae'
     },
     centro: {
       alignItems: 'center',
@@ -305,7 +310,8 @@ const ss= StyleSheet.create({
       borderRadius: 10,
     },
     selected: {
-      backgroundColor: '#00a1ae',
+      backgroundColor: '#6200ee',
+      // backgroundColor: '#00a1ae',
     },
     labelselected: {
       color:"#fff"
