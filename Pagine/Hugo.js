@@ -13,7 +13,7 @@ import {CosafaInterno} from '../struttura/Altre_Componenti.js';
 // import {Cosafa,Info2} from '../struttura/Altre_Componenti.js';
 // import { Link } from '@react-navigation/native';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const numeroversione=10014; //parametro aggiornamento
+const numeroversione=10016; //parametro aggiornamento
 const casuale=Math.floor(Math.random() * 10);
 // function Info({tinfo,stili}){
 const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
