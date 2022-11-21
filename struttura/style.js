@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 
+
+// 76497f
+const accent1="#d44b9e";
+
 const ss= StyleSheet.create({
+    accent1:{
+      color:accent1,
+    },
     divinterno1: {
       flex: 1,
       marginVertical:30,
@@ -117,6 +124,11 @@ const ss= StyleSheet.create({
       // borderColor: "#00a1ae",
       borderRadius: 7,
     },
+    bordoaccent1: {
+      borderWidth: 1,
+      borderColor: accent1,
+      borderRadius: 7,
+    },
     input1: {
       height: 50,
       backgroundColor: "#fff",
@@ -211,7 +223,8 @@ const ss= StyleSheet.create({
     },
     h1: {
       fontSize: 22, 
-      color: '#6200ee'
+      color: accent1
+      // color: '#6200ee'
       // color: '#00a1ae'
     },
     h2: {
@@ -310,7 +323,8 @@ const ss= StyleSheet.create({
       borderRadius: 10,
     },
     selected: {
-      backgroundColor: '#6200ee',
+      backgroundColor: accent1,
+      // backgroundColor: '#6200ee',
       // backgroundColor: '#00a1ae',
     },
     labelselected: {

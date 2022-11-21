@@ -15,13 +15,15 @@ import {CosafaInterno} from '../struttura/Altre_Componenti.js';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const numeroversione=10016; //parametro aggiornamento
 const casuale=Math.floor(Math.random() * 10);
+const accent1="#d44b9e";
+// const accent1="#b3336e";
 // function Info({tinfo,stili}){
 const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
   return (
     <IconButton
       icon="information"
       // color='#6200ee'
-      color='#00a1ae'
+      color={accent1}
       size={20}
       style={stili}
       onPress={async () => {
@@ -360,7 +362,7 @@ export default function Hugo({ navigation, route }) {
           <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
         <View style={{ width:"90%"}}>
-          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta+(costo>0?" "+costo.toFixed(2)+"€":"")} value={id} />
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta+(costo>0?" "+costo.toFixed(2)+"€":"")} value={id} />
         </View>
     </View>
     )
@@ -373,7 +375,7 @@ export default function Hugo({ navigation, route }) {
           <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
         <View style={{ width:"90%"}}>
-          <RadioButton.Item style={[ss.bordomare, ss.mb5, ss.w100]} label={etichetta} value={id} />
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={id} />
         </View>
       </View>
     )
@@ -764,7 +766,7 @@ export default function Hugo({ navigation, route }) {
                 <Text style={ss.h2}>mi faciliteresti il compito.</Text>
               </Surface>
             </View>
-            <Button onPress={ssettogglevisibilita}  mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
+            <Button onPress={ssettogglevisibilita} color={accent1} mode="contained"  style={[ss.w100]}>Cosa fa Hugò?</Button>
             {/*  color="#00a1ae"  */}
             {/* <Cosafa visibilita={visible} /> */}
             <Portal>
@@ -778,7 +780,7 @@ export default function Hugo({ navigation, route }) {
                 </Dialog.Content>
               </Dialog>
             </Portal>
-            <Button icon="phone" onPress={apriwa}  mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
+            <Button icon="phone" onPress={apriwa}  color={accent1} mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
             {/*  color="#00a1ae"  */}
             <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
               <Text style={[{ fontWeight: 'bold' }, ss.textcentro]}> Le opzioni contrassegnate con un asterisco * sono obbligatorie.</Text> 
@@ -815,7 +817,7 @@ export default function Hugo({ navigation, route }) {
                       </RadioButton.Group>
                     : null
                   }
-                  <Button onPress={showDialog6}  mode="outlined"  style={[ss.w100]}>Nuovo indirizzo</Button>
+                  <Button onPress={showDialog6} color={accent1} mode="outlined"  style={[ss.w100]}>Nuovo indirizzo</Button>
                   <Portal>
                     <Dialog visible={visible6} onDismiss={hideDialog6}>
                       <Dialog.Title>Inserisci un nuovo indirizzo</Dialog.Title>
@@ -940,7 +942,7 @@ export default function Hugo({ navigation, route }) {
                   {
                     (typeof(dispo)!="undefined" && dispo.length) ?
                       <View>
-                        <Button  
+                        <Button   color={accent1}
                         // color="#00a1ae" 
                         onPress={
                           async () => {
@@ -1011,7 +1013,7 @@ export default function Hugo({ navigation, route }) {
                         (dispo=="") ?
                           <View>
                             <Text style={{ fontSize: 20 }}>Al momento non ci sono Riders disponibili. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text>
-                            <Button  
+                            <Button  color={accent1} 
                             // color="#00a1ae" 
                             onPress={
                               async () => {
@@ -1029,7 +1031,7 @@ export default function Hugo({ navigation, route }) {
                       :
                         <View>
                           <Text style={[{ fontSize: 20 }, ss.textcentro]}>Seleziona un servizio e un indirizzo per vedere le nostre disponibilità di consegna.</Text>
-                          <Button  
+                          <Button   color={accent1}
                             //color="#00a1ae"
                             onPress={
                               async () => {
@@ -1093,16 +1095,16 @@ export default function Hugo({ navigation, route }) {
                     </View>
                     <Text style={[ss.w100,ss.gra, ss.textcentro, ss.mt10]}>Mancia</Text> 
                     <View style={[ss.row,ss.centro,ss.w100]}>
-                      <Button onPress={() => {1 === mancia ? setMancia(0): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
-                      <Button  onPress={() => {2 === mancia ? setMancia(0): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
-                      <Button onPress={() => {5 === mancia ? setMancia(0): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
-                      <Button onPress={() => {10 === mancia ? setMancia(0): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
+                      <Button color={accent1} onPress={() => {1 === mancia ? setMancia(0): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
+                      <Button color={accent1} onPress={() => {2 === mancia ? setMancia(0): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
+                      <Button color={accent1} onPress={() => {5 === mancia ? setMancia(0): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
+                      <Button color={accent1} onPress={() => {10 === mancia ? setMancia(0): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
                     </View>
                   </Surface>
 
                       
                   
-                  <Button 
+                  <Button  color={accent1}
                   //color="#00a1ae" 
                   onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
                   <Portal>
@@ -1117,7 +1119,7 @@ export default function Hugo({ navigation, route }) {
                         value={note}
                         onChangeText={note => setNote(note)}
                       />
-                      <Button style={[ss.w100, ss.mt15]} mode="contained" onPress={hideDialog3}>OK</Button>
+                      <Button style={[ss.w100, ss.mt15]} color={accent1} mode="contained" onPress={hideDialog3}>OK</Button>
                     </Modal>
                   </Portal> 
                   <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
@@ -1126,9 +1128,16 @@ export default function Hugo({ navigation, route }) {
                     <Text style={ss.h2}> €</Text>
                   </Surface>
                   
-                  <Button 
+                  <Button  color={accent1}
                   //color="#00a1ae" 
-                  onPress={showDialog5}  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
+                  onPress={async ()=>{
+                    if(typeof(richestaaggiornamento.id_attivita_base)!=="undefined" && richestaaggiornamento.id_attivita_base !="undefined" && richestaaggiornamento.id_attivita_base !="no"){
+                      let json_res = await richiesta(richestaaggiornamento);
+                      aggiornaPagina(json_res);
+                    }
+                    showDialog5();
+                  }}  
+                  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
                   <Portal>
                     <Dialog visible={visible5} onDismiss={hideDialog5}>
                       <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
@@ -1171,7 +1180,7 @@ export default function Hugo({ navigation, route }) {
                           : 
                             <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                               <Text style={[ss.h2,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
-                              <Button 
+                              <Button  color={accent1}
                               // color="#00a1ae" 
                               onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
                             </Surface>

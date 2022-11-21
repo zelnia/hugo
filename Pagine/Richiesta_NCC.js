@@ -3,12 +3,52 @@ import {useNavigation} from '@react-navigation/native';
 import Footer from '../struttura/Footer.js';
 import React, { useState, useEffect, useRef } from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
-import { TextInput,Surface, RadioButton,Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
+import { TextInput,Surface, RadioButton,Button,Portal, Dialog,Provider, Text, Checkbox,IconButton,modal} from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown'
 import {richiesta,getData} from '../struttura/Utils.js';
 import * as Linking from 'expo-linking';
+
+
+const accent1="#d44b9e";
+const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
+  return (
+    <IconButton
+      icon="information"
+      color={accent1}
+      size={20}
+      style={stili}
+      onPress={async () => {
+        settestoinfo(tinfo);
+        setVisible7(true);
+      }}
+    />
+  )
+}
+
 export default function Richiesta_NCC({ navigation, route }) {
 
+  function RadioMetodo({id,etichetta,info}){
+    return (
+      <View style={[{ flexDirection: 'row'},ss.w100]}>
+        <View style={{ width:"10%"}}>
+          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        </View>
+        <View style={{ width:"90%"}}>
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={id} />
+        </View>
+      </View>
+    )
+  }
+
+  const [visible5, setVisible5] = React.useState(false);
+  const showDialog5 = () => setVisible5(true);
+  const hideDialog5 = () => setVisible5(false);
+  const [visible7, setVisible7] = React.useState(false);
+  const [testoinfo, settestoinfo] = useState("");
+  
+  const listametodi = ["Carta","Saldo","AcquistoDiretto"];
+  const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
+  const [saldo, setSaldo] = useState(0);
   const [viapartenza, setviapartenza] = useState('');
   const [viadestinazione, setviadestinazione] = useState('');
   const [cittapartenza, setcittapartenza] = useState('');
@@ -358,6 +398,72 @@ export default function Richiesta_NCC({ navigation, route }) {
                       <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                         <Text style={ss.h2}>Durata: {duratatotale}</Text>
                       </Surface>
+                      <Button  color={accent1}
+                        //color="#00a1ae" 
+                        onPress={async ()=>{
+                          let idutente= await getData("@Id_User");
+                          let richiestasaldo={
+                            "Operazione":'richiestaSaldo',
+                            "iduser":idutente,
+                          }
+                          let json_res = await richiesta(richiestasaldo);
+                          setSaldo(json_res.altro.Saldo);
+                          showDialog5();
+                        }}  
+                        mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
+                        <Portal>
+                          <Dialog visible={visible5} onDismiss={hideDialog5}>
+                            <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
+                            <Dialog.Content>
+                              <RadioButton.Group 
+                                onValueChange={
+                                  (metodo_pagamento)=>{
+                                    setVisible5(false);
+                                    setMetodo_Pagamento(metodo_pagamento);
+                                  }
+                                } value={metodo_pagamento}>
+                                {
+                                  listametodi.includes("Carta") ?
+                                    <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" /> 
+                                  : null
+                                }
+                                {
+                                  listametodi.includes("Pre") ?
+                                    <RadioMetodo id="1" etichetta="Contanti o POS alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
+                                  : null
+                                }
+                                {
+                                  listametodi.includes("Saldo") && saldo>costototale ?
+                                    <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
+                                  : null 
+                                }
+                                {
+                                  listametodi.includes("AcquistoDiretto") ?
+                                    <RadioMetodo id="3" etichetta="Pagamento alla consegna in contanti o POS" info="Il pagamento sarà effettuato al completamento del servizio." />
+                                  : null 
+                                }
+                              </RadioButton.Group>
+                              {
+                                saldo>=costototale ?
+                                  <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                                    <Text style={ss.h2}>Il tuo saldo è: </Text>
+                                    <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>
+                                      {saldo}
+                                      {/* {saldo.toFixed(2)} */}
+                                    </Text>
+                                    <Text style={ss.h2}> €</Text>
+                                  </Surface>
+                                : 
+                                  <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                                    <Text style={[ss.h2,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
+                                    <Button  color={accent1}
+                                    // color="#00a1ae" 
+                                    onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
+                                  </Surface>
+                              }
+                            </Dialog.Content>
+                          </Dialog>
+                        </Portal> 
                       <Button mode="contained"  onPress={invioRichiesta}  style={[ss.w100,ss.mt15]}>Acquista</Button>    
                     </>
                   :
