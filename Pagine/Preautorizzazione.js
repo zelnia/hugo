@@ -8,6 +8,7 @@ import Footer from '../struttura/Footer.js';
 
 export default function Preautorizzazione({ navigation, route }) {
     const [nominativo, setnominativo] = useState('');
+    const [emailcarta, setemailcarta] = useState('');
     const [ncarta, setncarta] = useState('');
     const [cvc, setcvc] = useState('');
     const [mscadenza, setmscadenza] = useState('');
@@ -47,6 +48,11 @@ export default function Preautorizzazione({ navigation, route }) {
                       } catch (e) {
                         console.log(e);
                       }
+                      setnominativo("");
+                      setncarta("");
+                      setcvc("");
+                      setmscadenza("");
+                      setascadenza("");
                       navigation.navigate('Hugo', {
                         Id_Utente: Id_User,Nominativo:Nominativo2
                       });
@@ -68,48 +74,71 @@ export default function Preautorizzazione({ navigation, route }) {
                 <View style={ss.container}>
                     <Text  style={[ss.h1,ss.textcentro,ss.mt15]}>Inserisci i dati della tua carta di credito o debito:</Text>
                     <TextInput
+                        mode="outlined"
                         style={[ss.w100,ss.mt15]}
-                        label="Nominativo"
+                        label="Email"
+                        onChangeText={(emailcarta) => {
+                            setemailcarta(emailcarta)
+                        }}
+                        value={emailcarta ?? ""}
+                    />
+                    
+                    <Surface style={[ss.surface1,ss.mt15,ss.w100,ss.p10]} elevation={2}>
+                        <Text  style={[ss.mt15]}>Dati della carta:</Text>
+                        
+                        <View style={[{alignItems:"center"},ss.w100,ss.row]}>
+                            <TextInput
+                                mode="outlined"
+                                style={[ss.w100,ss.mt15,ss.w75]}
+                                label="Numero Carta"
+                                onChangeText={(ncarta) => {
+                                    setncarta(ncarta)
+                                }}
+                                value={ncarta ?? ""}
+                            />
+                            <Image source={require('../assets/carte.png')} style={[{height: calcolaAltezza(359,83,20,25)},ss.w25, ss.mt10]}  />   
+                        </View>
+                        <View style={[ss.w100,ss.row]}>
+                            <TextInput 
+                                mode="outlined"
+                                style={[ss.w32,ss.mt15]}
+                                label="MM"
+                                onChangeText={(mscadenza) => {
+                                    setmscadenza(mscadenza)
+                                }}
+                                value={mscadenza ?? ""}
+                            />
+                            <View style={ss.w2}></View>
+                            <TextInput
+                                mode="outlined"
+                                style={[ss.w32,ss.mt15]}
+                                label="AA"
+                                onChangeText={(ascadenza) => {
+                                    setascadenza(ascadenza)
+                                }}
+                                value={ascadenza ?? ""}
+                            />
+                            <View style={ss.w2}></View>
+                            <TextInput
+                                mode="outlined"
+                                style={[ss.w32,ss.mt15]}
+                                label="CVC"
+                                onChangeText={(cvc) => {
+                                    setcvc(cvc)
+                                }}
+                                value={cvc ?? ""}
+                            />
+                        </View>
+                    </Surface>
+                    <TextInput
+                        mode="outlined"
+                        style={[ss.w100,ss.mt15]}
+                        label="Titolare della carta"
                         onChangeText={(nominativo) => {
                             setnominativo(nominativo)
                         }}
                         value={nominativo ?? ""}
                     />
-                    <TextInput
-                        style={[ss.w100,ss.mt15]}
-                        label="Numero Carta"
-                        onChangeText={(ncarta) => {
-                            setncarta(ncarta)
-                        }}
-                        value={ncarta ?? ""}
-                    />
-                    <TextInput
-                        style={[ss.w100,ss.mt15]}
-                        label="CVC"
-                        onChangeText={(cvc) => {
-                            setcvc(cvc)
-                        }}
-                        value={cvc ?? ""}
-                    />
-                    <View style={[ss.w100,ss.row]}>
-                        <TextInput
-                            style={[ss.w49,ss.mt15]}
-                            label="Mese scadenza"
-                            onChangeText={(mscadenza) => {
-                                setmscadenza(mscadenza)
-                            }}
-                            value={mscadenza ?? ""}
-                        />
-                        <View style={ss.w2}></View>
-                        <TextInput
-                            style={[ss.w49,ss.mt15]}
-                            label="Anno scadenza"
-                            onChangeText={(ascadenza) => {
-                                setascadenza(ascadenza)
-                            }}
-                            value={ascadenza ?? ""}
-                        />
-                    </View>
                     <Surface style={[ss.surface1,ss.mt15,ss.w100,ss.p10]} elevation={4}>
                         <Text style={{textAlign:"justify"}}>Fornendo i dati della tua carta , consenti ad Hugò di preautorizzare o addebitare su di essa i futuri pagamenti in base a quanto previsto dai termini e condizioni.</Text>
                         <Text style={{textAlign:"justify"}}>N.b.: Ad ogni transazione, hai la sempre la possibilità di cancellare i tuoi dati con il tasto cancella preautorizzazione nel tuo profilo.</Text>

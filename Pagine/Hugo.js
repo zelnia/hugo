@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox,IconButton,Modal} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
+import * as Location from 'expo-location';
 
 //Componenti custom
 import {ss} from '../struttura/style.js';
@@ -13,16 +14,15 @@ import {CosafaInterno} from '../struttura/Altre_Componenti.js';
 // import {Cosafa,Info2} from '../struttura/Altre_Componenti.js';
 // import { Link } from '@react-navigation/native';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const numeroversione=10016; //parametro aggiornamento
+const numeroversione=10017; //parametro aggiornamento
 const casuale=Math.floor(Math.random() * 10);
-const accent1="#d44b9e";
+const accent1="#6f10b7";
 // const accent1="#b3336e";
 // function Info({tinfo,stili}){
 const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
   return (
     <IconButton
       icon="information"
-      // color='#6200ee'
       color={accent1}
       size={20}
       style={stili}
@@ -61,6 +61,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               value={indirizzoalternativo}
               onChangeText={indirizzoalternativo => setindirizzoalternativo(indirizzoalternativo)}
             />
+            <Button 
+              icon="map-marker"
+              onPress={
+                async () => {
+                  let { status } = await Location.requestForegroundPermissionsAsync();
+                  if (status !== 'granted') {
+                    setErrorMsg('Non è possibile proseguire senza il permesso per identificare la posizione.');
+                    return;
+                  }
+                  let location = await Location.getCurrentPositionAsync({});
+                  let place = await Location.reverseGeocodeAsync({
+                    latitude : location.coords.latitude,
+                    longitude : location.coords.longitude
+                  });
+                  let indirizzogeolocalizzato="";
+                  indirizzogeolocalizzato+=place[0].street+" ";
+                  indirizzogeolocalizzato+=place[0].streetNumber+" ";
+                  indirizzogeolocalizzato+=place[0].city+" ";
+                  indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                  setindirizzoalternativo(indirizzogeolocalizzato);
+                }
+              } 
+            >Geolocalizzati</Button>
+
           </View>
           <View  style={[ss.p3,ss.w100]}>
             <Divider />
@@ -146,6 +170,29 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               value={indirizzoalternativo}
               onChangeText={indirizzoalternativo => setindirizzoalternativo(indirizzoalternativo)}
             />
+            <Button 
+              icon="map-marker"
+              onPress={
+                async () => {
+                  let { status } = await Location.requestForegroundPermissionsAsync();
+                  if (status !== 'granted') {
+                    setErrorMsg('Non è possibile proseguire senza il permesso per identificare la posizione.');
+                    return;
+                  }
+                  let location = await Location.getCurrentPositionAsync({});
+                  let place = await Location.reverseGeocodeAsync({
+                    latitude : location.coords.latitude,
+                    longitude : location.coords.longitude
+                  });
+                  let indirizzogeolocalizzato="";
+                  indirizzogeolocalizzato+=place[0].street+" ";
+                  indirizzogeolocalizzato+=place[0].streetNumber+" ";
+                  indirizzogeolocalizzato+=place[0].city+" ";
+                  indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                  setindirizzoalternativo(indirizzogeolocalizzato);
+                }
+              } 
+            >Geolocalizzati</Button>
           </View>
           <View  style={[ss.p3,ss.w100]}>
             <Divider />
@@ -254,8 +301,8 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             <TextInput
               textAlign={'center'}
               onChangeText={(spesamax) => {
-                setSpesamax(spesamax.replace(/[^0-9]/g, ''))
-                // setSpesamax(spesamax)
+                setSpesamax(spesamax.replace(/[^0-9,]/g, ''))
+                // setSpesamax(spesamax.replace(/[^0-9]/g, ''))
               }}
               value={spesamax ?? ""}
               style={[{ height:32},ss.w100]}
@@ -352,6 +399,8 @@ export default function Hugo({ navigation, route }) {
   const [testoinfo, settestoinfo] = useState("");
 
 
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
 
   
@@ -362,7 +411,8 @@ export default function Hugo({ navigation, route }) {
           <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
         <View style={{ width:"90%"}}>
-          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta+(costo>0?" "+costo.toFixed(2)+"€":"")} value={id} />
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={id} />
+          {/* <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta+(costo>0?" "+costo.toFixed(2)+"€":"")} value={id} /> */}
         </View>
     </View>
     )
@@ -384,6 +434,7 @@ export default function Hugo({ navigation, route }) {
   // const [checked, setChecked] = React.useState(0);
   // const arrayservizi=[4.90,6.50,14.99,0,14.99,4.90,4.90];
   const [costogestioneincassi, setcostogestioneincassi] = useState(0);
+  const [costoservizio, setcostoservizio] = useState(0);
   const [totale, settotale] = useState(0);
   const [saldo, setSaldo] = useState(0);
   const [telefono, settelefono] = useState("");
@@ -450,6 +501,7 @@ export default function Hugo({ navigation, route }) {
 
 
   async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione){
+    let fixspesamax=spesamax.replace(",", ".");
     try {
       let richiestaprenotazione= {
         "cliente":Id_Utente,
@@ -464,7 +516,7 @@ export default function Hugo({ navigation, route }) {
         "auto":auto,
         "chiamami":chiamami,
         "sostiuisci":sostiuisci,
-        "spesamax":spesamax,
+        "spesamax":fixspesamax,
         "coupon":coupon,
         "scontocoupon":scontocoupon,
         "indirizzoalternativo":indirizzoalternativo,
@@ -565,7 +617,6 @@ export default function Hugo({ navigation, route }) {
       let Id_User = await getData('@Id_User');
       let richiestacheckaggiornamento={"Operazione":'checkVersione'}
       let checkAggiornamento = await richiesta(richiestacheckaggiornamento);
-      // console.log('checkAggiornamento', checkAggiornamento);
       if(checkAggiornamento.versione>numeroversione){
         Alert.alert(
           "Aggiornamento disponibile",
@@ -600,8 +651,6 @@ export default function Hugo({ navigation, route }) {
       if(UltimoIndirizzo!==null){
         setIndirizzo(UltimoIndirizzo);
       } else {
-        // console.log('listaindirizzi[0].Id', listaindirizzi[0].Id);
-        // setIndirizzo(listaindirizzi[0].Id);
         if(listaindirizzi.length==1){
           setIndirizzo(listaindirizzi[0].Id);
         }
@@ -645,11 +694,26 @@ export default function Hugo({ navigation, route }) {
     listaservizi.forEach(element => {
       if(element["id"]==servizio){
         setlistametodi(element["metodi_di_pagamento"]);
+        setcostoservizio(element["costo"]);
         return costoserv=element["costo"];
       }
     });
-    settotale((servizio!="no"?costoserv:0)+costogestioneincassi+parseFloat((spesamax!=""?spesamax:0))+(duratasosta/30*5)-scontocoupon+mancia);
-    // settotale((servizio!="no"?arrayservizi[servizio]:0)+costogestioneincassi+parseFloat(spesamax)+(duratasosta/30*5)-scontocoupon);
+    // (spesamax!=""?spesamax:0)
+    // (spesamax!=""?parseFloat((spesamax==="string"?spesamax.replace(/,/, '.'):spesamax)).toFixed(2):0)
+    // (spesamax==="string"?parseFloat(spesamax.replace(/,/, '.')).toFixed(2):)
+    // parseFloat((spesamax!=""?spesamax:0))
+    // parseFloat(spesamax!=""?(typeof spesamax==="string"?spesamax.replace(/,/, '.'):spesamax):0).toFixed(2)
+    // (parseFloat((typeof spesamax==="string"?spesamax.replace(/,/, '.'):spesamax)))
+    let costospesamax=0;
+    if(spesamax!=""){
+      if(typeof spesamax==="string"){
+        costospesamax=parseFloat(spesamax.replace(/,/, '.'));
+      } else {
+        costospesamax=parseFloat(spesamax);
+      }
+    }
+    // console.log(typeof(costospesamax));
+    settotale((servizio!="no"?costoserv:0)+costogestioneincassi+costospesamax+(duratasosta/30*5)-scontocoupon+mancia);
   }, [indirizzo,servizio,spesamax,duratasosta,scontocoupon,mancia]);
 
 
@@ -732,7 +796,6 @@ export default function Hugo({ navigation, route }) {
   }
 
   async function validaCoupon(cod_coupon){
-    console.log('cod_coupon', cod_coupon);
     if(cod_coupon.length>4){
       let richiestavalidazione={
         "Operazione":'validaCoupon',
@@ -1122,10 +1185,69 @@ export default function Hugo({ navigation, route }) {
                       <Button style={[ss.w100, ss.mt15]} color={accent1} mode="contained" onPress={hideDialog3}>OK</Button>
                     </Modal>
                   </Portal> 
-                  <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-                    <Text style={ss.h2}>Totale servizio: </Text>
-                    <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{totale.toFixed(2)}</Text>
-                    <Text style={ss.h2}> €</Text>
+                  <Surface style={[ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                    {
+                      costoservizio>0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Costo servizio: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
+                    {/* {
+                      costoservizio>0?
+                        <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
+                          <Text style={ss.h2}>Costo servizio: </Text>
+                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                          <Text style={ss.h2}> €</Text>
+                        </View>
+                      : null
+                    } */}
+                    {
+                      spesamax!=0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Spesa massima: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
+                    {/* {
+                      spesamax!=0?
+                        <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
+                          <Text style={ss.h2}>Spesa massima: </Text>
+                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
+                          <Text style={ss.h2}> €</Text>
+                        </View>
+                      : null
+                    } */}
+                    {
+                      mancia>0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Mancia: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{mancia.toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
+                    <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro,ss.py10]}>
+                      <Text style={ss.h2}>Totale: </Text>
+                      <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{totale.toFixed(2)}</Text>
+                      <Text style={ss.h2}> €</Text>
+                    </View>
                   </Surface>
                   
                   <Button  color={accent1}

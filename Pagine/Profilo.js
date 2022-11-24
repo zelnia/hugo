@@ -83,7 +83,7 @@ export default function Profilo({ navigation, route }) {
     
   const alertCancellaPreautorizzazione = () => Alert.alert(
     "Cancellazione Preautorizzazione",
-    "Questa operazone cancelleràla preautorizzazione per il tuo utente. Sei sicuro?",
+    "Questa operazone cancellerà la preautorizzazione, inclusi i dati della tua carta, per il tuo utente. Sei sicuro?",
     [
       {
         text: "No",

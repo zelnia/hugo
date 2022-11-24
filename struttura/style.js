@@ -2,7 +2,8 @@ import { StyleSheet } from 'react-native';
 
 
 // 76497f
-const accent1="#d44b9e";
+const accent1="#6f10b7";
+// const accent1="#d44b9e";
 
 const ss= StyleSheet.create({
     accent1:{
@@ -148,7 +149,6 @@ const ss= StyleSheet.create({
       borderBottomWidth: 1,
       borderBottomColor: "#ccc",
       borderBottomRadius: 2,
-      backgroundColor: "#aaddff",
     },
     bordomsblu: {
       borderWidth: 1,
@@ -247,6 +247,9 @@ const ss= StyleSheet.create({
     },
     w25: {
       width:'25%',
+    },
+    w32: {
+      width:'32%',
     },
     w33: {
       width:'33.33%',

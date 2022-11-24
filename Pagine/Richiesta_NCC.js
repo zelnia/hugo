@@ -2,14 +2,15 @@ import {ss} from '../struttura/style.js';
 import {useNavigation} from '@react-navigation/native';
 import Footer from '../struttura/Footer.js';
 import React, { useState, useEffect, useRef } from 'react';
-import {SafeAreaView, ScrollView, View} from 'react-native';
+import {SafeAreaView, ScrollView, View, Keyboard,TouchableWithoutFeedback} from 'react-native';
 import { TextInput,Surface, RadioButton,Button,Portal, Dialog,Provider, Text, Checkbox,IconButton,modal} from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown'
 import {richiesta,getData} from '../struttura/Utils.js';
 import * as Linking from 'expo-linking';
+import * as Location from 'expo-location';
 
 
-const accent1="#d44b9e";
+const accent1="#6f10b7";
 const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
   return (
     <IconButton
@@ -73,6 +74,7 @@ export default function Richiesta_NCC({ navigation, route }) {
 
 
   async function getCosto() {
+    Keyboard.dismiss;
     let riciestaCostoNCC={
       "Operazione":'getCostoNCC',
       "Partenza":viapartenza+", "+cittapartenza,
@@ -80,7 +82,7 @@ export default function Richiesta_NCC({ navigation, route }) {
       "Sosta":duratasosta,
     }
     let jcosto = await richiesta(riciestaCostoNCC);
-    console.log('jcosto.risposta', jcosto.risposta);
+    // console.log('jcosto.risposta', jcosto.risposta);
     if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
       let duratabase=Math.ceil(parseFloat(jcosto.risposta.Durata)/60+duratasosta);
       if(duratabase<=59){
@@ -100,20 +102,9 @@ export default function Richiesta_NCC({ navigation, route }) {
     }
   }
   async function invioRichiesta() {
+    let idutente= await getData("@Id_User");
     let checkgo=true;
-    let riciestaRichiesta={
-      "Operazione":'riciestaRichiesta',
-      "Indirizzo_Partenza":viapartenza,
-      "Citta_Partenza":cittapartenza,
-      "Indirizzo_Destinazione":viadestinazione,
-      "Citta_Destinazione":cittadestinazione,
-      "Durata_Sosta":duratasosta,
-      "giorno":giorno,
-      "mese":mese,
-      "anno":anno,
-      "Passeggeri":passeggeri,
-      "Note":note,
-    }
+
     let messaggioerrore="Per favore compila i seguenti campi:";
     if(viapartenza==""){messaggioerrore+=" 'Via di partenza'";checkgo=false;}
     if(cittapartenza==""){messaggioerrore+=" 'Città di partenza'";checkgo=false;}
@@ -169,20 +160,42 @@ export default function Richiesta_NCC({ navigation, route }) {
     if(mese==""){messaggioerrore+=" 'Mese'";checkgo=false;}
     if(anno==""){messaggioerrore+=" 'Anno'";checkgo=false;}
     if(checkgo){
-      let jriciestaRichiesta = await richiesta(riciestaRichiesta);
-      if(jriciestaRichiesta){
-        alert("Richiesta inviata correttamente!");
-        try {
-          let idutente= await getData("@Id_User");
-          let nom= await getData("@Nominativo");
-          navigation.navigate('Hugo',{
-            Id_Utente: idutente,Nominativo:nom
-          });
-        } catch (error) {
-          console.log('error', error);
-        }
+      let richiestaRichiesta={
+        "Operazione":'richiestaRichiesta',
+        "Indirizzo_Partenza":viapartenza,
+        "Citta_Partenza":cittapartenza,
+        "Indirizzo_Destinazione":viadestinazione,
+        "Citta_Destinazione":cittadestinazione,
+        "Durata_Sosta":duratasosta,
+        "giorno":giorno,
+        "mese":mese,
+        "anno":anno,
+        "Passeggeri":passeggeri,
+        "Note":note,
+        "Metodo_Pagamento":metodo_pagamento,
+        "Cliente":idutente
+      }
+      console.log('idutente', idutente);
+      console.log('richiestaRichiesta', richiestaRichiesta);
+
+      if(metodo_pagamento==0 || metodo_pagamento=="0"){
+        let acquisto=await richiesta(richiestaRichiesta,false,"https://ristostore.it/Pagamenti/AcquistoNCCHugo");
+        Linking.openURL(acquisto.PaginaAcquisto);
       } else {
-        alert("Richiesta non riuscita");
+        let jrichiestaRichiesta = await richiesta(richiestaRichiesta);
+        if(jrichiestaRichiesta){
+          alert("Richiesta inviata correttamente!");
+          try {
+            let nom= await getData("@Nominativo");
+            navigation.navigate('Hugo',{
+              Id_Utente: idutente,Nominativo:nom
+            });
+          } catch (error) {
+            console.log('error', error);
+          }
+        } else {
+          alert("Richiesta non riuscita");
+        }
       }
     } else {
       alert(messaggioerrore);
@@ -192,7 +205,7 @@ export default function Richiesta_NCC({ navigation, route }) {
     return (
       <Provider>
         <SafeAreaView style={ss.safeareaview}>
-          <ScrollView>
+          <ScrollView keyboardShouldPersistTaps='handled'>
             <View style={ss.container}>
               <Text  style={ss.h1}>Richiesta noleggio con conducente</Text>
               <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
@@ -202,7 +215,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                     <TextInput
                       mode='outlined'
                       style={[ss.w100]}
-                      label="Via di partenza"
+                      label="Via di partenza e numero civico"
                       onChangeText={(viapartenza) => {
                         setviapartenza(viapartenza)
                       }}
@@ -220,6 +233,27 @@ export default function Richiesta_NCC({ navigation, route }) {
                       value={cittapartenza ?? ""}
                     />
                   </View>
+                  <View>
+                    <Button 
+                      icon="map-marker"
+                      onPress={
+                        async () => {
+                          let { status } = await Location.requestForegroundPermissionsAsync();
+                          if (status !== 'granted') {
+                            setErrorMsg('Permission to access location was denied');
+                            return;
+                          }
+                          let location = await Location.getCurrentPositionAsync({});
+                          let place = await Location.reverseGeocodeAsync({
+                            latitude : location.coords.latitude,
+                            longitude : location.coords.longitude
+                          });
+                          setviapartenza(place[0].street+" "+place[0].streetNumber);
+                          setcittapartenza(place[0].city);
+                        }
+                      } 
+                    >Geolocalizzati</Button>
+                  </View>
                 </Surface>
                 
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
@@ -228,7 +262,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                     <TextInput
                       mode='outlined'
                       style={[ss.w100,ss.mt15]}
-                      label="Via di destinazione"
+                      label="Via di destinazione e numero civico"
                       onChangeText={(viadestinazione) => {
                         setviadestinazione(viadestinazione)
                       }}
