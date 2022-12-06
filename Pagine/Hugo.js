@@ -14,7 +14,7 @@ import {CosafaInterno} from '../struttura/Altre_Componenti.js';
 // import {Cosafa,Info2} from '../struttura/Altre_Componenti.js';
 // import { Link } from '@react-navigation/native';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const numeroversione=10017; //parametro aggiornamento
+const numeroversione=10018; //parametro aggiornamento
 const casuale=Math.floor(Math.random() * 10);
 const accent1="#6f10b7";
 // const accent1="#b3336e";
@@ -495,13 +495,22 @@ export default function Hugo({ navigation, route }) {
     }
   }
   async function apriwa(){
-    Linking.openURL("https://wa.me/+393333256236");
+    Linking.openURL("https://wa.me/+393383083224");
   }
 
 
 
   async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione){
-    let fixspesamax=spesamax.replace(",", ".");
+    if(isNaN(spesamax)){
+      if(prefixspesamax==""){
+        var prefixspesamax=0;
+      } else {
+        var prefixspesamax=spesamax.replace(",", ".");
+      }
+      var fixspesamax=parseFloat(prefixspesamax);
+    } else {
+      var fixspesamax=spesamax;
+    }
     try {
       let richiestaprenotazione= {
         "cliente":Id_Utente,
@@ -529,12 +538,15 @@ export default function Hugo({ navigation, route }) {
       if(indirizzo=="no"){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
       if(servizio=="no"){checkgo=false,errore+="Per favore scegli un servizio. \r\n"}
       if(servizio==0 || servizio==1 || servizio==5){
-        if(spesamax<1){
+        if(fixspesamax<1){
           checkgo=false,errore+="Per favore imposta la spesa massima. \r\n"
         }
         if(cosa==""){
           checkgo=false,errore+="Per favore imposta cosa acquistare. \r\n"
         }
+      }
+      if(servizio==4){
+        richiestaprenotazione["duratasosta"]=duratasosta;
       }
       if(metodo_pagamento=="no"){
         checkgo=false,
@@ -542,6 +554,7 @@ export default function Hugo({ navigation, route }) {
       }
       if(oraprenotazione=="no"){checkgo=false,errore+="Per favore scegli un orario. \r\n"}
       if(checkgo){
+        let checkriuscito=false;
         switch (metodo_pagamento) {
           case 0:
             let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
@@ -560,7 +573,7 @@ export default function Hugo({ navigation, route }) {
               let AcquistoConPre=await richiesta(richiestaprenotazione);
               if(AcquistoConPre.Risposta=="inserimento_ritiro_riuscito"){
                 alert("Inserimento Riuscito");
-                navigation.navigate('History');
+                checkriuscito=true;
               }
               if(typeof(AcquistoConPre.Errore)!=="undefined"){
                 alert(AcquistoConPre.Errore);
@@ -575,7 +588,8 @@ export default function Hugo({ navigation, route }) {
             let AcquistoConSaldo=await richiesta(richiestaprenotazione);
             if(AcquistoConSaldo.Risposta=="inserimento_ritiro_riuscito"){
               setSaldo(parseFloat(AcquistoConSaldo.Saldo));
-              alert("Inserimento Riuscito");
+              alert("Acuisto con saldo Riuscito");
+              checkriuscito=true;
             }
             if(AcquistoConSaldo2.Errore!=="undefined" && typeof(AcquistoConSaldo2.Errore)!=="undefined"){
               alert(AcquistoConSaldo.Errore);
@@ -586,16 +600,19 @@ export default function Hugo({ navigation, route }) {
             let AcquistoConSaldo2=await richiesta(richiestaprenotazione);
             if(AcquistoConSaldo2.Risposta=="inserimento_ritiro_riuscito"){
               setSaldo(parseFloat(AcquistoConSaldo2.Saldo));
-              alert("Inserimento Riuscito");
+              alert("Acquisto Riuscito");
+              checkriuscito=true;
             }
             if(AcquistoConSaldo2.Errore!=="undefined" && typeof(AcquistoConSaldo2.Errore)!=="undefined"){
               alert(AcquistoConSaldo2.Errore);
             }
+            break;
           case "3":
             richiestaprenotazione["Operazione"]="AcquistoDiretto";
             let AcquistoDiretto=await richiesta(richiestaprenotazione);
             if(AcquistoDiretto.Risposta=="inserimento_ritiro_riuscito"){
               alert("Inserimento Riuscito");
+              checkriuscito=true;
             }
             if(AcquistoDiretto.Errore!=="undefined" && typeof(AcquistoDiretto.Errore)!=="undefined"){
               alert(AcquistoDiretto.Errore);
@@ -603,6 +620,25 @@ export default function Hugo({ navigation, route }) {
             break;
           default:
             break;
+        }
+        if(checkriuscito){
+          navigation.navigate('History');
+          setcheckdomani(false);
+          setChiamami(false);
+          setSostiuisci(false);
+          settestooggidomani("per oggi");
+          setduratasosta(0);
+          setSpesamax(0);
+          setscontocoupon(0);
+          setpasseggeri(0);
+          setMetodo_Pagamento("no");
+          setServizio("no");
+          setora("no");
+          setAuto("no");
+          setNote("");
+          setNote2("");
+          setCosa("");
+          setcoupon("");
         }
       } else {
         alert(errore);
@@ -745,8 +781,19 @@ export default function Hugo({ navigation, route }) {
 
   function checkservizio(servizio){
     setcheckdomani(false);
+    setChiamami(false);
+    setSostiuisci(false);
     settestooggidomani("per oggi");
     setduratasosta(0);
+    setSpesamax(0);
+    setscontocoupon(0);
+    setpasseggeri(0);
+    setMetodo_Pagamento("no");
+    setAuto("no");
+    setNote("");
+    setNote2("");
+    setCosa("");
+    setcoupon("");
     switch (servizio) {
       case 1:
         setcheckdomani(true);
@@ -1195,6 +1242,19 @@ export default function Hugo({ navigation, route }) {
                           <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
                             <Text style={ss.h2}> €</Text> 
                             <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
+                    {
+                      duratasosta>0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Costo sosta: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{(duratasosta/30*5).toFixed(2)}</Text>
                           </View>
                         </View>
                       : null
