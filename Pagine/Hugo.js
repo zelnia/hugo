@@ -437,6 +437,7 @@ export default function Hugo({ navigation, route }) {
   const [costoservizio, setcostoservizio] = useState(0);
   const [totale, settotale] = useState(0);
   const [saldo, setSaldo] = useState(0);
+  const [fiducia, setfiducia] = useState(0);
   const [telefono, settelefono] = useState("");
   const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
@@ -491,6 +492,7 @@ export default function Hugo({ navigation, route }) {
     if(typeof(json?.dati?.ore)!="undefined") {
       setDispo(elaboraore(json.dati.ore));
       setSaldo(parseFloat(json.altro.Saldo));
+      setfiducia(parseFloat(json.altro.Fiducia));
       settelefono(json.altro.Telefono);
     }
   }
@@ -1347,7 +1349,7 @@ export default function Hugo({ navigation, route }) {
                             : null 
                           }
                           {
-                            listametodi.includes("AcquistoDiretto") ?
+                            (listametodi.includes("AcquistoDiretto") || fiducia==1) ?
                               <RadioMetodo id="3" etichetta="Pagamento alla consegna in contanti o POS" info="Il pagamento sarà effettuato al completamento del servizio." />
                             : null 
                           }
