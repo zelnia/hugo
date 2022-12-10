@@ -33,8 +33,24 @@ const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
     />
   )
 }
+async function costodistanzaByIndirizzo(dove){
+  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+  let calcolacostodistanza={
+    "UltimoIndirizzo":UltimoIndirizzo,
+    "indirizzoluogo":dove,
+    "Operazione":"calcolacostodistanza"
+  }
+  let json_res = await richiesta(calcolacostodistanza);
+  if(json_res.risposta==="Indirizzo_non_trovato"){
+    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+    return 0; 
+  } else {
+    return parseFloat(json_res.risposta.Totale); 
+    // setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+  }
+}
 
-const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto}) => { 
+const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,setdove,dove,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto,setlat,setlon,Id_Utente,setrubrica,showDialog8,setcostodistanza}) => { 
   if(servizio=="no"){
     return (
       <></>
@@ -80,6 +96,8 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   indirizzogeolocalizzato+=place[0].streetNumber+" ";
                   indirizzogeolocalizzato+=place[0].city+" ";
                   indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                  setlat(location.coords.latitude);
+                  setlon(location.coords.longitude);
                   setindirizzoalternativo(indirizzogeolocalizzato);
                 }
               } 
@@ -91,17 +109,78 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
           </View>
           <View style={{ flexDirection: 'row',width:"100%"}}>
             <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo dove vuoi essere accompagnato.  Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro. Da pagare direttamente alla fine del servizio." />
-            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Se vuoi indicami il luogo di destinazione, numero di passeggeri e cellulare se diverso da quello predefinito.</Text> 
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il luogo di destinazione, numero di passeggeri e cellulare se diverso da quello predefinito.</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
             <TextInput
               multiline = {true}
               numberOfLines = {4}
-              label="Luogo"
+              label="il nome del luogo"
               mode='outlined'
               value={note2}
               onChangeText={note2 => setNote2(note2)}
             />
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo della destinazione</Text> 
+          </View>
+          <View  style={[ss.p3,ss.w100]}>
+            <TextInput
+              multiline = {true}
+              numberOfLines = {1}
+              mode='outlined'
+              label="Specifica via, numero civico e comune"
+              value={dove}
+              onChangeText={dove => setdove(dove)}
+              onBlur={
+                async () => {
+                  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                  let calcolacostodistanza={
+                    "UltimoIndirizzo":UltimoIndirizzo,
+                    "indirizzoluogo":dove,
+                    "Operazione":"calcolacostodistanza"
+                  }
+                  let json_res = await richiesta(calcolacostodistanza);
+                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                    setcostodistanza(0); 
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else {
+                    setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                  }
+                }
+              }
+
+            />
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={async ()=>{
+              if(dove!=="" && note2!==""){
+                let salvainrubrica={
+                  "iduser":Id_Utente,
+                  "nomeluogo":note2,
+                  "indirizzoluogo":dove,
+                  "Operazione":"salvainrubrica"
+                }
+                let json_res = await richiesta(salvainrubrica);
+                // console.log('json_res.errore', json_res.errore);
+                if(typeof(json_res.errore!==undefined)){
+                  alert(json_res.errore);
+                } else {
+                  setrubrica(json_res.altro.Rubrica);
+                }
+              } else {
+                alert("Per favore compila il nome e l'indirizzo del luogo")
+              }
+            }}  
+            mode="contained"  style={[ss.w100,ss.mt15]}>Salva questo luogo in rubrica</Button>
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={()=>{
+              showDialog8(true);
+            }}  
+            mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
           </View>
           <TextInput
             style={[ss.mt10, ss.w100]}
@@ -189,6 +268,8 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   indirizzogeolocalizzato+=place[0].streetNumber+" ";
                   indirizzogeolocalizzato+=place[0].city+" ";
                   indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                  setlat(location.coords.latitude);
+                  setlon(location.coords.longitude);
                   setindirizzoalternativo(indirizzogeolocalizzato);
                 }
               } 
@@ -265,16 +346,95 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
         <Surface style={[ss.surface1, ss.w100]} elevation={4}>
           <View style={{ flexDirection: 'row',width:"100%"}}>
             <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il negozio dove vuoi che acquisti o ritiri quanto indicato. Se il luogo di acquisto suggerito da te con il luogo di consegna superano i 5 km, per ogni km in più verrà calcolato un euro. Da pagare direttamente alla fine del servizio." />
-            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami dove acquistare oppure fai scegliere ad Hugò</Text> 
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica il nome del negozio dove acquistare oppure fai scegliere ad Hugò</Text> 
           </View>
           <TextInput
             multiline = {true}
-            numberOfLines = {4}
+            numberOfLines = {1}
             mode='outlined'
-            label="Indica il luogo"
+            label="Indica il negozio"
             value={note2}
             onChangeText={note2 => setNote2(note2)}
           />
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo del negozio</Text> 
+          </View>
+          <TextInput
+            multiline = {true}
+            numberOfLines = {1}
+            mode='outlined'
+            label="Specifica via, numero civico e comune"
+            value={dove}
+            onChangeText={dove => setdove(dove)}
+            // onEndEditing={
+            //   async () => {
+            //     console.log('testx');
+            //     let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+            //     let calcolacostodistanza={
+            //       "UltimoIndirizzo":UltimoIndirizzo,
+            //       "indirizzoluogo":dove,
+            //       "Operazione":"calcolacostodistanza"
+            //     }
+            //     console.log('test2');
+            //     let json_res = await richiesta(calcolacostodistanza);
+            //     console.log('test3');
+            //     if(json_res.risposta==="Indirizzo_non_trovato"){
+            //       alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+            //     } else {
+            //       console.log("json_res.risposta.Totale"); 
+            //       console.log(json_res.risposta.Totale); 
+            //     }
+            //   }
+            // }
+            onBlur={
+              async () => {
+                let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                let calcolacostodistanza={
+                  "UltimoIndirizzo":UltimoIndirizzo,
+                  "indirizzoluogo":dove,
+                  "Operazione":"calcolacostodistanza"
+                }
+                let json_res = await richiesta(calcolacostodistanza);
+                if(json_res.risposta==="Indirizzo_non_trovato"){
+                  setcostodistanza(0); 
+                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                } else {
+                  setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                }
+              }
+            }
+
+          />
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={async ()=>{
+              if(dove!=="" && note2!==""){
+                let salvainrubrica={
+                  "iduser":Id_Utente,
+                  "nomeluogo":note2,
+                  "indirizzoluogo":dove,
+                  "Operazione":"salvainrubrica"
+                }
+                let json_res = await richiesta(salvainrubrica);
+                // console.log('json_res.errore', json_res.errore);
+                if(typeof(json_res.errore!==undefined)){
+                  alert(json_res.errore);
+                } else {
+                  setrubrica(json_res.altro.Rubrica);
+                }
+              } else {
+                alert("Per favore compila il nome e l'indirizzo del luogo")
+              }
+            }}  
+            mode="contained"  style={[ss.w100,ss.mt15]}>Salva questo luogo in rubrica</Button>
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={()=>{
+              showDialog8(true);
+            }}  
+            mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
+          </View>
         </Surface>
         <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
           <View style={[ss.w90,ss.row]}>
@@ -354,12 +514,82 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
           </View>
           <TextInput
             multiline = {true}
-            numberOfLines = {4}
+            numberOfLines = {1}
             mode='outlined'
             label="Indica il luogo"
             value={note2}
             onChangeText={note2 => setNote2(note2)}
           />
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo del posto</Text> 
+          </View>
+          {/* <TextInput
+            multiline = {true}
+            numberOfLines = {1}
+            mode='outlined'
+            label="Scrivi l indirizzo con via e numero civico"
+            value={dove}
+            onChangeText={dove => setdove(dove)}
+          />
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo del negozio</Text> 
+          </View> */}
+          <TextInput
+            multiline = {true}
+            numberOfLines = {1}
+            mode='outlined'
+            label="Specifica via, numero civico e comune"
+            value={dove}
+            onChangeText={dove => setdove(dove)}
+            onBlur={
+              async () => {
+                let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                let calcolacostodistanza={
+                  "UltimoIndirizzo":UltimoIndirizzo,
+                  "indirizzoluogo":dove,
+                  "Operazione":"calcolacostodistanza"
+                }
+                let json_res = await richiesta(calcolacostodistanza);
+                if(json_res.risposta==="Indirizzo_non_trovato"){
+                  setcostodistanza(0); 
+                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                } else {
+                  setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                }
+              }
+            }
+
+          />
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={async ()=>{
+              if(dove!=="" && note2!==""){
+                let salvainrubrica={
+                  "iduser":Id_Utente,
+                  "nomeluogo":note2,
+                  "indirizzoluogo":dove,
+                  "Operazione":"salvainrubrica"
+                }
+                let json_res = await richiesta(salvainrubrica);
+                // console.log('json_res.errore', json_res.errore);
+                if(typeof(json_res.errore!==undefined)){
+                  alert(json_res.errore);
+                } else {
+                  setrubrica(json_res.altro.Rubrica);
+                }
+              } else {
+                alert("Per favore compila il nome e l'indirizzo del luogo")
+              }
+            }}  
+            mode="contained"  style={[ss.w100,ss.mt15]}>Salva questo luogo in rubrica</Button>
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1}
+            onPress={()=>{
+              showDialog8(true);
+            }}  
+            mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
+          </View>
         </Surface>
       </Surface>
     );
@@ -396,6 +626,9 @@ export default function Hugo({ navigation, route }) {
   const [visible7, setVisible7] = React.useState(false);
   const showDialog7 = () => setVisible7(true);
   const hideDialog7 = () => setVisible7(false);
+  const [visible8, setVisible8] = React.useState(false);
+  const showDialog8 = () => setVisible8(true);
+  const hideDialog8 = () => setVisible8(false);
   const [testoinfo, settestoinfo] = useState("");
 
 
@@ -438,6 +671,7 @@ export default function Hugo({ navigation, route }) {
   const [totale, settotale] = useState(0);
   const [saldo, setSaldo] = useState(0);
   const [fiducia, setfiducia] = useState(0);
+  const [rubrica, setrubrica] = useState([]);
   const [telefono, settelefono] = useState("");
   const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
@@ -445,6 +679,7 @@ export default function Hugo({ navigation, route }) {
   const [servizio, setServizio] = useState('no');
   const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
   const [note, setNote] = useState("");
+  const [dove, setdove] = useState("");
   const [note2, setNote2] = useState("");
   const [indirizzoalternativo, setindirizzoalternativo] = useState("");
   const [cosa, setCosa] = useState("");
@@ -459,6 +694,8 @@ export default function Hugo({ navigation, route }) {
   const [scontocoupon, setscontocoupon] = useState(0);
   const [duratasosta, setduratasosta] = useState(0);
   const [passeggeri, setpasseggeri] = useState(0);
+  const [lat, setlat] = useState(false);
+  const [lon, setlon] = useState(false);
 
   //NUOVO INDIRIZZO
   const [nuovoindirizzo, setNuovoindirizzo] = useState("");
@@ -473,6 +710,7 @@ export default function Hugo({ navigation, route }) {
   const [indirizzi, setIndirizzi] = useState([]);
   const [listaservizi, setlistaservizi] = useState([]);
   const [listametodi, setlistametodi] = useState([]);
+  const [costodistanza, setcostodistanza] = useState(0);
   let elencoindirizzi=indirizzi;
   
   const [richestaaggiornamento, setrichestaaggiornamento] = useState({
@@ -493,6 +731,8 @@ export default function Hugo({ navigation, route }) {
       setDispo(elaboraore(json.dati.ore));
       setSaldo(parseFloat(json.altro.Saldo));
       setfiducia(parseFloat(json.altro.Fiducia));
+      setrubrica(json.altro.Rubrica);
+      // console.log('json_res', json.altro.Rubrica);
       settelefono(json.altro.Telefono);
     }
   }
@@ -502,7 +742,7 @@ export default function Hugo({ navigation, route }) {
 
 
 
-  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione){
+  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione){
     if(isNaN(spesamax)){
       if(prefixspesamax==""){
         var prefixspesamax=0;
@@ -522,6 +762,7 @@ export default function Hugo({ navigation, route }) {
         "metodo_pagamento":metodo_pagamento,
         "note":note,
         "note2":note2,
+        "dove":dove,
         "cosa":cosa,
         "mancia":mancia,
         "auto":auto,
@@ -534,6 +775,10 @@ export default function Hugo({ navigation, route }) {
         "telefono":telefono,
         "passeggeri":passeggeri,
         "oraprenotazione":oraprenotazione
+      }
+      if(lat){
+        richiestaprenotazione["Lat"]=lat;
+        richiestaprenotazione["Lon"]=lon;
       }
       let checkgo=true;
       let errore="";
@@ -639,6 +884,7 @@ export default function Hugo({ navigation, route }) {
           setAuto("no");
           setNote("");
           setNote2("");
+          setdove("");
           setCosa("");
           setcoupon("");
         }
@@ -751,8 +997,8 @@ export default function Hugo({ navigation, route }) {
       }
     }
     // console.log(typeof(costospesamax));
-    settotale((servizio!="no"?costoserv:0)+costogestioneincassi+costospesamax+(duratasosta/30*5)-scontocoupon+mancia);
-  }, [indirizzo,servizio,spesamax,duratasosta,scontocoupon,mancia]);
+    settotale((servizio!="no"?costoserv:0)+costogestioneincassi+costospesamax+(duratasosta/30*5)-scontocoupon+mancia+costodistanza);
+  }, [indirizzo,servizio,spesamax,duratasosta,scontocoupon,mancia,costodistanza]);
 
 
   // const MINUTE_MS = 10000;
@@ -794,6 +1040,7 @@ export default function Hugo({ navigation, route }) {
     setAuto("no");
     setNote("");
     setNote2("");
+    setdove("");
     setCosa("");
     setcoupon("");
     switch (servizio) {
@@ -1182,6 +1429,8 @@ export default function Hugo({ navigation, route }) {
                     setindirizzoalternativo={setindirizzoalternativo} 
                     note2={note2} 
                     setNote2={setNote2} 
+                    setdove={setdove} 
+                    dove={dove} 
                     validaCoupon={validaCoupon} 
                     telefono={telefono} 
                     settelefono={settelefono}  
@@ -1190,6 +1439,12 @@ export default function Hugo({ navigation, route }) {
                     auto={auto} 
                     setAuto={setAuto} 
                     OpzioniAuto={OpzioniAuto}
+                    setlat={setlon} 
+                    setlon={setlon} 
+                    Id_Utente={Id_Utente}
+                    setrubrica={setrubrica}
+                    showDialog8={showDialog8}
+                    setcostodistanza={setcostodistanza}
                   />
                   <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
                     <View style={[{flexDirection: 'row', alignItems: 'center'},ss.w100,ss.textcentro]}>
@@ -1244,6 +1499,20 @@ export default function Hugo({ navigation, route }) {
                           <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
                             <Text style={ss.h2}> €</Text> 
                             <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
+                    {
+                      costodistanza>0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Costo distanza: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costodistanza}</Text>
+                            {/* <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costodistanza.toFixed(2)}</Text> */}
                           </View>
                         </View>
                       : null
@@ -1307,7 +1576,7 @@ export default function Hugo({ navigation, route }) {
                     }
                     <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro,ss.py10]}>
                       <Text style={ss.h2}>Totale: </Text>
-                      <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{totale.toFixed(2)}</Text>
+                      <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{parseFloat(totale).toFixed(2)}</Text>
                       <Text style={ss.h2}> €</Text>
                     </View>
                   </Surface>
@@ -1375,7 +1644,7 @@ export default function Hugo({ navigation, route }) {
                   <TouchableOpacity
                     onPress={
                       () => {
-                        inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, cosa, mancia, auto, chiamami, sostiuisci, spesamax, indirizzoalternativo,coupon, oraprenotazione);
+                        inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax, indirizzoalternativo,coupon, oraprenotazione);
                       }
                     }
                     style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
@@ -1404,6 +1673,58 @@ export default function Hugo({ navigation, route }) {
                 <Text>
                   {testoinfo}
                 </Text>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={visible8} onDismiss={hideDialog8}>
+              <Dialog.Title>Rubrica</Dialog.Title>
+              <Dialog.Content>
+                <View>
+                  {
+                    rubrica.length>0 ? 
+                      rubrica.map((indi, index) => (
+                        indi!==null ?
+                          <View style={{ flexDirection: 'row',width:"100%"}} key={index+"rubrica"}>
+                            <Button  style={[ss.w100, ss.mt15,ss.w75]} mode="outlined" onPress={
+                              async ()=>{
+                                setNote2(indi.nomeluogo);
+                                setdove(indi.indirizzoluogo);
+                                let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                                let calcolacostodistanza={
+                                  "UltimoIndirizzo":UltimoIndirizzo,
+                                  "indirizzoluogo":indi.indirizzoluogo,
+                                  "Operazione":"calcolacostodistanza"
+                                }
+                                let json_res = await richiesta(calcolacostodistanza);
+                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                  setcostodistanza(0); 
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else {
+                                  setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                }
+                                setVisible8(false);
+                              }
+                            }>{indi.nomeluogo}</Button>
+                            <Button  style={[ss.w100, ss.mt15,ss.w25]} mode="outlined" onPress={
+                              async ()=>{
+                                let newrubrica=rubrica;
+                                newrubrica.splice(index, 1);
+                                let salvarubrica={
+                                  "iduser":Id_Utente,
+                                  "rubrica":JSON.stringify(newrubrica),
+                                  "Operazione":"salvarubrica"
+                                }
+                                let json_res = await richiesta(salvarubrica);
+                                setVisible8(false);
+                              }
+                            }>Elimina</Button>
+                          </View>
+                        : null
+                      ))
+                    : null
+                  }
+                </View>
               </Dialog.Content>
             </Dialog>
           </Portal>
