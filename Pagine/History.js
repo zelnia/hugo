@@ -16,7 +16,7 @@ export default function History({ navigation, route }) {
           "Id_User":Id_User,
         }
         let datiritiri = await richiesta(richiestaritiri,'apiHugo');
-        setritiri(datiritiri);
+        setritiri(datiritiri.reverse());
       }
       fetchData();
     }, []);

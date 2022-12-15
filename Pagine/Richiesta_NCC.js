@@ -48,7 +48,7 @@ export default function Richiesta_NCC({ navigation, route }) {
   const [testoinfo, settestoinfo] = useState("");
   
   const listametodi = ["Carta","Saldo","AcquistoDiretto"];
-  const [metodo_pagamento, setMetodo_Pagamento] = useState('no');
+  const [metodo_pagamento, setMetodo_Pagamento] = useState(false);
   const [saldo, setSaldo] = useState(0);
   const [viapartenza, setviapartenza] = useState('');
   const [viadestinazione, setviadestinazione] = useState('');
@@ -159,6 +159,7 @@ export default function Richiesta_NCC({ navigation, route }) {
     if(giorno==""){messaggioerrore+=" 'Giorno'";checkgo=false;}
     if(mese==""){messaggioerrore+=" 'Mese'";checkgo=false;}
     if(anno==""){messaggioerrore+=" 'Anno'";checkgo=false;}
+    if(!metodo_pagamento){messaggioerrore="Per favore scegli un metodo di pagamento.";checkgo=false;}
     if(checkgo){
       let richiestaRichiesta={
         "Operazione":'richiestaRichiesta',
@@ -175,8 +176,8 @@ export default function Richiesta_NCC({ navigation, route }) {
         "Metodo_Pagamento":metodo_pagamento,
         "Cliente":idutente
       }
-      console.log('idutente', idutente);
-      console.log('richiestaRichiesta', richiestaRichiesta);
+      // console.log('idutente', idutente);
+      // console.log('richiestaRichiesta', richiestaRichiesta);
 
       if(metodo_pagamento==0 || metodo_pagamento=="0"){
         let acquisto=await richiesta(richiestaRichiesta,false,"https://ristostore.it/Pagamenti/AcquistoNCCHugo");

@@ -20,6 +20,7 @@ import Hugo from './Pagine/Hugo.js';
 import LogOut from './Pagine/LogOut.js';
 import LogIn from './Pagine/LogIn.js';
 import RicaricaSaldo from './Pagine/RicaricaSaldo.js';
+import SpecchiettoCosti from './Pagine/SpecchiettoCosti.js';
 
 
 
@@ -222,6 +223,7 @@ export default function App() {
         <Tab.Screen name="LogOut" component={LogOut}/>
         <Tab.Screen name="LogIn" component={LogIn}/>
         <Tab.Screen name="RicaricaSaldo" component={RicaricaSaldo}/>
+        <Tab.Screen name="SpecchiettoCosti" component={SpecchiettoCosti}/>
       </Tab.Navigator>
     </NavigationContainer>
   );

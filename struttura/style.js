@@ -42,6 +42,13 @@ const ss= StyleSheet.create({
       borderColor: "#ccc",
       borderRadius: 4,
     },
+    // divinterno4: {
+    //   padding:15,
+    //   backgroundColor: '#fff',
+    //   borderWidth: 2,
+    //   borderColor: "#ccc",
+    //   borderRadius: 4,
+    // },
     row: {
       flexDirection:"row"
     },
@@ -112,6 +119,10 @@ const ss= StyleSheet.create({
       flex: 1,
       backgroundColor: '#eee',
     },
+    safeareaview2: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
     bordogrigio: {
       borderWidth: 1,
       borderColor: "#6200ee",
@@ -171,6 +182,9 @@ const ss= StyleSheet.create({
     mx0:{
       marginHorizontal: 0,
     },
+    m0:{
+      margin: 0,
+    },
     me5:{
       marginEnd: 5,
     },
@@ -185,6 +199,9 @@ const ss= StyleSheet.create({
     },
     mt15:{
       marginTop: 15,
+    },
+    mt25:{
+      marginTop: 25,
     },
     my10:{
       marginVertical: 10,
@@ -233,6 +250,9 @@ const ss= StyleSheet.create({
     h3: {
       fontSize: 16,
       fontWeight: "bold",
+    },
+    h4: {
+      fontSize: 16,
     },
     w100: {
       alignSelf: 'stretch',
