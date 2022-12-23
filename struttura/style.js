@@ -9,6 +9,19 @@ const ss= StyleSheet.create({
     accent1:{
       color:accent1,
     },
+    nrs:{
+      // padding:10,
+      borderRadius:9,
+      borderColor:accent1,
+      backgroundColor: "#fff",
+      overflow:"hidden",
+    },
+    bwith1:{
+      borderWidth:1,
+    },
+    bwith3:{
+      borderWidth:3,
+    },
     divinterno1: {
       flex: 1,
       marginVertical:30,
@@ -203,6 +216,9 @@ const ss= StyleSheet.create({
     mt25:{
       marginTop: 25,
     },
+    my5:{
+      marginVertical: 5,
+    },
     my10:{
       marginVertical: 10,
     },
@@ -239,13 +255,13 @@ const ss= StyleSheet.create({
       color: '#00a1ae'
     },
     h1: {
-      fontSize: 22, 
+      fontSize: 16, 
       color: accent1
       // color: '#6200ee'
       // color: '#00a1ae'
     },
     h2: {
-      fontSize: 20
+      fontSize: 16
     },
     h3: {
       fontSize: 16,
@@ -261,6 +277,12 @@ const ss= StyleSheet.create({
     w50: {
       alignSelf: 'stretch',
       width:'50%',
+    },
+    w10: {
+      width:'10%',
+    },
+    w15: {
+      width:'15%',
     },
     w20: {
       width:'20%',

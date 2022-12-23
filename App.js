@@ -21,6 +21,7 @@ import LogOut from './Pagine/LogOut.js';
 import LogIn from './Pagine/LogIn.js';
 import RicaricaSaldo from './Pagine/RicaricaSaldo.js';
 import SpecchiettoCosti from './Pagine/SpecchiettoCosti.js';
+import Recuperapassword from './Pagine/Recuperapassword.js';
 
 
 
@@ -180,7 +181,8 @@ function Accesso({ navigation }) {
                       style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
                       <Text style={{ fontSize: 20, color: '#fff' }}>Accedi</Text>
                     </TouchableOpacity>
-                    <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
+                    <Button onPress={async () => {navigation.navigate('Recuperapassword');}}  mode="outlined"  style={[ss.w100, ss.mt15]}>Recupera la password</Button>
+                    <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100]}>Oppure Registrati</Button>
                     <Button icon="phone" color="#00a1ae" onPress={()=>{Linking.openURL("https://wa.me/+393333256236");}}  mode="outlined"  style={[ss.w100]}>Vorresti parlare con Hugò? Clicca per messaggiare con lui!</Button>
 
                     <View style={[ss.centro,ss.w100,ss.mt15]}>
@@ -223,6 +225,7 @@ export default function App() {
         <Tab.Screen name="LogOut" component={LogOut}/>
         <Tab.Screen name="LogIn" component={LogIn}/>
         <Tab.Screen name="RicaricaSaldo" component={RicaricaSaldo}/>
+        <Tab.Screen name="Recuperapassword" component={Recuperapassword}/>
         <Tab.Screen name="SpecchiettoCosti" component={SpecchiettoCosti}/>
       </Tab.Navigator>
     </NavigationContainer>

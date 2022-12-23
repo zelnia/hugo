@@ -109,7 +109,7 @@ function EtichettaSurface(props) {
         (props.children!=null && props.children!="") ?
           <Surface style={[ss.surface1,ss.w100, props.stilisurf]} elevation={4}>
             {
-              props.etichetta ?
+              props.etichetta && props.etichetta!=""?
                 <View style={{ flexDirection: 'row'}}>
                   <Text style={[ss.w50]}>{props.etichetta}</Text>
                   <Grassetto stilitesto={[ss.w50]}>{props.children}</Grassetto>

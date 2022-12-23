@@ -11,7 +11,7 @@ import * as Location from 'expo-location';
 
 
 const accent1="#6f10b7";
-const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
+const Info = ({settestoinfo,tinfo,stili,setvisibleinfo}) => {
   return (
     <IconButton
       icon="information"
@@ -20,7 +20,7 @@ const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
       style={stili}
       onPress={async () => {
         settestoinfo(tinfo);
-        setVisible7(true);
+        setvisibleinfo(true);
       }}
     />
   )
@@ -32,7 +32,7 @@ export default function Richiesta_NCC({ navigation, route }) {
     return (
       <View style={[{ flexDirection: 'row'},ss.w100]}>
         <View style={{ width:"10%"}}>
-          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+          <Info setvisibleinfo={setvisibleinfo} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
         </View>
         <View style={{ width:"90%"}}>
           <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={id} />
@@ -44,7 +44,7 @@ export default function Richiesta_NCC({ navigation, route }) {
   const [visible5, setVisible5] = React.useState(false);
   const showDialog5 = () => setVisible5(true);
   const hideDialog5 = () => setVisible5(false);
-  const [visible7, setVisible7] = React.useState(false);
+  const [visibleinfo, setvisibleinfo] = React.useState(false);
   const [testoinfo, settestoinfo] = useState("");
   
   const listametodi = ["Carta","Saldo","AcquistoDiretto"];
@@ -56,6 +56,7 @@ export default function Richiesta_NCC({ navigation, route }) {
   const [cittadestinazione, setcittadestinazione] = useState('');
   // const [indirizzodestinazione, setindirizzodestinazione] = useState('');
 
+  const monthNamesIta = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
   const [ora, setora] = useState('');
   const [minuti, setminuti] = useState('');
   const [giorno, setgiorno] = useState('');
@@ -129,8 +130,9 @@ export default function Richiesta_NCC({ navigation, route }) {
         return alert ("Per favore compila l'orario di partenza indicando i minuti a 2 cifre. Ad esempio 05.");
       }
     }
-    if(mese!=""){
-      let mese_fixed=parseInt(mese.replace(/[^0-9]/g, ''));
+    if(mese!==""){
+      console.log('mese', mese);
+      let mese_fixed=parseInt(mese.toString().replace(/[^0-9]/g, ''));
       if(isNaN(mese_fixed) || mese_fixed=="" || (mese_fixed<1 || mese_fixed>12)){
         return alert ("Per favore compila il mese di partenza indicandolo nel formato a 2 cifre. Ad esempio 02 per indicare Febbraio.");
       }
@@ -202,6 +204,21 @@ export default function Richiesta_NCC({ navigation, route }) {
       alert(messaggioerrore);
     }
   }
+  useEffect(() => {
+    async function fetchData() {
+      let cittaindirizzo = await getData('@cittaindirizzo');
+      if(cittaindirizzo!==null){
+        setcittadestinazione(cittaindirizzo);
+        setcittapartenza(cittaindirizzo);
+        const d = new Date();
+        let month = d.getMonth()+1;     
+        let fullyear = d.getFullYear().toString();
+        setmese(month);
+        setanno(fullyear.substring(2));
+      }
+    }
+    fetchData();
+  }, []);
 
     return (
       <Provider>
@@ -433,6 +450,9 @@ export default function Richiesta_NCC({ navigation, route }) {
                       <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                         <Text style={ss.h2}>Durata: {duratatotale}</Text>
                       </Surface>
+                      <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                        <Text style={ss.gra}>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
+                      </Surface>
                       <Button  color={accent1}
                         //color="#00a1ae" 
                         onPress={async ()=>{
@@ -446,59 +466,6 @@ export default function Richiesta_NCC({ navigation, route }) {
                           showDialog5();
                         }}  
                         mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
-                        <Portal>
-                          <Dialog visible={visible5} onDismiss={hideDialog5}>
-                            <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
-                            <Dialog.Content>
-                              <RadioButton.Group 
-                                onValueChange={
-                                  (metodo_pagamento)=>{
-                                    setVisible5(false);
-                                    setMetodo_Pagamento(metodo_pagamento);
-                                  }
-                                } value={metodo_pagamento}>
-                                {
-                                  listametodi.includes("Carta") ?
-                                    <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" /> 
-                                  : null
-                                }
-                                {
-                                  listametodi.includes("Pre") ?
-                                    <RadioMetodo id="1" etichetta="Contanti o POS alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
-                                  : null
-                                }
-                                {
-                                  listametodi.includes("Saldo") && saldo>costototale ?
-                                    <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
-                                  : null 
-                                }
-                                {
-                                  listametodi.includes("AcquistoDiretto") ?
-                                    <RadioMetodo id="3" etichetta="Pagamento alla consegna in contanti o POS" info="Il pagamento sarà effettuato al completamento del servizio." />
-                                  : null 
-                                }
-                              </RadioButton.Group>
-                              {
-                                saldo>=costototale ?
-                                  <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-                                    <Text style={ss.h2}>Il tuo saldo è: </Text>
-                                    <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>
-                                      {saldo}
-                                      {/* {saldo.toFixed(2)} */}
-                                    </Text>
-                                    <Text style={ss.h2}> €</Text>
-                                  </Surface>
-                                : 
-                                  <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-                                    <Text style={[ss.h2,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
-                                    <Button  color={accent1}
-                                    // color="#00a1ae" 
-                                    onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
-                                  </Surface>
-                              }
-                            </Dialog.Content>
-                          </Dialog>
-                        </Portal> 
                       <Button mode="contained"  onPress={invioRichiesta}  style={[ss.w100,ss.mt15]}>Acquista</Button>    
                     </>
                   :
@@ -522,6 +489,72 @@ export default function Richiesta_NCC({ navigation, route }) {
                   style={[ss.w100,ss.mt15]}>Oppure torna indietro</Button>
               </Surface>
             </View>
+
+            <Portal>
+              <Dialog visible={visible5} onDismiss={hideDialog5}>
+                <Dialog.Title>Scegli il metodo di pagamento *</Dialog.Title>
+                <Dialog.Content>
+                  <RadioButton.Group 
+                    onValueChange={
+                      (metodo_pagamento)=>{
+                        setVisible5(false);
+                        setMetodo_Pagamento(metodo_pagamento);
+                      }
+                    } value={metodo_pagamento}>
+                    {
+                      listametodi.includes("Carta") ?
+                        <RadioMetodo id="0" etichetta="Carta di credito" info="Sarai reindirizzato al portale per l'inserimento dei tuoi dati di pagamento" /> 
+                      : null
+                    }
+                    {
+                      listametodi.includes("Pre") ?
+                        <RadioMetodo id="1" etichetta="Contanti o POS alla consegna con preautorizzazione" info="La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
+                      : null
+                    }
+                    {
+                      listametodi.includes("Saldo") && saldo>costototale ?
+                        <RadioMetodo id="2" etichetta="Saldo" info="L'importo verra detratto dal tuo saldo cliente. Vai nel profilo per ricaricarlo." />
+                      : null 
+                    }
+                    {
+                      listametodi.includes("AcquistoDiretto") ?
+                        <RadioMetodo id="3" etichetta="Pagamento alla consegna in contanti o POS" info="Il pagamento sarà effettuato al completamento del servizio." />
+                      : null 
+                    }
+                  </RadioButton.Group>
+                  {
+                    saldo>=costototale ?
+                      <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                        <Text style={ss.h2}>Il tuo saldo è: </Text>
+                        <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>
+                          {saldo}
+                          {/* {saldo.toFixed(2)} */}
+                        </Text>
+                        <Text style={ss.h2}> €</Text>
+                      </Surface>
+                    : 
+                      <Surface style={[{alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                        <Text style={[ss.h2,ss.textcentro]}>In questo momento il tuo saldo non è sufficiente per utilizzarlo come metodo di pagamento.</Text>
+                        <Button  color={accent1}
+                        // color="#00a1ae" 
+                        onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100,ss.mt5]}>Ricarica il saldo</Button>
+                      </Surface>
+                  }
+                </Dialog.Content>
+              </Dialog>
+            </Portal> 
+            <Portal>
+            <Dialog visible={visibleinfo} onDismiss={()=>{setvisibleinfo(false)}}>
+              <Dialog.Title>Info</Dialog.Title>
+              <Dialog.Content>
+                <Text>
+                  {testoinfo}
+                </Text>
+                <Button color="#00a1ae" onPress={async () => {navigation.navigate('SpecchiettoCosti');}}  mode="contained"  style={[ss.w100,ss.my10]}>Tutte le tariffe</Button>
+                <Button onPress={()=>{setvisibleinfo(false)}}>Chiudi</Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
           </ScrollView>
         </SafeAreaView>
       </Provider>

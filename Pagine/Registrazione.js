@@ -6,7 +6,39 @@ import {SafeAreaView, ScrollView, View} from 'react-native';
 import { TextInput,Surface, RadioButton, Button, Paragraph,Portal, Dialog,Provider,Divider, Text, Checkbox} from 'react-native-paper';
 import {richiesta,getLocal,getData} from '../struttura/Utils.js';
 
+function makeid() {
+  var testoId = "";
+  var possible = "0123456789";
+  for (var i = 0; i < 3; i++)
+    testoId += possible.charAt(Math.floor(Math.random() * possible.length));
+  return testoId;
+}
+const codicesms = makeid();
+console.log('codicesms1', codicesms);
+
 export default function Registrazione({ navigation, route }) {
+
+
+  async function verificasms(pretel) {
+    var telefono="";
+		var prefisso="+39";
+		if(pretel.length>10){
+			var strFirstThree = pretel.substring(0,3);
+			var strFirstTwo = pretel.substring(0,2);
+			if(strFirstThree=="+39"){
+				telefono=pretel.substring(3);
+			} else if(strFirstTwo=="39"){
+				telefono=pretel.substring(2);
+			} else {
+				prefisso=strFirstThree;		
+			}
+		} else {
+			telefono=pretel;
+		}
+    let verifica={"Operazione":"verificasms", "codiceconferma": codicesms, "telefono": ""+prefisso+telefono};
+    let json_res = await richiesta(verifica);
+    alert("Sms inviato.");
+  }
 
   const [visible, setVisible] = React.useState(false);
   const showDialog = () => setVisible(true);
@@ -29,12 +61,14 @@ export default function Registrazione({ navigation, route }) {
   const [note, setnote] = useState('');
   const [nome, setnome] = useState('');
   const [telefono, settelefono] = useState('');
+  const [codiceverifica, setcodiceverifica] = useState('');
   const [conferma, setconferma] = useState('');
   const [trattamentodati, settrattamentodati] = useState('no');
 
   //Dati fatturazione
   const [ragionesociale, setragionesociale] = useState('');
   const [iva, setiva] = useState('');
+  const [cupa, setcupa] = useState('');
   const [cf, setcf] = useState('');
   const [indirizzo2, setindirizzo2] = useState('');
   const [civico2, setcivico2] = useState('');
@@ -43,7 +77,7 @@ export default function Registrazione({ navigation, route }) {
   const [cap2, setcap2] = useState('');
 
 
-  async function inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,Note_Indirizzo,telefono,codiceamico){
+  async function inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,Note_Indirizzo,telefono,codiceamico,codiceverifica, codicesms,iva,cupa ){
     try {
       let richiestaregistrazione= {
         "Operazione":'Registrazione',
@@ -58,10 +92,13 @@ export default function Registrazione({ navigation, route }) {
         "note":note,
         "Note_Indirizzo":Note_Indirizzo,
         "telefono":telefono,
-        "codiceamico":codiceamico
+        "codiceamico":codiceamico,
+        "piva":iva,
+        "cupa":cupa,
       }
       let checkgo=true;
       let errore="";
+      if(codiceverifica!==codicesms){checkgo=false,errore+="Per favore verifica il tuo telefono. \r\n"}
       if(indirizzo==""){checkgo=false,errore+="Per favore scegli un indirizzo. \r\n"}
       if(citta==""){checkgo=false,errore+="Per favore scegli un citta. \r\n"}
       if(email==""){checkgo=false,errore+="Per favore scegli un email. \r\n"}
@@ -185,6 +222,25 @@ export default function Registrazione({ navigation, route }) {
                     }}
                     value={telefono ?? ""}
                   />
+                  <Button mode="outlined"  style={[ss.w100,ss.mt15]}
+                   onPress={() => {verificasms(telefono);}}
+                  >Verifica il cellulare</Button>
+                  <TextInput
+                    style={[ss.w100,ss.mt15]}
+                    label="Codice di verifica"
+                    onChangeText={(codiceverifica) => {
+                      setcodiceverifica(codiceverifica)
+                    }}
+                    onBlur={() => {
+                      console.log('codiceverifica', codiceverifica);
+                      console.log('codicesms', codicesms);
+                      if(codiceverifica!==codicesms){
+                        alert("Il codice inserito non é corretto.");
+                        setcodiceverifica("");
+                      }
+                    }}
+                    value={codiceverifica ?? ""}
+                  />
                   <Text style={[ss.textcentro, ss.mt10,ss.h2]}>Hai un codice amico?</Text>
                   <Text style={[ss.textcentro]}>Indicalo per guadagnare subito 2 euro nel tuo saldo!</Text>
                   <TextInput
@@ -281,8 +337,27 @@ export default function Registrazione({ navigation, route }) {
                       </Dialog.Content>
                     </Dialog>
                   </Portal>  */}
+                  <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                    <Text  style={ss.h3}>Area aziende</Text>
+                    <TextInput
+                      style={[ss.w100,ss.mt15]}
+                      label="Partita iva"
+                      onChangeText={(iva) => {
+                        setiva(iva)
+                      }}
+                      value={iva ?? ""}
+                    />
+                    <TextInput
+                      style={[ss.w100,ss.mt15]}
+                      label="Codice univoco"
+                      onChangeText={(cupa) => {
+                        setcupa(cupa)
+                      }}
+                      value={cupa ?? ""}
+                    />
+                  </Surface>
                   <Button mode="contained"  style={[ss.w100,ss.mt15]}
-                   onPress={() => {inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,note,telefono,codiceamico);}}
+                   onPress={() => {inviaRegistrazione (nome,email,pwd,indirizzo,civico,citta,provincia,cap,note,note,telefono,codiceamico,codiceverifica,codicesms,iva,cupa);}}
                   >Registrati</Button>
                   <Button icon='arrow-left' onPress={() => {navigation.navigate('Accesso');}} style={[ss.w100,ss.mt15]}>Oppure torna indietro</Button>
                 </View>

@@ -157,7 +157,7 @@ export default function Profilo({ navigation, route }) {
             <EtichettaSurface etichetta="Telefono:">{utente.Telefono}</EtichettaSurface>
             <EtichettaSurface etichetta="Codice Amico:">{utente.Codice_Amico}</EtichettaSurface>
             <EtichettaSurface etichetta="Telefono:">{utente.Telefono}</EtichettaSurface>
-            <EtichettaSurface etichetta="Saldo:">{utente.Saldo}</EtichettaSurface>
+            <EtichettaSurface etichetta="Saldo:">{utente.Saldo} €</EtichettaSurface>
           </View>
           <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
             <Button color="#00a1ae" onPress={async () => {navigation.navigate('RicaricaSaldo');}}  mode="contained"  style={[ss.w100]}>Ricarica il saldo</Button>

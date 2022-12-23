@@ -4,7 +4,9 @@ import {View} from 'react-native';
 import {IconButton} from 'react-native-paper'; 
 import { getData } from './Utils.js';
 
-export default function Footer({no="no"}) {
+// export default function Footer({no="no"}) {
+export default function Footer() {
+    const no="nah";
     const navigation = useNavigation();
     return(
     <View  style={[{ flexDirection: 'row' },ss.w100,ss.textcentro]}>
