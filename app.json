@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hugò Personal Shopper",
     "slug": "hugo",
-    "version": "1.0.28",
+    "version": "1.0.34",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ristoapps.hugo",
-      "buildNumber": "1.0.28",
+      "buildNumber": "1.0.34",
       "infoPlist": {
         "NSCameraUsageDescription": "To scan cards through Stripe"
       }
@@ -31,7 +31,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ristoapps.hugo",
-      "versionCode": 128
+      "versionCode": 134
     },
     "web": {
       "favicon": "./assets/favicon.png"

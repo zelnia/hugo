@@ -1,10 +1,8 @@
 import {ss} from '../struttura/style.js';
-import {useNavigation} from '@react-navigation/native';
 import Footer from '../struttura/Footer.js';
 import React, { useState, useEffect, useRef } from 'react';
 import {SafeAreaView, ScrollView, View, Keyboard,TouchableWithoutFeedback} from 'react-native';
-import { TextInput,Surface, RadioButton,Button,Portal, Dialog,Provider, Text, Checkbox,IconButton,modal} from 'react-native-paper';
-import SelectDropdown from 'react-native-select-dropdown'
+import { TextInput,Surface, RadioButton,Button,Portal, Dialog,Provider, Text, IconButton} from 'react-native-paper';
 import {richiesta,getData} from '../struttura/Utils.js';
 import * as Linking from 'expo-linking';
 import * as Location from 'expo-location';
@@ -26,13 +24,20 @@ const Info = ({settestoinfo,tinfo,stili,setvisibleinfo}) => {
   )
 }
 
-export default function Richiesta_NCC({ navigation, route }) {
 
-  async function apriwa(){
-    Linking.openURL("https://wa.me/+393383083224");
-  }
-  async function chiama(){
-    Linking.openURL("tel:+393383083224");
+export default function Richiesta_AEI({ navigation, route }) {
+  
+  function RadioServizio({val,etichetta,stili,info}){
+    return (
+      <View style={[{ flexDirection: 'row'},ss.w100,stili]}>
+        <View style={{ width:"10%"}}>
+          <Info setvisibleinfo={setvisibleinfo} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        </View>
+        <View style={{ width:"90%"}}>
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={val} />
+        </View>
+      </View>
+    )
   }
   function RadioMetodo({id,etichetta,info}){
     return (
@@ -52,9 +57,12 @@ export default function Richiesta_NCC({ navigation, route }) {
   const hideDialog5 = () => setVisible5(false);
   const [visibleinfo, setvisibleinfo] = React.useState(false);
   const [testoinfo, settestoinfo] = useState("");
+  const [soggetto, setsoggetto] = useState("Anziani");
+  const [opzioniaei, setopzioniaei] = useState("Accompagnamento");
   
   const listametodi = ["Carta","Saldo","AcquistoDiretto"];
   const [metodo_pagamento, setMetodo_Pagamento] = useState(false);
+  const [checksottocasa, setchecksottocasa] = useState(true);
   const [saldo, setSaldo] = useState(0);
   const [viapartenza, setviapartenza] = useState('');
   const [viadestinazione, setviadestinazione] = useState('');
@@ -88,19 +96,22 @@ export default function Richiesta_NCC({ navigation, route }) {
       "Destinazione":viadestinazione+", "+cittadestinazione,
       "Sosta":duratasosta,
     }
+    if(opzioniaei=="Compagnia" || (opzioniaei==="Spesa e commissioni" && checksottocasa)){
+      riciestaCostoNCC.Destinazione=riciestaCostoNCC.Partenza;
+    }
     let jcosto = await richiesta(riciestaCostoNCC);
     // console.log('jcosto.risposta', jcosto.risposta);
     if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
-      let duratabase=Math.ceil(parseFloat(jcosto.risposta.Durata)/60+duratasosta);
+      let duratabase=Math.ceil(parseFloat(jcosto.risposta.Durata)/60+duratasosta+30);
       if(duratabase<=59){
         setduratatotale(duratabase+" minuti");
       }else if(59<duratabase && duratabase<120){
         let restominuti=duratabase%60;
-        setduratatotale("Un ora e "+restominuti+" minuti");
+        setduratatotale("Un ora"+(restominuti>0?" e "+restominuti+" minuti":""));
       } else if(120<=duratabase){
         let numeroore=Math.trunc(duratabase/60);
         let restominuti=duratabase%60;
-        setduratatotale(numeroore+" ore e "+restominuti+" minuti");
+        setduratatotale(numeroore+" ore"+(restominuti>0?" e "+restominuti+" minuti":""));
       }
       setcostototale(parseFloat(jcosto.risposta.Totale));
     } else {
@@ -115,8 +126,10 @@ export default function Richiesta_NCC({ navigation, route }) {
     let messaggioerrore="Per favore compila i seguenti campi:";
     if(viapartenza==""){messaggioerrore+=" 'Via di partenza'";checkgo=false;}
     if(cittapartenza==""){messaggioerrore+=" 'Città di partenza'";checkgo=false;}
-    if(viadestinazione==""){messaggioerrore+=" 'Via di destinazione'";checkgo=false;}
-    if(cittadestinazione==""){messaggioerrore+=" 'Città di destinazione'";checkgo=false;}
+    if(!(opzioniaei=="Compagnia" || (opzioniaei==="Spesa e commissioni" && checksottocasa))){
+      if(viadestinazione==""){messaggioerrore+=" 'Via di destinazione'";checkgo=false;}
+      if(cittadestinazione==""){messaggioerrore+=" 'Città di destinazione'";checkgo=false;}
+    }
 
     if(passeggeri!=""){
       let passeggeri_fixed=parseInt(passeggeri.replace(/[^0-9]/g, ''));
@@ -182,7 +195,11 @@ export default function Richiesta_NCC({ navigation, route }) {
         "Passeggeri":passeggeri,
         "Note":note,
         "Metodo_Pagamento":metodo_pagamento,
-        "Cliente":idutente
+        "Cliente":idutente,
+        "Tipo":"AEI",
+        "Soggetto":soggetto,
+        "Opzioni_Servizio":opzioniaei,
+        "checksottocasa":checksottocasa?"si":"no",
       }
       // console.log('idutente', idutente);
       // console.log('richiestaRichiesta', richiestaRichiesta);
@@ -225,27 +242,74 @@ export default function Richiesta_NCC({ navigation, route }) {
     }
     fetchData();
   }, []);
+  async function apriwa(){
+    Linking.openURL("https://wa.me/+393383083224");
+  }
+  async function chiama(){
+    Linking.openURL("tel:+393383083224");
+  }
 
     return (
       <Provider>
         <SafeAreaView style={ss.safeareaview}>
           <ScrollView keyboardShouldPersistTaps='handled'>
             <View style={ss.container}>
-              <Text style={[ss.h1, ss.mt15]}>Richiesta noleggio con conducente</Text>
+              <Text style={[ss.h1, ss.mt15]}>Richiesta accompagnamento anziani o invalidi</Text>
+              <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                <Button icon={require('../assets/wa.png')} onPress={apriwa}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
+                <Button icon="phone" onPress={chiama}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Chiamami per ordinare</Button>
+              </Surface>
               <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
-                  <Button icon={require('../assets/wa.png')} onPress={apriwa}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
-                  <Button icon="phone" onPress={chiama}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Chiamami per ordinare</Button>
-                </Surface>
-                <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
-                  <View>
-                    <Text>Partenza</Text>
+                <RadioButton.Group 
+                    onValueChange={
+                      opzioniaei => {
+                        setsoggetto("Anziani");
+                        setviapartenza("");
+                        setcittapartenza("");
+                        setviadestinazione("");
+                        setcittadestinazione("");
+                        setduratatotale("no");
+                        setora("");
+                        setminuti("");
+                        setgiorno("");
+                        setmese("");
+                        setnote("");
+                        setpasseggeri("");
+                        setanno(23);
+                        setduratasosta(0);
+                        setopzioniaei(opzioniaei);
+                        // if(opzioniaei=="Pet sitting notturno" || opzioniaei=="Pet sitting diurnon"){
+                        //   setcostototale(24);
+                        // } else {
+                        //   setcostototale(15);
+                        // }
+                      }
+                    } value={opzioniaei}>
+                    <RadioServizio val="Accompagnamento" etichetta="Accompagnamento 14,99€" info="Hugò ti offre un servizio di trasporto e accompagnamento per anziani e  disabili. Persone con problemi di autonomia o mobilità ridotta, possono richiedere di essere accompagnate e trasportate in ospedale per una visita medica in giro per la città o dove loro vogliono andare, Hugò sapà fornire tutto l'aiuto necessario. e necessario indicare la destinazione, sarà calcolato un euro per km percorso (solo andata) dalla tua abitazione n.b Hugò ti chiameà prima per ulteriori dettagli costo 14,99€ più km percorsi."/>
+                    <RadioServizio val="Spesa e commissioni" etichetta="Spesa e commissioni 14,99€" info="Hugò può  recarsi con tè nei tuoi negozi di quartiere preferiti per fare la spesa, sbrigare pratiche burocratiche, commissioni,  andare in farmacia ect… Nota Bene: Hugò ti chiamerà prima per ulteriori dettagli costo 14,99€ inclusi i primi 30 minuti."/>
+                    {/* <RadioServizio val="Spesa e commissioni" etichetta="Spesa e commissioni 14,99€" info="Hugò può  recarsi nei tuoi negozi di quartiere preferiti per fare la spesa, sbrigare pratiche burocratiche, commissioni,  andare in farmacia ect… n.b Hugò ti chiamerà prima per ulteriori dettagli costo 14,99€ inclusa prima ora "/> */}
+                    <RadioServizio val="Compagnia" etichetta="Compagnia 14.99€" info="Hugò ti  offre un servizio di compagnia di qualità a casa, in ospedale o dove tu voglia . Hugò ti porterà tanta  discrezione e simpatia. n.b Hugò ti chiamerà prima per ulteriori dettagli costo 14,99€ inclusi i primi 30 minuti."/>
+                  </RadioButton.Group>
+                  <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+                    <Button onPress={() => {setsoggetto("Anziani");}} style={[("Anziani" === soggetto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"Anziani" === soggetto ? ss.labelselected : ss.unselected} mode="outlined">Anziani</Button>
+                    <Button onPress={() => {setsoggetto("Invalidi");}} style={[("Invalidi" === soggetto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"Invalidi" === soggetto ? ss.labelselected : ss.unselected}   mode="outlined">Invalidi</Button>
+                  </View>
+                  <View style={ss.mt10}>
+                    {
+                      opzioniaei=="Compagnia" ?
+                        <Text>Indica a Hugò dove recarsi</Text>
+                      :
+                        <Text>Partenza</Text>
+                    }
                     <TextInput
                       mode='outlined'
                       style={[ss.w100]}
                       label="Via di partenza e numero civico"
                       onChangeText={(viapartenza) => {
-                        setviapartenza(viapartenza)
+                        setviapartenza(viapartenza);
+                        setduratatotale("");
+                        setcostototale(0);
                       }}
                       value={viapartenza ?? ""}
                     />
@@ -256,7 +320,9 @@ export default function Richiesta_NCC({ navigation, route }) {
                       style={[ss.w100]}
                       label="Citta di partenza"
                       onChangeText={(cittapartenza) => {
-                        setcittapartenza(cittapartenza)
+                        setcittapartenza(cittapartenza);  
+                        setduratatotale("");
+                        setcostototale(0);
                       }}
                       value={cittapartenza ?? ""}
                     />
@@ -284,31 +350,83 @@ export default function Richiesta_NCC({ navigation, route }) {
                   </View>
                 </Surface>
                 
-                <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
-                  <Text>Destinazione</Text>
-                  <View>
-                    <TextInput
-                      mode='outlined'
-                      style={[ss.w100,ss.mt15]}
-                      label="Via di destinazione e numero civico"
-                      onChangeText={(viadestinazione) => {
-                        setviadestinazione(viadestinazione)
-                      }}
-                      value={viadestinazione ?? ""}
-                    />
-                  </View>
-                  <View>
-                    <TextInput
-                      mode='outlined'
-                      style={[ss.w100,ss.mt15]}
-                      label="Citta di destinazione"
-                      onChangeText={(cittadestinazione) => {
-                        setcittadestinazione(cittadestinazione)
-                      }}
-                      value={cittadestinazione ?? ""}
-                    />
-                  </View>
-                </Surface>  
+                {
+                  opzioniaei==="Compagnia" ? null
+                  : opzioniaei==="Spesa e commissioni" ?
+                    <>
+                      <View>
+                        <Text>Il servizio sarà effettuato nel tuo stesso quartiere:</Text>
+                        <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+                          <Button onPress={() => {setchecksottocasa(true);}} style={[(checksottocasa ? ss.selected : ss.unselected),ss.w50]} labelStyle={checksottocasa ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+                          <Button onPress={() => {setchecksottocasa(false);}} style={[(!checksottocasa ? ss.selected : ss.unselected),ss.w50]} labelStyle={!checksottocasa ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
+                        </View>
+                      </View>
+                      {
+                        checksottocasa ? null
+                        : 
+                          <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                            <Text>Destinazione</Text>
+                            <View>
+                              <TextInput
+                                mode='outlined'
+                                style={[ss.w100,ss.mt15]}
+                                label="Via di destinazione e numero civico"
+                                onChangeText={(viadestinazione) => {
+                                  setviadestinazione(viadestinazione);
+                                  setduratatotale("");
+                                  setcostototale(0);
+                                }}
+                                value={viadestinazione ?? ""}
+                              />
+                            </View>
+                            <View>
+                              <TextInput
+                                mode='outlined'
+                                style={[ss.w100,ss.mt15]}
+                                label="Citta di destinazione"
+                                onChangeText={(cittadestinazione) => {
+                                  setcittadestinazione(cittadestinazione);
+                                  setduratatotale("");
+                                  setcostototale(0);
+                                }}
+                                value={cittadestinazione ?? ""}
+                              />
+                            </View>
+                          </Surface>                     
+                      }
+                    </>
+                  : 
+                    <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                      <Text>Destinazione</Text>
+                      <View>
+                        <TextInput
+                          mode='outlined'
+                          style={[ss.w100,ss.mt15]}
+                          label="Via di destinazione e numero civico"
+                          onChangeText={(viadestinazione) => {
+                            setviadestinazione(viadestinazione);
+                            setduratatotale("");
+                            setcostototale(0);
+                          }}
+                          value={viadestinazione ?? ""}
+                        />
+                      </View>
+                      <View>
+                        <TextInput
+                          mode='outlined'
+                          style={[ss.w100,ss.mt15]}
+                          label="Citta di destinazione"
+                          onChangeText={(cittadestinazione) => {
+                            setcittadestinazione(cittadestinazione);
+                            setduratatotale("");
+                            setcostototale(0);
+                          }}
+                          value={cittadestinazione ?? ""}
+                        />
+                      </View>
+                    </Surface> 
+                }
+                 
                                 
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                   <Text>Quando:</Text>
@@ -335,22 +453,6 @@ export default function Richiesta_NCC({ navigation, route }) {
                           value={minuti ?? ""}
                         />
                       </View>
-                      {/* <View style={[{ paddingTop: 5},ss.w50]}>
-                        <View style={[ss.w90]}>
-                          <SelectDropdown
-                            data={mesi}
-                            onSelect={(selectedItem, index) => {
-                              setmeseSelected(selectedItem);
-                            }}
-                            buttonTextAfterSelection={(selectedItem, index) => {
-                              return selectedItem
-                            }}
-                            rowTextForSelection={(item, index) => {
-                              return item
-                            }}
-                          />
-                        </View>
-                      </View> */}
                   </View>
                   <View style={[{ flexDirection: 'row'},ss.mt15]}>
                       <View style={ss.w33}>
@@ -388,54 +490,46 @@ export default function Richiesta_NCC({ navigation, route }) {
                       </View>
                   </View>
                 </Surface>
-                <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
-                  {/* <Text>Altre opzioni</Text> */}
-                  {/* <TextInput
-                    mode='outlined'
-                    style={[ss.w100,ss.mt15]}
-                    label="Tipo di spostamento"
-                    onChangeText={(tipospostamento) => {
-                      settipospostamento(tipospostamento)
-                    }}
-                    value={tipospostamento ?? ""}
-                  /> */}
-                  
-                  <Text style={[ss.mt10]}>Se Hugò ti dovrà aspettare, indica per quanti minuti.</Text> 
+                <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>       
+                  <Text style={[ss.mt10]}>Indica quanti minuti Hugò dovrà stare con tè.</Text> 
+                  {/* <Text style={[ss.mt10]}>Se Hugò ti dovrà aspettare, indica per quanti minuti.</Text>  */}
                   <View>
                     <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
-                        <Button onPress={() => {(30 === duratasosta ?setduratasosta(0):setduratasosta(30));}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
-                        <Button onPress={() => {(60 === duratasosta ?setduratasosta(0):setduratasosta(60));}} style={[(60 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={60 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">60</Button>
-                        <Button onPress={() => {(90 === duratasosta ?setduratasosta(0):setduratasosta(90));}} style={[(90 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={90 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">90</Button>
-                        <Button onPress={() => {(120 === duratasosta ?setduratasosta(0):setduratasosta(120));}} style={[(120 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={120 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">120</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (30 === duratasosta ?setduratasosta(0):setduratasosta(30));}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (60 === duratasosta ?setduratasosta(0):setduratasosta(60));}} style={[(60 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={60 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">60</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (90 === duratasosta ?setduratasosta(0):setduratasosta(90));}} style={[(90 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={90 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">90</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (120 === duratasosta ?setduratasosta(0):setduratasosta(120));}} style={[(120 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={120 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">120</Button>
                     </View>
                     <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
-                        <Button onPress={() => {(150 === duratasosta ?setduratasosta(0):setduratasosta(150));}} style={[(150 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={150 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">150</Button>
-                        <Button onPress={() => {(180 === duratasosta ?setduratasosta(0):setduratasosta(180));}} style={[(180 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={180 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">180</Button>
-                        <Button onPress={() => {(210 === duratasosta ?setduratasosta(0):setduratasosta(210));}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
-                        <Button onPress={() => {(240 === duratasosta ?setduratasosta(0):setduratasosta(240));}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (150 === duratasosta ?setduratasosta(0):setduratasosta(150));}} style={[(150 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={150 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">150</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (180 === duratasosta ?setduratasosta(0):setduratasosta(180));}} style={[(180 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={180 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">180</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (210 === duratasosta ?setduratasosta(0):setduratasosta(210));}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (240 === duratasosta ?setduratasosta(0):setduratasosta(240));}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
+                    </View>
+                    <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (360 === duratasosta ?setduratasosta(0):setduratasosta(360));}} style={[(360 === duratasosta ? ss.selected : ss.unselected),ss.w50]} labelStyle={360 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">6 Ore</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (480 === duratasosta ?setduratasosta(0):setduratasosta(480));}} style={[(480 === duratasosta ? ss.selected : ss.unselected),ss.w50]} labelStyle={480 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">8 ore</Button>
+                    </View>
+                    <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (600 === duratasosta ?setduratasosta(0):setduratasosta(600));}} style={[(600 === duratasosta ? ss.selected : ss.unselected),ss.w50]} labelStyle={600 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">10 ore</Button>
+                        <Button onPress={() => {setduratatotale("no");setcostototale(0); (720 === duratasosta ?setduratasosta(0):setduratasosta(720));}} style={[(720 === duratasosta ? ss.selected : ss.unselected),ss.w50]} labelStyle={720 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">12 ore</Button>
                     </View>
                   </View>
-                  <View style={{ flexDirection: 'row'}}>
-                    {/* <TextInput
-                      mode='outlined'
-                      style={[ss.w50,ss.mt15]}
-                      label="Durata attesa"
-                      onChangeText={(durataattesa) => {
-                        setdurataattesa(durataattesa)
-                      }}
-                      value={durataattesa ?? ""}
-                    /> */}
-                    <TextInput
-                      mode='outlined'
-                      style={[ss.w100,ss.mt15]}
-                      label="Passeggeri"
-                      onChangeText={(passeggeri) => {
-                        setpasseggeri(passeggeri)
-                      }}
-                      value={passeggeri ?? ""}
-                    />
-                  </View>
-                
+                  {
+                    opzioniaei==="Accompagnamento" ? 
+                      <View style={{ flexDirection: 'row'}}>
+                        <TextInput
+                          mode='outlined'
+                          style={[ss.w100,ss.mt15]}
+                          label="Passeggeri"
+                          onChangeText={(passeggeri) => {
+                            setpasseggeri(passeggeri)
+                          }}
+                          value={passeggeri ?? ""}
+                        />
+                      </View>
+                    :null
+                  }
                   <TextInput
                     multiline = {true}
                     numberOfLines = {4}

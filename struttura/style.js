@@ -311,6 +311,9 @@ const ss= StyleSheet.create({
     w75: {
       width:'75%',
     },
+    w85: {
+      width:'85%',
+    },
     w90: {
       width:'90%',
     },

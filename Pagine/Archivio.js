@@ -6,7 +6,7 @@ import {SafeAreaView, ScrollView, View,Alert} from 'react-native';
 import {richiesta,getData,Grassetto,EtichettaSurface} from '../struttura/Utils.js';
 import { useIsFocused } from "@react-navigation/native";
 
-export default function History({ navigation, route }) {
+export default function Archivio({ navigation, route }) {
   // var listaritiri=[];
   const [utente, setutente] = useState([]);
   const [listaservizi, setlistaservizi] = useState([]);
@@ -25,7 +25,7 @@ export default function History({ navigation, route }) {
     async function fetchData() {
       let Id_User = await getData('@Id_User');
       let richiestaritiri={
-        "Operazione":'getRitiriRecenti',
+        "Operazione":'getRitiri',
         "Id_User":Id_User,
       }
       let datiritiri = await richiesta(richiestaritiri,'apiHugo');
@@ -40,60 +40,60 @@ export default function History({ navigation, route }) {
     }
 
 
-    async function alertCancellaRitiro(rid){
-      Alert.alert(
-        "Cancellazione ritiro",
-        "Quest operazone cancellerà il ritiro "+rid+" e non sarà possibile annullarla. Sei sicuro?",
-        [
-          {
-            text: "No",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
-          },
-          { 
-            text: "OK", 
-            onPress: async () => {
-              let Id_User = await getData('@Id_User');
-              let richiestacancellaRitiro={
-                "Operazione":'cancellaRitiro',
-                "Id_User":Id_User,
-                "Id_Ritiro":rid,
-              }
-              try {
-                richiesta(richiestacancellaRitiro,'apiHugo')
-                .then(async (json) => {
-                  alert("Ritiro cancellato");
-                  setritiri(json.reverse());
-                });
-              } catch(e) {
-                console.log('Errore richiestacancellaRitiro', richiestacancellaRitiro);
-              }
-            } 
-          }
-        ]
-      );
-      // let Id_User = await getData('@Id_User');
-      // let richiestacancellaRitiro={
-      //   "Operazione":'cancellaRitiro',
-      //   "Id_User":Id_User,
-      //   "Id_Ritiro":rid,
-      // }
-      // try {
-      //   richiesta(richiestacancellaRitiro,'apiHugo')
-      //   .then(async (json) => {
-      //     alert("Ritiro cancellato");
-      //     setritiri(json.reverse());
-      //   });
-      // } catch(e) {
-      //   console.log('Errore richiestacancellaRitiro', richiestacancellaRitiro);
-      // }
-    }
+    // async function alertCancellaRitiro(rid){
+    //   Alert.alert(
+    //     "Cancellazione ritiro",
+    //     "Quest operazone cancellerà il ritiro "+rid+" e non sarà possibile annullarla. Sei sicuro?",
+    //     [
+    //       {
+    //         text: "No",
+    //         onPress: () => console.log("Cancel Pressed"),
+    //         style: "cancel"
+    //       },
+    //       { 
+    //         text: "OK", 
+    //         onPress: async () => {
+    //           let Id_User = await getData('@Id_User');
+    //           let richiestacancellaRitiro={
+    //             "Operazione":'cancellaRitiro',
+    //             "Id_User":Id_User,
+    //             "Id_Ritiro":rid,
+    //           }
+    //           try {
+    //             richiesta(richiestacancellaRitiro,'apiHugo')
+    //             .then(async (json) => {
+    //               alert("Ritiro cancellato");
+    //               setritiri(json.reverse());
+    //             });
+    //           } catch(e) {
+    //             console.log('Errore richiestacancellaRitiro', richiestacancellaRitiro);
+    //           }
+    //         } 
+    //       }
+    //     ]
+    //   );
+    //   // let Id_User = await getData('@Id_User');
+    //   // let richiestacancellaRitiro={
+    //   //   "Operazione":'cancellaRitiro',
+    //   //   "Id_User":Id_User,
+    //   //   "Id_Ritiro":rid,
+    //   // }
+    //   // try {
+    //   //   richiesta(richiestacancellaRitiro,'apiHugo')
+    //   //   .then(async (json) => {
+    //   //     alert("Ritiro cancellato");
+    //   //     setritiri(json.reverse());
+    //   //   });
+    //   // } catch(e) {
+    //   //   console.log('Errore richiestacancellaRitiro', richiestacancellaRitiro);
+    //   // }
+    // }
 
     return (
       <SafeAreaView style={ss.safeareaview}>
         <ScrollView>
           <View style={ss.container}>
-            <Text  style={ss.h1}>Servizi in corso</Text>
+            <Text  style={ss.h1}>Archivio Storico Servizi</Text>
             {
               ritiri.length!=0 ?
                 ritiri.map((r, index) => (
@@ -119,9 +119,6 @@ export default function History({ navigation, route }) {
                     <EtichettaSurface etichetta="Sostituzione:">{r.Sostituisci_Hugo==1?"Si":"No"}</EtichettaSurface>
                     {typeof(r.Spesamax_Hugo)!=="undefined" && r.Spesamax_Hugo!==null && r.Spesamax_Hugo!=0?<EtichettaSurface etichetta="Spesa Max:">{r.Spesamax_Hugo}</EtichettaSurface>:null}
                     <EtichettaSurface etichetta="Servizio scelto:">{listaservizi.length>0?listaservizi[r.Servizio_Hugo].etichetta:""}</EtichettaSurface>
-                    <View style={[ss.centro,ss.w100,ss.px5, ss.mt15]}>
-                      <Button color="#ffc107" onPress={()=>{alertCancellaRitiro(r.Id)}}  mode="contained"  style={[ss.w100]}>Annulla servizio</Button>
-                    </View>
                   </Surface>
                 ))
               :
@@ -129,11 +126,6 @@ export default function History({ navigation, route }) {
                   <Grassetto>Al momento il tuo storico é vuoto.</Grassetto>
                 </Surface>
             }
-          </View>
-          <View style={[ss.centro,ss.w100,ss.px5, ss.mt15]}>
-            <Button onPress={async () => {
-                navigation.navigate('Archivio');
-              }} mode="contained"  style={[ss.w100]}>Vai all'archivio completo.</Button>
           </View>
         </ScrollView>
         <Footer  no="storico"/>

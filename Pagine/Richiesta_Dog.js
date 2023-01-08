@@ -26,14 +26,8 @@ const Info = ({settestoinfo,tinfo,stili,setvisibleinfo}) => {
   )
 }
 
-export default function Richiesta_NCC({ navigation, route }) {
+export default function Richiesta_Dog({ navigation, route }) {
 
-  async function apriwa(){
-    Linking.openURL("https://wa.me/+393383083224");
-  }
-  async function chiama(){
-    Linking.openURL("tel:+393383083224");
-  }
   function RadioMetodo({id,etichetta,info}){
     return (
       <View style={[{ flexDirection: 'row'},ss.w100]}>
@@ -42,6 +36,18 @@ export default function Richiesta_NCC({ navigation, route }) {
         </View>
         <View style={{ width:"90%"}}>
           <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={id} />
+        </View>
+      </View>
+    )
+  }
+  function RadioServizio({val,etichetta,stili,info}){
+    return (
+      <View style={[{ flexDirection: 'row'},ss.w100,stili]}>
+        <View style={{ width:"10%"}}>
+          <Info setvisibleinfo={setvisibleinfo} settestoinfo={settestoinfo} tinfo={info} stili={[ss.mt15,ss.w100,ss.mx0]} />
+        </View>
+        <View style={{ width:"90%"}}>
+          <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label={etichetta} value={val} />
         </View>
       </View>
     )
@@ -70,41 +76,44 @@ export default function Richiesta_NCC({ navigation, route }) {
   const [anno, setanno] = useState('');
   const [tipospostamento, settipospostamento] = useState('');
   const [durataattesa, setdurataattesa] = useState('');
-  const [costototale, setcostototale] = useState(0);
-  const [duratatotale, setduratatotale] = useState("no");
+  const [costototale, setcostototale] = useState(24);
+  // const [duratatotale, setduratatotale] = useState("no");
   const [duratasosta, setduratasosta] = useState(0);
   const [passeggeri, setpasseggeri] = useState('');
   const [note, setnote] = useState('');
+  const [soggetto, setsoggetto] = useState("Dog");
+  const [opzionidog, setopzionidog] = useState("Pet sitting notturno");
 
   const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre","Novembre","Dicembre"];
   const [meseselected, setmeseSelected] = useState(undefined);
+
 
 
   async function getCosto() {
     Keyboard.dismiss;
     let riciestaCostoNCC={
       "Operazione":'getCostoNCC',
-      "Partenza":viapartenza+", "+cittapartenza,
-      "Destinazione":viadestinazione+", "+cittadestinazione,
+      "Tipo":"Dog",
+      "Opzioni_Dog":opzionidog,
       "Sosta":duratasosta,
     }
     let jcosto = await richiesta(riciestaCostoNCC);
     // console.log('jcosto.risposta', jcosto.risposta);
     if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
-      let duratabase=Math.ceil(parseFloat(jcosto.risposta.Durata)/60+duratasosta);
-      if(duratabase<=59){
-        setduratatotale(duratabase+" minuti");
-      }else if(59<duratabase && duratabase<120){
-        let restominuti=duratabase%60;
-        setduratatotale("Un ora e "+restominuti+" minuti");
-      } else if(120<=duratabase){
-        let numeroore=Math.trunc(duratabase/60);
-        let restominuti=duratabase%60;
-        setduratatotale(numeroore+" ore e "+restominuti+" minuti");
-      }
+      // let duratabase=Math.ceil(parseFloat(jcosto.risposta.Durata)/60+duratasosta);
+      // if(duratabase<=59){
+      //   setduratatotale(duratabase+" minuti");
+      // } else if(59<duratabase && duratabase<120){
+      //   let restominuti=duratabase%60;
+      //   setduratatotale("Un ora e "+restominuti+" minuti");
+      // } else if(120<=duratabase){
+      //   let numeroore=Math.trunc(duratabase/60);
+      //   let restominuti=duratabase%60;
+      //   setduratatotale(numeroore+" ore e "+restominuti+" minuti");
+      // }
       setcostototale(parseFloat(jcosto.risposta.Totale));
     } else {
-      setduratatotale("");
+      // setduratatotale("");
       setcostototale(0);
     }
   }
@@ -173,16 +182,19 @@ export default function Richiesta_NCC({ navigation, route }) {
         "Operazione":'richiestaRichiesta',
         "Indirizzo_Partenza":viapartenza,
         "Citta_Partenza":cittapartenza,
-        "Indirizzo_Destinazione":viadestinazione,
-        "Citta_Destinazione":cittadestinazione,
-        "Durata_Sosta":duratasosta,
+        // "Indirizzo_Destinazione":viadestinazione,
+        // "Citta_Destinazione":cittadestinazione,
+        // "Durata_Sosta":duratasosta,
         "giorno":giorno,
         "mese":mese,
         "anno":anno,
         "Passeggeri":passeggeri,
         "Note":note,
         "Metodo_Pagamento":metodo_pagamento,
-        "Cliente":idutente
+        "Cliente":idutente,
+        "Tipo":"Dog",
+        "Soggetto":soggetto,
+        "Opzioni_Servizio":opzionidog,
       }
       // console.log('idutente', idutente);
       // console.log('richiestaRichiesta', richiestaRichiesta);
@@ -225,21 +237,62 @@ export default function Richiesta_NCC({ navigation, route }) {
     }
     fetchData();
   }, []);
+  async function apriwa(){
+    Linking.openURL("https://wa.me/+393383083224");
+  }
+  async function chiama(){
+    Linking.openURL("tel:+393383083224");
+  }
 
     return (
       <Provider>
         <SafeAreaView style={ss.safeareaview}>
           <ScrollView keyboardShouldPersistTaps='handled'>
             <View style={ss.container}>
-              <Text style={[ss.h1, ss.mt15]}>Richiesta noleggio con conducente</Text>
+              <Text style={[ss.h1, ss.mt15]}>Richiesta servizio dog sitter</Text>
               <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                   <Button icon={require('../assets/wa.png')} onPress={apriwa}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Messaggia con me per info</Button>
                   <Button icon="phone" onPress={chiama}  color="#4acd6e" mode="outlined"  style={[ss.w100]}>Chiamami per ordinare</Button>
                 </Surface>
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                  <View style={[{ flexDirection: 'row'},ss.centro,ss.w100, ss.mb15]}>
+                    <Button onPress={() => {setsoggetto("Dog");}} style={[("Dog" === soggetto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"Dog" === soggetto ? ss.labelselected : ss.unselected} mode="outlined">Dog</Button>
+                    <Button onPress={() => {setsoggetto("Cat");}} style={[("Cat" === soggetto ? ss.selected : ss.unselected),ss.w50]} labelStyle={"Cat" === soggetto ? ss.labelselected : ss.unselected}   mode="outlined">Cat</Button>
+                  </View>
+                  <RadioButton.Group 
+                    onValueChange={
+                      opzionidog => {
+                        setviapartenza("");
+                        setcittapartenza("");
+                        setviadestinazione("");
+                        setcittadestinazione("");
+                        setora("");
+                        setminuti("");
+                        setgiorno("");
+                        setmese("");
+                        setnote("");
+                        setpasseggeri("");
+                        setanno(23);
+                        setduratasosta(0);
+                        setopzionidog(opzionidog);
+                        if(opzionidog=="Pet sitting notturno 24€" || opzionidog=="Pet sitting diurno 24€" || opzionidog=="Pet sitting notturno" || opzionidog=="Pet sitting diurno"){
+                          setcostototale(24);
+                        } else if(opzionidog=="Passeggiata 8€" || opzionidog=="Passeggiata"){
+                          setcostototale(8);
+                        } else {
+                          setcostototale(15);
+                        }
+                      }
+                    } value={opzionidog}>
+                    <RadioServizio val="Pet sitting notturno" etichetta="Pet sitting notturno 24€" info="I tuoi figli pelosi rimangono a casa del sitter di notte. Saranno come in famiglia. Il pet sitter ti chiamerà prima per ulteriori dettagli"/>
+                    <RadioServizio val="Pet sitting diurno" etichetta="Pet sitting diurno 24€" info="Il tuo animale domestico trascorrerà la giornata a casa del sitter il pet sitter ti chiamerà prima per ulteriori dettagli"/>
+                    <RadioServizio val="Passeggiata" etichetta="Passeggiata 8€" info="Hugò verrà a prendere il tuo amico peloso e lo porterà a spasso, il costo è riferito per circa 30 min il pet sitter ti chiamerà prima per ulteriori dettagli "/>
+                    <RadioServizio val="Visita dal veterinaio" etichetta="Visita dal veterinaio 15€" info="Hugò verrà a prendere il tuo amico e lo porterà dal veterinario, e necessario indicare il nome e  la via del veterinario sarà calcolato un euro per km percorso (solo andata) dalla tua abitazione il pet sitter ti chiamerà prima per ulteriori dettagli"/>
+                    <RadioServizio val="Tolettatura" etichetta="Tolettatura 15€" info="Hugò verrà a prendere il tuo amico e lo porterà a farsi bello/a, e necessario indicare il nome e  la via della vanity pet preferita, sarà calcolato un euro per km percorso (solo andata) dalla tua abitazione il pet sitter ti chiamerà prima per ulteriori dettagli"/>
+                  </RadioButton.Group>
                   <View>
-                    <Text>Partenza</Text>
+                    <Text>Il tuo domicilio:</Text>
                     <TextInput
                       mode='outlined'
                       style={[ss.w100]}
@@ -248,6 +301,28 @@ export default function Richiesta_NCC({ navigation, route }) {
                         setviapartenza(viapartenza)
                       }}
                       value={viapartenza ?? ""}
+                      onBlur={
+                        async () => {
+                          if(opzionidog=="Visita dal veterinaio" || opzionidog=="Tolettatura"){
+                            Keyboard.dismiss;
+                            let riciestaCostoNCC={
+                              "Operazione":'getCostoNCC',
+                              "Tipo":"Dog",
+                              "Partenza":viapartenza+", "+cittapartenza,
+                              "Destinazione":viadestinazione+", "+cittadestinazione,
+                              "Opzioni_Servizio":opzionidog,
+                              "Sosta":duratasosta,
+                            }
+                            let jcosto = await richiesta(riciestaCostoNCC);
+                            if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
+                              setcostototale(parseFloat(jcosto.risposta.Totale));
+                            } else {
+                              alert("Indirizzo_non_trovato");
+                              setcostototale(0);
+                            }
+                          }
+                        }
+                      }
                     />
                   </View>
                   <View>
@@ -259,6 +334,28 @@ export default function Richiesta_NCC({ navigation, route }) {
                         setcittapartenza(cittapartenza)
                       }}
                       value={cittapartenza ?? ""}
+                      onBlur={
+                        async () => {
+                          if(opzionidog=="Visita dal veterinaio" || opzionidog=="Tolettatura"){
+                            Keyboard.dismiss;
+                            let riciestaCostoNCC={
+                              "Operazione":'getCostoNCC',
+                              "Tipo":"Dog",
+                              "Partenza":viapartenza+", "+cittapartenza,
+                              "Destinazione":viadestinazione+", "+cittadestinazione,
+                              "Opzioni_Servizio":opzionidog,
+                              "Sosta":duratasosta,
+                            }
+                            let jcosto = await richiesta(riciestaCostoNCC);
+                            if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
+                              setcostototale(parseFloat(jcosto.risposta.Totale));
+                            } else {
+                              alert("Indirizzo_non_trovato");
+                              setcostototale(0);
+                            }
+                          }
+                        }
+                      }
                     />
                   </View>
                   <View>
@@ -283,8 +380,77 @@ export default function Richiesta_NCC({ navigation, route }) {
                     >Geolocalizzati</Button>
                   </View>
                 </Surface>
-                
-                <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                {
+                  (opzionidog=="Visita dal veterinaio" || opzionidog=="Tolettatura") ?
+                    <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
+                      <Text>Destinazione</Text>
+                      <View>
+                        <TextInput
+                          mode='outlined'
+                          style={[ss.w100,ss.mt15]}
+                          label="Via di destinazione e numero civico"
+                          onChangeText={(viadestinazione) => {
+                            setviadestinazione(viadestinazione)
+                          }}
+                          value={viadestinazione ?? ""}
+                          onBlur={
+                            async function getCosto() {
+                              Keyboard.dismiss;
+                              let riciestaCostoNCC={
+                                "Operazione":'getCostoNCC',
+                                "Tipo":"Dog",
+                                "Partenza":viapartenza+", "+cittapartenza,
+                                "Destinazione":viadestinazione+", "+cittadestinazione,
+                                "Opzioni_Servizio":opzionidog,
+                                "Sosta":duratasosta,
+                              }
+                              let jcosto = await richiesta(riciestaCostoNCC);
+                              if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
+                                setcostototale(parseFloat(jcosto.risposta.Totale));
+                              } else {
+                                alert("Indirizzo_non_trovato");
+                                setcostototale(0);
+                              }
+                            }
+                          }
+                        />
+                      </View>
+                      <View>
+                        <TextInput
+                          mode='outlined'
+                          style={[ss.w100,ss.mt15]}
+                          label="Citta di destinazione"
+                          onChangeText={(cittadestinazione) => {
+                            setcittadestinazione(cittadestinazione)
+                          }}
+                          value={cittadestinazione ?? ""}
+                          onBlur={
+                            async function getCosto() {
+                              Keyboard.dismiss;
+                              let riciestaCostoNCC={
+                                "Operazione":'getCostoNCC',
+                                "Tipo":"Dog",
+                                "Partenza":viapartenza+", "+cittapartenza,
+                                "Destinazione":viadestinazione+", "+cittadestinazione,
+                                "Opzioni_Servizio":opzionidog,
+                                "Sosta":duratasosta,
+                              }
+                              let jcosto = await richiesta(riciestaCostoNCC);
+                              if(jcosto.risposta!="Indirizzo_non_trovato" && jcosto.risposta!="Operazione_non_riuscita"){
+                                setcostototale(parseFloat(jcosto.risposta.Totale));
+                              } else {
+                                alert("Indirizzo_non_trovato");
+                                setcostototale(0);
+                              }
+                              console.log('jcosto', jcosto);
+                            }
+                          }
+                        />
+                      </View>
+                    </Surface>
+                  : null
+                }
+                {/* <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                   <Text>Destinazione</Text>
                   <View>
                     <TextInput
@@ -308,7 +474,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                       value={cittadestinazione ?? ""}
                     />
                   </View>
-                </Surface>  
+                </Surface>   */}
                                 
                 <Surface style={[ss.surface1,ss.mb15,ss.mt15,ss.w100]} elevation={4}>
                   <Text>Quando:</Text>
@@ -400,7 +566,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                     value={tipospostamento ?? ""}
                   /> */}
                   
-                  <Text style={[ss.mt10]}>Se Hugò ti dovrà aspettare, indica per quanti minuti.</Text> 
+                  {/* <Text style={[ss.mt10]}>Se Hugò ti dovrà aspettare, indica per quanti minuti.</Text> 
                   <View>
                     <View style={[{ flexDirection: 'row' },ss.centro,ss.w100]}>
                         <Button onPress={() => {(30 === duratasosta ?setduratasosta(0):setduratasosta(30));}} style={[(30 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={30 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">30</Button>
@@ -414,7 +580,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                         <Button onPress={() => {(210 === duratasosta ?setduratasosta(0):setduratasosta(210));}} style={[(210 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={210 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">210</Button>
                         <Button onPress={() => {(240 === duratasosta ?setduratasosta(0):setduratasosta(240));}} style={[(240 === duratasosta ? ss.selected : ss.unselected),ss.w25]} labelStyle={240 === duratasosta ? ss.labelselected : ss.unselected} mode="outlined">240</Button>
                     </View>
-                  </View>
+                  </View> */}
                   <View style={{ flexDirection: 'row'}}>
                     {/* <TextInput
                       mode='outlined'
@@ -428,7 +594,7 @@ export default function Richiesta_NCC({ navigation, route }) {
                     <TextInput
                       mode='outlined'
                       style={[ss.w100,ss.mt15]}
-                      label="Passeggeri"
+                      label="Numero animali"
                       onChangeText={(passeggeri) => {
                         setpasseggeri(passeggeri)
                       }}
@@ -448,21 +614,25 @@ export default function Richiesta_NCC({ navigation, route }) {
                     value={note ?? ""}
                   />
                 </Surface>
-                <Button mode="outlined" onPress={getCosto} style={[ss.w100,ss.mt15]}>Calcola il costo</Button>
+                {/* {
+                  (opzionidog=="Visita dal veterinaio" || opzionidog=="Tolettatura") ?
+                    <Button mode="outlined" onPress={getCosto} style={[ss.w100,ss.mt15]}>Calcola il </Button>
+                  : null
+                } */}
                 {
-                  costototale>0 && duratatotale!="" ?
+                  costototale>0 ?
                     <>
                       <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                         <Text style={ss.h2}>Totale: </Text>
                         <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{costototale.toFixed(2)}</Text>
                         <Text style={ss.h2}> €</Text>
                       </Surface>
-                      <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                      {/* <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                         <Text style={ss.h2}>Durata: {duratatotale}</Text>
-                      </Surface>
-                      <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                      </Surface> */}
+                      {/* <Surface style={[{ flexDirection: 'row',alignItems:'center'},ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
                         <Text style={ss.gra}>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
-                      </Surface>
+                      </Surface> */}
                       <Button  color={accent1}
                         //color="#00a1ae" 
                         onPress={async ()=>{
@@ -478,17 +648,17 @@ export default function Richiesta_NCC({ navigation, route }) {
                         mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
                       <Button mode="contained"  onPress={invioRichiesta}  style={[ss.w100,ss.mt15]}>Acquista</Button>    
                     </>
-                  :
-                    <>
-                      {
-                        duratatotale!="no" ?
-                          <Surface style={[ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-                            <Text style={ss.h2}>Non siamo riusciti a calcolare la distanza. Verifica che via e città inseriti siano corretti e riprova.</Text>
-                            <Button mode="contained" onPress={()=>{Linking.openURL("https://wa.me/+393333256236");}} style={[ss.w100,ss.mt15]}>Altrimenti contattaci</Button>    
-                          </Surface>
-                        : null
-                      }
-                    </>
+                  : null
+                    // <>
+                    //   {
+                    //     duratatotale!="no" ?
+                    //       <Surface style={[ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                    //         <Text style={ss.h2}>Non siamo riusciti a calcolare la distanza. Verifica che via e città inseriti siano corretti e riprova.</Text>
+                    //         <Button mode="contained" onPress={()=>{Linking.openURL("https://wa.me/+393333256236");}} style={[ss.w100,ss.mt15]}>Altrimenti contattaci</Button>    
+                    //       </Surface>
+                    //     : null
+                    //   }
+                    // </>
                 }
                 <Button icon='arrow-left' 
                   onPress={async () => {

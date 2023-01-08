@@ -14,7 +14,7 @@ import {CosafaInterno} from '../struttura/Altre_Componenti.js';
 // import {Cosafa,Info2} from '../struttura/Altre_Componenti.js';
 // import { Link } from '@react-navigation/native';
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const percorsi_immagini_servizi=[require("../assets/immaginiservizi/0.png"),require("../assets/immaginiservizi/1.png"),require("../assets/immaginiservizi/2.png"),require("../assets/immaginiservizi/3.png"),require("../assets/immaginiservizi/4.png"),require("../assets/immaginiservizi/5.png"),require("../assets/immaginiservizi/6.png"),require("../assets/immaginiservizi/7.png")];
+const percorsi_immagini_servizi=[require("../assets/immaginiservizi/0.png"),require("../assets/immaginiservizi/1.png"),require("../assets/immaginiservizi/2.png"),require("../assets/immaginiservizi/3.png"),require("../assets/immaginiservizi/4.png"),require("../assets/immaginiservizi/5.png"),require("../assets/immaginiservizi/6.png"),require("../assets/immaginiservizi/7.png"),require("../assets/immaginiservizi/8.png"),require("../assets/immaginiservizi/9.png")];
 const numeroversione=10022; //parametro aggiornamento
 const costobasesosta=7; // costo base della sosta
 const casuale=Math.floor(Math.random() * 10);
@@ -35,25 +35,25 @@ const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
     />
   )
 }
-async function costodistanzaByIndirizzo(dove,comunedestinazione){
-  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
-  let calcolacostodistanza={
-    "UltimoIndirizzo":UltimoIndirizzo,
-    "indirizzoluogo":dove+" "+comunedestinazione,
-    "Operazione":"calcolacostodistanza"
-  }
-  let json_res = await richiesta(calcolacostodistanza);
-  if(json_res.risposta==="Indirizzo_non_trovato"){
-    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
-    return 0; 
-  } else {
-    return parseFloat(json_res.risposta.Totale); 
-    // setcostodistanza(parseFloat(json_res.risposta.Totale)); 
-  }
-}
+// async function costodistanzaByIndirizzo(dove,comunedestinazione){
+//   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+//   let calcolacostodistanza={
+//     "UltimoIndirizzo":UltimoIndirizzo,
+//     "indirizzoluogo":dove+" "+comunedestinazione,
+//     "Operazione":"calcolacostodistanza"
+//   }
+//   let json_res = await richiesta(calcolacostodistanza);
+//   if(json_res.risposta==="Indirizzo_non_trovato"){
+//     alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+//     return 0; 
+//   } else {
+//     return parseFloat(json_res.risposta.Totale); 
+//     // setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+//   }
+// }
 
 // OPZIONI SERVIZIO
-const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,setdove,dove,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto,setlat,setlon,Id_Utente,setrubrica,showDialog8,showDialog10,setcostodistanza, hugosceglie,sethugosceglie, dove2, setdove2, cosahugo2, setcosahugo2, nomeluogo2, setnomeluogo2, triplettadove, settriplettadove,comunedestinazione,setcomunedestinazione,comunedestinazione2,setcomunedestinazione2, ritiroconsegna, setritiroconsegna, testoritirooconsegna, settestoritirooconsegna,telreferente, settelreferente}) => { 
+const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,setdove,dove,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto,setlat,setlon,Id_Utente,setrubrica,showDialog8,showDialog10,setcostodistanza, hugosceglie,sethugosceglie, dove2, setdove2, cosahugo2, setcosahugo2, nomeluogo2, setnomeluogo2, triplettadove, settriplettadove,comunedestinazione,setcomunedestinazione,comunedestinazione2,setcomunedestinazione2, ritiroconsegna, setritiroconsegna, testoritirooconsegna, settestoritirooconsegna,telreferente, settelreferente,richiestafattura,setrichiestafattura,showDialog12,showDialog13,showDialog14,setcheckcalcoladistanza}) => { 
   if(servizio=="no"){
     return (
       <></>
@@ -68,7 +68,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             <Divider />
           </View>
           <View style={{ flexDirection: 'row',width:"100%"}}>
-            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indicami se vuoi il luogo di destinazione. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro aggiuntivo. Se non hai indicato il luogo di destinazione questa differenza sará richiesta  alla fine del servizio." />
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indicami se vuoi il luogo di destinazione. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro aggiuntivo. Nota bene: se non hai indicato il luogo di destinazione l'eventuale differenza sará richiesta  alla fine del servizio. Il servizio si effettua solo in città per le trasferte usare Hugò noleggio con conducente (NCC)." />
             <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Se vuoi indicami il luogo di prelivevo se diverso da quello predefinito</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
@@ -90,9 +90,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcostodistanza(parseFloat(json_res.risposta.Totale));
+                      setcheckcalcoladistanza(0); 
                     }
                   }
                 }
@@ -125,11 +127,15 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             >Geolocalizzati</Button>
 
           </View>
+          
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog14(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+          </View>
           <View  style={[ss.p3,ss.w100]}>
             <Divider />
           </View>
           <View style={{ flexDirection: 'row',width:"100%"}}>
-            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo dove vuoi essere accompagnato.  Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro." />
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo dove vuoi essere accompagnato. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro. Il servizio si effettua solo in città, per le trasferte usare Hugò noleggio con conducente (NCC)" />
             <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il luogo di destinazione.</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
@@ -143,7 +149,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             />
           </View>
           <View style={{ flexDirection: 'row',width:"100%"}}>
-            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo della destinazione specificando il comune, se diverso da quello predefinito, per conoscere il costo totale del servizio.</Text> 
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indica l'indirizzo della destinazione specificando il comune, se diverso da quello predefinito, per conoscere il costo totale del servizio. Se non conosci il luogo di destinazione eventuali differenze saranno calcolate alla fine del servizio.</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
             <TextInput
@@ -164,9 +170,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
                       setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcheckcalcoladistanza(0);
                     }
                   }
                 }
@@ -182,7 +190,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               //     let json_res = await richiesta(calcolacostodistanza);
               //     if(json_res.risposta==="Indirizzo_non_trovato"){
               //       setcostodistanza(0); 
-              //       alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+              //       alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
               //     } else {
               //       setcostodistanza(parseFloat(json_res.risposta.Totale)); 
               //     }
@@ -210,9 +218,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
                       setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcheckcalcoladistanza(0);
                     }
                   }
                 }
@@ -249,6 +259,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               showDialog8(true);
             }}  
             mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
+          </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog12(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
           </View>
           <TextInput
             style={[ss.mt10, ss.w100]}
@@ -295,7 +308,32 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             <Text style={[{ fontWeight: 'bold' }, ss.h2]}>{(duratasosta/30*costobasesosta).toFixed(2)}</Text>
             <Text style={ss.h2}> €</Text>
           </Surface>
+          <Text style={[ss.mt10]}>Vuoi la fattura o la ricevuta per questo servizio?</Text>
+          <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+              <Button onPress={() => {setrichiestafattura(1);}} style={[(1 === richiestafattura ? ss.selected : ss.unselected),ss.w50]} labelStyle={1 === richiestafattura ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+              <Button onPress={() => {setrichiestafattura(0);}} style={[(0 === richiestafattura ? ss.selected : ss.unselected),ss.w50]} labelStyle={0 === richiestafattura ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
+            </View>
         </View>
+        <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
+            <View style={[ss.row, ss.w50]}>
+              <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica un codice coupon per risparmiare ulteriormente" />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+            </View>
+            <View style={ss.w50}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(coupon) => {
+                  setcoupon(coupon);
+                  validaCoupon(coupon);
+                }}
+                value={coupon ?? ""}
+                style={[{ height:32},ss.w100]}
+              />
+            </View>
+          </View>
       </Surface>
     );
   }
@@ -305,7 +343,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
         <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.h1]}>Opzioni servizio:</Text> 
         <View style={{alignItems: 'center' }}>
           <View style={{ flexDirection: 'row',width:"100%"}}>
-            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il punto di ritiro. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro." />
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica il luogo o il punto di ritiro. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro. Il servizio si effettua solo in città, per le trasferte usare Hugò noleggio con conducente (NCC)" />
             <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il luogo di prelievo se diverso da quello predefinito</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
@@ -327,9 +365,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
                       setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcheckcalcoladistanza(0);
                     }
                   }
                 }
@@ -361,12 +401,15 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               } 
             >Geolocalizzati</Button>
           </View>
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog14(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+          </View>
           <View  style={[ss.p3,ss.w100]}>
             <Divider />
           </View>
           <View style={{ flexDirection: 'row',width:"100%"}}>
             <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indicami se vuoi il luogo di destinazione. Se la destinazione supera i 10 km dal punto di partenza, per ogni km in più verrà calcolato un euro aggiuntivo. Se non hai indicato il luogo di destinazione questa differenza sará richiesta  alla fine del servizio." />
-            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il luogo di destinazione specificando il comune, se diverso da quello predefinito, per conoscere il costo totale del servizio.</Text> 
+            <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il luogo di destinazione specificando il comune, se diverso da quello predefinito, per conoscere il costo totale del servizio. Se non conosci il luogo di destinazione eventuali differenze saranno calcolate alla fine del servizio.</Text> 
           </View>
           <View  style={[ss.p3,ss.w100]}>
             <TextInput
@@ -397,9 +440,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
                       setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcheckcalcoladistanza(0);
                     }
                   }
                 }
@@ -421,9 +466,11 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     let json_res = await richiesta(calcolacostodistanza);
                     if(json_res.risposta==="Indirizzo_non_trovato"){
                       setcostodistanza(0); 
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                      setcheckcalcoladistanza(1);
+                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                      setcostodistanza(parseFloat(json_res.risposta.Totale));
+                      setcheckcalcoladistanza(0); 
                     }
                   }
                 }
@@ -460,6 +507,10 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               }}  
               mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
             </View>
+            
+          <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog12(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+          </View>
             <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami il numero di passeggeri, il cellulare se diverso da quello predefinito e se è necessaria un auto.</Text> 
             <TextInput
               style={ss.mt10}
@@ -484,8 +535,33 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               <Button onPress={() => {3 === passeggeri ? setpasseggeri(0): setpasseggeri(3);}} style={[(3 === passeggeri ? ss.selected : ss.unselected),ss.w25]} labelStyle={3 === passeggeri ? ss.labelselected : ss.unselected}   mode="outlined">3</Button>
               <Button onPress={() => {4 === passeggeri ? setpasseggeri(0): setpasseggeri(4);}}  style={[(4 === passeggeri ? ss.selected : ss.unselected),ss.w25]} labelStyle={4 === passeggeri ? ss.labelselected : ss.unselected}  mode="outlined">4</Button>
             </View>
+            <Text style={[ss.mt10]}>Vuoi la fattura per questo servizio?</Text>
+            <View style={[{ flexDirection: 'row'},ss.centro,ss.w100]}>
+              <Button onPress={() => {setrichiestafattura(1);}} style={[(1 === richiestafattura ? ss.selected : ss.unselected),ss.w50]} labelStyle={1 === richiestafattura ? ss.labelselected : ss.unselected} mode="outlined">Si</Button>
+              <Button onPress={() => {setrichiestafattura(0);}} style={[(0 === richiestafattura ? ss.selected : ss.unselected),ss.w50]} labelStyle={0 === richiestafattura ? ss.labelselected : ss.unselected}   mode="outlined">No</Button>
+            </View>
           </View>
         </View>
+        <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
+            <View style={[ss.row, ss.w50]}>
+              <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica un codice coupon per risparmiare ulteriormente" />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+            </View>
+            <View style={ss.w50}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(coupon) => {
+                  setcoupon(coupon);
+                  validaCoupon(coupon);
+                }}
+                value={coupon ?? ""}
+                style={[{ height:32},ss.w100]}
+              />
+            </View>
+          </View>
       </Surface>
     );
   }
@@ -515,18 +591,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             >
               <View style={[{ flexDirection: 'row'},ss.w100]}>
                 <View style={{ width:"10%"}}>
-                  <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Se vuoi che il servizio sia piú veloce, lascia scegliere ad Hugò dove acquistare" stili={[ss.mt15,ss.w100,ss.mx0]} />
+                  <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Se vuoi che il servizio sia piú veloce, lascia scegliere ad Hugò dove acquistare. Nota bene: pagherai sempre l importo dello scontrino che il rider ti darà al momento della consegna più le spese per il servizio richiesto. " stili={[ss.mt15,ss.w100,ss.mx0]} />
                 </View>
                 <View style={{ width:"90%"}}>
-                  <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label="Voglio che Hugò scelga dove acquistare" value={1} />
+                  <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label="Voglio che Hugò scelga dove acquistare." value={1} />
                 </View>
               </View>
               <View style={[{ flexDirection: 'row'},ss.w100]}>
                 <View style={{ width:"10%"}}>
-                  <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Scegli questa opzione se vuoi il tuo negozio preferito per gli acquisti." stili={[ss.mt15,ss.w100,ss.mx0]} />
+                  <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Scegli questa opzione se vuoi il tuo negozio preferito per gli acquisti. Nota bene: pagherai sempre l importo dello scontrino che il rider ti darà al momento della consegna più le spese per il servizio richiesto. " stili={[ss.mt15,ss.w100,ss.mx0]} />
                 </View>
                 <View style={{ width:"90%"}}>
-                  <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label="Voglio indicare ad Hugo dove acquistare" value={0} />
+                  <RadioButton.Item style={[ss.bordoaccent1, ss.mb5, ss.w100]} label="Voglio indicare ad Hugo dove acquistare." value={0} />
                 </View>
               </View>
             </RadioButton.Group>
@@ -579,17 +655,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                         var calcolacostodistanza={
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
                         }
                         if(dove2!=="" && comunedestinazione2!==""){
                           calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                          calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
                           setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcheckcalcoladistanza(0);
                         }
                       }
                     }
@@ -607,17 +687,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                         let calcolacostodistanza={
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
                         }
                         if(dove2!=="" && comunedestinazione2!==""){
                           calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                          calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
                           setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcheckcalcoladistanza(0);
                         }
                       }
                     }
@@ -654,6 +738,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   }}  
                   mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
                 </View>
+                {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+                  <Button  color={accent1} onPress={()=>{showDialog12(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+                </View> */}
                 <View style={{ flexDirection: 'row',width:"100%"}}>
                   <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica cosa acquistare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):" />
                   <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami cosa acquistare *</Text> 
@@ -685,14 +772,17 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                             let calcolacostodistanza={
                               "UltimoIndirizzo":UltimoIndirizzo,
                               "indirizzoluogo":dove+" "+comunedestinazione,
-                              "Operazione":"calcolacostodistanza"
+                              "Operazione":"calcolacostodistanza",
+                              "comunedestinazione":comunedestinazione,
                             }
                             let json_res = await richiesta(calcolacostodistanza);
                             if(json_res.risposta==="Indirizzo_non_trovato"){
                               setcostodistanza(0); 
-                              alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                              setcheckcalcoladistanza(1);
+                              alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                             } else {
                               setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                              setcheckcalcoladistanza(0);
                             }
                           }
                         }
@@ -737,14 +827,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "UltimoIndirizzo":UltimoIndirizzo,
                                 "indirizzoluogo":dove+" "+comunedestinazione,
                                 "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                                "Operazione":"calcolacostodistanza"
+                                "Operazione":"calcolacostodistanza",
+                                "comunedestinazione":comunedestinazione,
+                                "comunedestinazione2":comunedestinazione2
                               }
                               let json_res = await richiesta(calcolacostodistanza);
                               if(json_res.risposta==="Indirizzo_non_trovato"){
                                 setcostodistanza(0); 
-                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                                setcheckcalcoladistanza(1);
+                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                               } else {
-                                setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                setcostodistanza(parseFloat(json_res.risposta.Totale));
+                                setcheckcalcoladistanza(0); 
                               }
                             }
                           }
@@ -763,14 +857,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "UltimoIndirizzo":UltimoIndirizzo,
                                 "indirizzoluogo":dove+" "+comunedestinazione,
                                 "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                                "Operazione":"calcolacostodistanza"
+                                "Operazione":"calcolacostodistanza",
+                                "comunedestinazione":comunedestinazione,
+                                "comunedestinazione2":comunedestinazione2
                               }
                               let json_res = await richiesta(calcolacostodistanza);
                               if(json_res.risposta==="Indirizzo_non_trovato"){
                                 setcostodistanza(0); 
-                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                                setcheckcalcoladistanza(1);
+                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                               } else {
                                 setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                setcheckcalcoladistanza(0);
                               }
                             }
                           }
@@ -780,7 +878,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                       <View style={{ flexDirection: 'row',width:"100%"}}>
                         <Button  color={accent1} onPress={()=>{showDialog10(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
                       </View>
-
+                      {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+                        <Button  color={accent1} onPress={()=>{showDialog13(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+                      </View> */}
                       <View style={{ flexDirection: 'row',width:"100%"}}>
                         <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica cosa acquistare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):" />
                         <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami cosa acquistare *</Text> 
@@ -835,7 +935,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
         </View>
         <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
           <View style={[{ width:"70%"},ss.row]}>
-            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: pagherai sempre l importo dello scontrino che il rider ti darà al momento della consegna più le spese per il servizio richiesto.  L'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
+            <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica ad Hugò la spesa massima consentita per il servizio scelto. Nota bene: pagherai sempre l importo dello scontrino che il rider ti darà al momento della consegna più le spese per il servizio richiesto. L'importo inserito in caso di pagamento alla consegna sarà preautorizzato sulla tua carta.
             La preautorizzazione è una somma momentaneamente sospesa sulla tua carta (non è l'addebito finale). Dopo aver pagato l'ordine alla consegna la preautorizzazione sarà cancellata e rimborsata in automatico." />
             <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Indica la spesa massima * :</Text> 
           </View>
@@ -947,17 +1047,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
                     "indirizzoluogo":dove+" "+comunedestinazione,
-                    "Operazione":"calcolacostodistanza"
+                    "Operazione":"calcolacostodistanza",
+                    "comunedestinazione":comunedestinazione,
                   }
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato"){
                     setcostodistanza(0); 
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
                   }
                 }
               }
@@ -975,17 +1079,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
                     "indirizzoluogo":dove+" "+comunedestinazione,
-                    "Operazione":"calcolacostodistanza"
+                    "Operazione":"calcolacostodistanza",
+                    "comunedestinazione":comunedestinazione,
                   }
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato"){
                     setcostodistanza(0); 
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
                   }
                 }
               }
@@ -1023,6 +1131,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             }}  
             mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
           </View>
+          {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog12(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+          </View> */}
           <View  style={[ss.p3,ss.w100 ]}>
             <View style={[ss.w100, ss.textcentro]}>
               <Text style={[{ fontWeight: 'bold'},ss.w100,ss.textcentro]}>Vuoi inserire un altro luogo dove {testoritirooconsegna}? Il secondo sará scontato del 50%.</Text>
@@ -1040,14 +1151,17 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                       let calcolacostodistanza={
                         "UltimoIndirizzo":UltimoIndirizzo,
                         "indirizzoluogo":dove+" "+comunedestinazione,
-                        "Operazione":"calcolacostodistanza"
+                        "Operazione":"calcolacostodistanza",
+                        "comunedestinazione":comunedestinazione,
                       }
                       let json_res = await richiesta(calcolacostodistanza);
                       if(json_res.risposta==="Indirizzo_non_trovato"){
                         setcostodistanza(0); 
-                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                       } else {
                         setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcheckcalcoladistanza(0);
                       }
                     }
                   }
@@ -1092,14 +1206,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
                           "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
+                          "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
-                          setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcostodistanza(0);
+                          setcheckcalcoladistanza(1); 
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcheckcalcoladistanza(0);
                         }
                       }
                     }
@@ -1118,14 +1236,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
                           "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
+                          "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
                           setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
-                          setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcostodistanza(parseFloat(json_res.risposta.Totale));
+                          setcheckcalcoladistanza(0); 
                         }
                       }
                     }
@@ -1136,7 +1258,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                 <View style={{ flexDirection: 'row',width:"100%"}}>
                   <Button  color={accent1} onPress={()=>{showDialog10(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
                 </View>
-
+                {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+                  <Button  color={accent1} onPress={()=>{showDialog13(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+                </View> */}
                 <View style={{ flexDirection: 'row',width:"100%"}}>
                   <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica cosa ritirare o consegnare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):" />
                   <Text style={[{ fontWeight: 'bold' }, ss.mt10, ss.w90]}>Indicami cosa {testoritirooconsegna} *</Text> 
@@ -1154,6 +1278,26 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               </>
             : null
           }
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
+            <View style={[ss.row, ss.w50]}>
+              <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica un codice coupon per risparmiare ulteriormente" />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+            </View>
+            <View style={ss.w50}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(coupon) => {
+                  setcoupon(coupon);
+                  validaCoupon(coupon);
+                }}
+                value={coupon ?? ""}
+                style={[{ height:32},ss.w100]}
+              />
+            </View>
+          </View>
         </Surface>
       </Surface>
     );
@@ -1231,17 +1375,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
                     "indirizzoluogo":dove+" "+comunedestinazione,
+                    "comunedestinazione":comunedestinazione,
                     "Operazione":"calcolacostodistanza"
                   }
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato"){
                     setcostodistanza(0); 
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
                   }
                 }
               }
@@ -1259,17 +1407,21 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
                     "indirizzoluogo":dove+" "+comunedestinazione,
+                    "comunedestinazione":comunedestinazione,
                     "Operazione":"calcolacostodistanza"
                   }
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato"){
                     setcostodistanza(0); 
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
                   }
                 }
               }
@@ -1307,6 +1459,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             }}  
             mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
           </View>
+          {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+            <Button  color={accent1} onPress={()=>{showDialog12(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+          </View> */}
           <View  style={[ss.p3,ss.w100 ]}>
             <View style={[ss.w100, ss.textcentro]}>
               <Text style={[{ fontWeight: 'bold'},ss.w100,ss.textcentro]}>Vuoi inserire un altro luogo dove {testoritirooconsegna}? Il secondo sará scontato del 50%.</Text>
@@ -1324,14 +1479,17 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                       let calcolacostodistanza={
                         "UltimoIndirizzo":UltimoIndirizzo,
                         "indirizzoluogo":dove+" "+comunedestinazione,
+                        "comunedestinazione":comunedestinazione,
                         "Operazione":"calcolacostodistanza"
                       }
                       let json_res = await richiesta(calcolacostodistanza);
                       if(json_res.risposta==="Indirizzo_non_trovato"){
                         setcostodistanza(0); 
-                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                       } else {
-                        setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcostodistanza(parseFloat(json_res.risposta.Totale));
+                        setcheckcalcoladistanza(0); 
                       }
                     }
                   }
@@ -1376,14 +1534,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
                           "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
+                          "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
                           setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcheckcalcoladistanza(0);
                         }
                       }
                     }
@@ -1402,14 +1564,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "UltimoIndirizzo":UltimoIndirizzo,
                           "indirizzoluogo":dove+" "+comunedestinazione,
                           "indirizzoluogo2":dove2+" "+comunedestinazione2,
-                          "Operazione":"calcolacostodistanza"
+                          "Operazione":"calcolacostodistanza",
+                          "comunedestinazione":comunedestinazione,
+                          "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato"){
-                          setcostodistanza(0); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                          setcostodistanza(0);
+                          setcheckcalcoladistanza(1); 
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                          setcheckcalcoladistanza(0);
                         }
                       }
                     }
@@ -1420,6 +1586,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                 <View style={{ flexDirection: 'row',width:"100%"}}>
                   <Button  color={accent1} onPress={()=>{showDialog10(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Apri la rubrica</Button>
                 </View>
+                {/* <View style={{ flexDirection: 'row',width:"100%"}}>
+                  <Button  color={accent1} onPress={()=>{showDialog13(true);}}  mode="outlined"  style={[ss.w100,ss.mt15]}>Luoghi suggeriti</Button>
+                </View> */}
 
                 <View style={{ flexDirection: 'row',width:"100%"}}>
                   <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica cosa ritirare o consegnare (Ad esempio 1 kg di mele, 1 casa di acqua Panna, 2 Confezioni di pasta Barilla, etc):" />
@@ -1438,6 +1607,26 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               </>
             : null
           }
+          <View  style={[ss.p3,ss.w100]}>
+            <Divider />
+          </View>
+          <View style={[ss.centro, ss.row, ss.w100,ss.mt10]}>
+            <View style={[ss.row, ss.w50]}>
+              <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Indica un codice coupon per risparmiare ulteriormente" />
+              <Text style={[{ fontWeight: 'bold' }, ss.mt10]}>Coupon</Text> 
+            </View>
+            <View style={ss.w50}>
+              <TextInput
+                textAlign={'center'}
+                onChangeText={(coupon) => {
+                  setcoupon(coupon);
+                  validaCoupon(coupon);
+                }}
+                value={coupon ?? ""}
+                style={[{ height:32},ss.w100]}
+              />
+            </View>
+          </View>
         </Surface>
       </Surface>
     );
@@ -1489,6 +1678,15 @@ export default function Hugo({ navigation, route }) {
   const [visible11, setVisible11] = React.useState(false);
   const showDialog11 = () => setVisible11(true);
   const hideDialog11 = () => setVisible11(false);
+  const [visible12, setVisible12] = React.useState(false);
+  const showDialog12 = () => setVisible12(true);
+  const hideDialog12 = () => setVisible12(false);
+  const [visible13, setVisible13] = React.useState(false);
+  const showDialog13 = () => setVisible13(true);
+  const hideDialog13 = () => setVisible13(false);
+  const [visible14, setVisible14] = React.useState(false);
+  const showDialog14 = () => setVisible14(true);
+  const hideDialog14 = () => setVisible14(false);
   
 
   const [location, setLocation] = useState(null);
@@ -1522,6 +1720,11 @@ export default function Hugo({ navigation, route }) {
               richiesta(richiestacancellaindirizzo,'apiHugo')
               .then(async (json) => {
                 setIndirizzi(json);
+                if(Array.isArray(json) && json.length==1){
+                  setIndirizzo(json[0].Id);
+                  setccittaindirizzo(json[0].Citta);
+                  setindirizzoalternativo(json[0].Via+" "+json[0].Civico+" "+json[0].Citta);
+                }
               });
             } catch(e) {
               // remove error
@@ -1591,6 +1794,7 @@ export default function Hugo({ navigation, route }) {
   const [saldo, setSaldo] = useState(0);
   const [fiducia, setfiducia] = useState(0);
   const [rubrica, setrubrica] = useState([]);
+  const [luoghisuggeriti, setluoghisuggeriti] = useState([]);
   const [telefono, settelefono] = useState("");
   const [attivitabase, setattivitabase] = useState("no");
   const [indirizzo, setIndirizzo] = useState("no");
@@ -1624,6 +1828,7 @@ export default function Hugo({ navigation, route }) {
   const [ritiroconsegna, setritiroconsegna] = useState(false);
   const [testoritirooconsegna, settestoritirooconsegna] = useState("ritirare");
   const [telreferente, settelreferente] = useState("");
+  const [richiestafattura, setrichiestafattura] = useState(0);
   
   //NUOVO INDIRIZZO
   const [nuovoindirizzo, setNuovoindirizzo] = useState("");
@@ -1639,6 +1844,7 @@ export default function Hugo({ navigation, route }) {
   const [listaservizi, setlistaservizi] = useState([]);
   const [listametodi, setlistametodi] = useState([]);
   const [costodistanza, setcostodistanza] = useState(0);
+  const [checkcalcoladistanza, setcheckcalcoladistanza] = useState(0);
   const [hugosceglie, sethugosceglie] = useState(1);
   const [triplettadove, settriplettadove] = useState(false);
   let elencoindirizzi=indirizzi;
@@ -1676,7 +1882,7 @@ export default function Hugo({ navigation, route }) {
 
 
 
-  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri){
+  async function inviaPrenotazione (indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax, coupon,indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri,richiestafattura){
     if(isNaN(spesamax)){
       if(prefixspesamax==""){
         var prefixspesamax=0;
@@ -1695,9 +1901,9 @@ export default function Hugo({ navigation, route }) {
         "servizio":servizio,
         "metodo_pagamento":metodo_pagamento,
         "note":note,
-        "dove":dove+" "+comunedestinazione,
+        // "dove":dove+" "+comunedestinazione,
         "cosa":cosa,
-        "note2":note2,
+        // "note2":note2,
         "mancia":mancia,
         "auto":auto,
         "spesamax":fixspesamax,
@@ -1707,9 +1913,15 @@ export default function Hugo({ navigation, route }) {
         "telefono":telefono,
         "passeggeri":passeggeri,
         "oraprenotazione":oraprenotazione,
-        "telreferente":telreferente
+        // "telreferente":telreferente,
+        "richiestafattura":richiestafattura,
+        "checkdcalcoladistanza":checkcalcoladistanza,
       }
-      if(dove2!=="" && dove2!==" "){
+      if(dove!=="" && dove!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2))){
+        richiestaprenotazione["dove"]=dove+" "+comunedestinazione;
+        richiestaprenotazione["note2"]=note2;
+      }
+      if(dove2!=="" && dove2!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2))){
         richiestaprenotazione["dove2"]=dove2+" "+comunedestinazione2;
         richiestaprenotazione["cosahugo2"]=cosahugo2;
         richiestaprenotazione["nomeluogo2"]=nomeluogo2;
@@ -1720,6 +1932,9 @@ export default function Hugo({ navigation, route }) {
       }
       if(sostiuisci){
         richiestaprenotazione["sostiuisci"]=1;
+      }
+      if(typeof(telreferente)!=="undefined" && telreferente!=="" && telreferente!==" " && telreferente!=="undefined"){
+        richiestaprenotazione["telreferente"]=telreferente;
       }
       if(chiamami){
         richiestaprenotazione["chiamami"]=1;
@@ -1787,7 +2002,6 @@ export default function Hugo({ navigation, route }) {
               if(AcquistoConPre.Risposta=="inserimento_ritiro_riuscito"){
                 alert("Inserimento Riuscito");
                 checkriuscito=true;
-                listaritiriaggiornata=AcquistoConPre.Ritiri;
 
               }
               if(typeof(AcquistoConPre.Errore)!=="undefined"){
@@ -1805,7 +2019,6 @@ export default function Hugo({ navigation, route }) {
               setSaldo(parseFloat(AcquistoConSaldo.Saldo));
               alert("Acuisto con saldo Riuscito");
               checkriuscito=true;
-              // listaritiriaggiornata=AcquistoConSaldo.Ritiri;
             }
             if(AcquistoConSaldo2.Errore!=="undefined" && typeof(AcquistoConSaldo2.Errore)!=="undefined"){
               alert(AcquistoConSaldo.Errore);
@@ -1916,10 +2129,10 @@ export default function Hugo({ navigation, route }) {
       setlistaservizi(elencoservizi);
 
       let UltimoIndirizzo = await getData('@UltimoIndirizzo');
-      if(UltimoIndirizzo!==null){
-        setIndirizzo(UltimoIndirizzo);
+      if(typeof(UltimoIndirizzo)!=="undefined" && UltimoIndirizzo!==null && typeof(listaindirizzi)!=="undefined" &&  listaindirizzi!==null && Array.isArray(listaindirizzi) && listaindirizzi.length>1){
         let indirizzoscelto = listaindirizzi.filter(indirizzi => indirizzi.Id == UltimoIndirizzo);
-        if(typeof(indirizzoscelto)!=="undefined" && typeof(indirizzoscelto[0])!=="undefined" && typeof(indirizzoscelto[0].Citta)!=="undefined"){
+        if(typeof(indirizzoscelto)!=="undefined" && indirizzoscelto!==null && indirizzoscelto.length==1 && typeof(indirizzoscelto[0])!=="undefined" && typeof(indirizzoscelto[0].Citta)!=="undefined" && typeof(indirizzoscelto[0].Via)!=="undefined"){
+          setIndirizzo(UltimoIndirizzo);
           setccittaindirizzo(indirizzoscelto[0].Citta);
           setindirizzoalternativo(indirizzoscelto[0].Via+" "+indirizzoscelto[0].Civico+" "+indirizzoscelto[0].Citta);
         }
@@ -1957,9 +2170,12 @@ export default function Hugo({ navigation, route }) {
           "Id_Indirizzo":indirizzo,
         }
         let jattivitabase = await richiesta(richiestaattivitabase);
+        // console.log('jattivitabase', jattivitabase);
         if(typeof(jattivitabase.id_attivita_base)!=="undefined" && jattivitabase.id_attivita_base !="undefined" && jattivitabase.id_attivita_base !="no"){
           setattivitabase(jattivitabase.id_attivita_base);
           setdescrizioneindirizzo(jattivitabase.descrizione_indirizzo);
+          setluoghisuggeriti(jattivitabase.luoghisuggeriti);
+          // console.log('luoghisuggeriti', jattivitabase.luoghisuggeriti);
           richestaaggiornamento.id_attivita_base=jattivitabase.id_attivita_base;
         }
         let json_res = await richiesta(richestaaggiornamento);
@@ -2048,6 +2264,7 @@ export default function Hugo({ navigation, route }) {
     setnomeluogo2("");
     setcosahugo2("");
     setcostodistanza(0);
+    setrichiestafattura(0);
     sethugosceglie(1);
     settriplettadove(false);
     switch (servizio) {
@@ -2057,6 +2274,12 @@ export default function Hugo({ navigation, route }) {
         break;
       case 3:
         navigation.navigate('Richiesta NCC');
+        break; 
+      case 8:
+        navigation.navigate('Richiesta dog sitter');
+        break; 
+      case 9:
+        navigation.navigate('Richiesta assistenza anziani e invalidi');
         break; 
       case 4:
         setduratasosta(30);
@@ -2108,7 +2331,7 @@ export default function Hugo({ navigation, route }) {
       
       if(typeof(coupon)!==null, coupon["tipo"]=="Corretto"){
         setscontocoupon(parseFloat(coupon["Importo"]));
-        alert("Coupon validato");
+        alert("Coupon validato: Hai ottenuto uno sconto di "+coupon["Importo"]+" euro.");
       } else {
         setscontocoupon(0);
       }
@@ -2127,6 +2350,7 @@ export default function Hugo({ navigation, route }) {
               <Surface style={[ss.surface1,ss.mb15,ss.centro,ss.w75]} elevation={4}>
                 <Text style={ss.h1}>Ciao {Nominativo}!</Text>
                 <Text style={ss.h2}>Cosa posso portarti oggi?</Text>
+                <Text style={ss.h2}>Cosa posso consegnare per te?</Text>
                 <Text style={ss.h2}>Dove posso accompagnarti?</Text>
                 {/* <Text style={[ss.h2,ss.textcentro]}>Per piacere inserisci più dettagli possibili:</Text>
                 <Text style={ss.h2}>mi faciliteresti il compito.</Text> */}
@@ -2189,16 +2413,20 @@ export default function Hugo({ navigation, route }) {
                               <View style={{ width:"90%"}}>
                                 <RadioButton.Item label={indirizzo["Via"]+" "+indirizzo["Civico"]+" "+indirizzo["Citta"]} value={indirizzo["Id"]}/>
                               </View>
-                              <View style={{ width:"10%",justifyContent:"center"}}>
-                                <IconButton
-                                  icon="delete-circle"
-                                  color={accent1}
-                                  size={20}
-                                  onPress={() => {
-                                    alertCancellaIndirizzo(indirizzo["Id"])
-                                  }}
-                                />
-                              </View>
+                              {
+                                indirizzi.length>1 ?
+                                  <View style={{ width:"10%",justifyContent:"center"}}>
+                                    <IconButton
+                                      icon="delete-circle"
+                                      color={accent1}
+                                      size={20}
+                                      onPress={() => {
+                                        alertCancellaIndirizzo(indirizzo["Id"])
+                                      }}
+                                    />
+                                  </View>
+                                : null
+                              }
                             </View>
                           ))
                         }
@@ -2319,7 +2547,7 @@ export default function Hugo({ navigation, route }) {
                   }
                 }  
                 mode="contained"  style={[ss.w100, ss.mt10]}
-              >Cambia indirizzo *</Button>
+              >Scegli indirizzo *</Button>
               {
                 typeof(descrizioneindirizzo)!=="undefined" && descrizioneindirizzo!==null && descrizioneindirizzo!=="no" ?
                   <View style={[ss.my10,ss.w100]}>
@@ -2329,7 +2557,7 @@ export default function Hugo({ navigation, route }) {
               }
             </Surface>
             {
-              indirizzo!="no" ?
+              (indirizzo!=="no" && indirizzo!=="" && indirizzo!==null) ?
                 <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
                   <View style={{ flexDirection: 'row'}}>
                     <Text style={[ss.h1,ss.mt15]}>Scegli un servizio *:</Text>
@@ -2350,7 +2578,32 @@ export default function Hugo({ navigation, route }) {
                             <View style={ss.mt15}>
                               {
                                 listaservizi.map((s, index) => (
+                                  s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [8].includes(s["id"])?
+                                    <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
+                                  :
+                                    null
+                                ))
+                              }
+                            </View>
+                          }
+                          {
+                            <View style={ss.mt15}>
+                              {
+                                listaservizi.map((s, index) => (
                                   s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [2,3,4].includes(s["id"])?
+                                    <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
+                                  :
+                                    null
+                                ))
+                              }
+                            </View>
+                          }
+                          
+                          {
+                            <View style={ss.mt15}>
+                              {
+                                listaservizi.map((s, index) => (
+                                  s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [9].includes(s["id"])?
                                     <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
                                   :
                                     null
@@ -2404,7 +2657,7 @@ export default function Hugo({ navigation, route }) {
                             showDialog2();
                           }
                         }  
-                        mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                        mode="contained"  style={[ss.w100, ss.mt10]}>Scegli indirizzo *</Button>
                         <View style={[ss.my10,ss.w100]}>
                           <Text style={[{ fontSize: 20 },ss.mt5,ss.textcentro]}>{descrizioneindirizzo}</Text>
                         </View>
@@ -2431,9 +2684,9 @@ export default function Hugo({ navigation, route }) {
                                           <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
                                         </TouchableOpacity>
                                       :
-                                        <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
+                                        <View style={[{ backgroundColor: 'white', width:'25%' }]} 
                                         key={index+"no"+index2}>
-                                          <Text style={ss.h4}>     </Text>
+                                          {/* <Text style={ss.h4}>     </Text> */}
                                         </View>
                                     :
                                       (Ora2!="No") ?
@@ -2447,9 +2700,8 @@ export default function Hugo({ navigation, route }) {
                                           <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
                                         </TouchableOpacity>
                                       :
-                                        <View style={[{ backgroundColor: 'white', width:'25%' }, ss.p10, ss.centro]} 
-                                        key={index+"no"+index2}>
-                                          <Text style={ss.h4}>   </Text>
+                                        <View style={[{ backgroundColor: 'white', width:'25%' }]} key={index+"no"+index2}>
+                                          // <Text style={ss.h4}>   </Text>
                                         </View>
 
                                   ))
@@ -2475,7 +2727,7 @@ export default function Hugo({ navigation, route }) {
                                 showDialog2();
                               }
                             }  
-                            mode="contained"  style={[ss.w100, ss.mt10]}>Cambia indirizzo *</Button>
+                            mode="contained"  style={[ss.w100, ss.mt10]}>Scegli indirizzo *</Button>
                           </View>
                         :
                           <View><Text style={ss.h4}>Nessuna disponibilita. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text></View>
@@ -2558,6 +2810,12 @@ export default function Hugo({ navigation, route }) {
                     settestoritirooconsegna={settestoritirooconsegna}
                     telreferente={telreferente}
                     settelreferente={settelreferente}
+                    richiestafattura={richiestafattura}
+                    setrichiestafattura={setrichiestafattura}
+                    showDialog12={showDialog12}
+                    showDialog13={showDialog13}
+                    showDialog14={showDialog14}
+                    setcheckcalcoladistanza={setcheckcalcoladistanza}
                   />
                   <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
                     <View style={[{flexDirection: 'row'},ss.w100]}>
@@ -2644,8 +2902,23 @@ export default function Hugo({ navigation, route }) {
                               <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costodistanza.toFixed(2)}</Text>
                             </View>
                           </View>
-                          <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio,ss.row]}>
-                            <Text>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
+                          <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
+                            <Text  style={[ss.textcentro,ss.w100,ss.centro]}>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
+                            <Button  color={accent1} mode="text">Ricalcola</Button>
+                          </View>
+                        </>
+                      : null
+                    }
+                    {
+                      checkcalcoladistanza>0?
+                        <>
+                          <View style={[{ flexDirection: 'row'},ss.w100,ss.py10]}>
+                            <View style={ss.w100}>
+                              <Text style={[{color:"red"},ss.textcentro,ss.w100,ss.h2]}>ATTENZIONE:</Text> 
+                            </View>
+                          </View>
+                          <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
+                            <Text  style={[ss.textcentro,ss.w100,ss.centro]}>Non siamo riusciti a calcolare il costo della distanza: assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
                             <Button  color={accent1} mode="text">Ricalcola</Button>
                           </View>
                         </>
@@ -2708,6 +2981,19 @@ export default function Hugo({ navigation, route }) {
                         </View>
                       : null
                     }
+                    {
+                      scontocoupon>0?
+                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                          <View style={ss.w50}>
+                            <Text style={ss.h2}>Coupon: </Text> 
+                          </View>
+                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                            <Text style={ss.h2}> €</Text> 
+                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>- {scontocoupon.toFixed(2)}</Text>
+                          </View>
+                        </View>
+                      : null
+                    }
                     <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro,ss.py10]}>
                       <Text style={ss.h2}>Totale: </Text>
                       <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{parseFloat(totale).toFixed(2)}</Text>
@@ -2729,7 +3015,7 @@ export default function Hugo({ navigation, route }) {
                   <TouchableOpacity
                     onPress={
                       () => {
-                        inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax,coupon, indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri);
+                        inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax,coupon, indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri,richiestafattura);
                       }
                     }
                     style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
@@ -2843,6 +3129,7 @@ export default function Hugo({ navigation, route }) {
                                 setcomunedestinazione(indi.comunedestinazione);
                                 let calcolacostodistanza={
                                   "indirizzoluogo":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  "comunedestinazione":indi.comunedestinazione,
                                 }
                                 if(servizio == 2 || servizio == 4){
                                   calcolacostodistanza.Partenza=indirizzoalternativo;
@@ -2856,9 +3143,11 @@ export default function Hugo({ navigation, route }) {
                                 let json_res = await richiesta(calcolacostodistanza);
                                 if(json_res.risposta==="Indirizzo_non_trovato"){
                                   setcostodistanza(0); 
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                  setcheckcalcoladistanza(0);
                                 }
                                 setVisible8(false);
                               }
@@ -2939,7 +3228,9 @@ export default function Hugo({ navigation, route }) {
                                 settelreferente(indi.telreferente);
                                 let calcolacostodistanza={
                                   "indirizzoluogo":dove+" "+comunedestinazione,
-                                  "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione
+                                  "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  "comunedestinazione":comunedestinazione,
+                                  "comunedestinazione2":indi.comunedestinazione
                                 }
                                 if(servizio == 2 || servizio == 4){
                                   calcolacostodistanza.Partenza=indirizzoalternativo;
@@ -2953,9 +3244,11 @@ export default function Hugo({ navigation, route }) {
                                 let json_res = await richiesta(calcolacostodistanza);
                                 if(json_res.risposta==="Indirizzo_non_trovato"){
                                   setcostodistanza(0); 
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Potrebbero essere applicati altri costi alla fine del servizio.");
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                  setcheckcalcoladistanza(0);
                                 }
                                 setVisible10(false);
                               }
@@ -3015,6 +3308,203 @@ export default function Hugo({ navigation, route }) {
                   }
                 </View>
                 <Button onPress={hideDialog10}>Chiudi</Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={visible12} onDismiss={hideDialog12}>
+              <Dialog.Title>Luoghi Suggeriti</Dialog.Title>
+              <Dialog.Content>
+                <View>
+                  {
+                    typeof(luoghisuggeriti)!=="undefined" && luoghisuggeriti!=="undefined" && luoghisuggeriti.length>0 ? 
+                      luoghisuggeriti.map((indi, index) => (
+                        indi!==null ?
+                          <View style={{ flexDirection: 'row',width:"100%"}} key={index+"luoghisuggeriti"}>
+                            <Button  style={[ss.w100,ss.w85]} mode="outlined" onPress={
+                              async ()=>{
+                                setNote2(indi.nomeluogo);
+                                setdove(indi.indirizzoluogo);
+                                settelreferente(indi.telreferente);
+                                setcomunedestinazione(indi.comunedestinazione);
+                                let calcolacostodistanza={
+                                  "indirizzoluogo":dove+" "+comunedestinazione,
+                                  "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  "comunedestinazione":comunedestinazione,
+                                  "comunedestinazione2":indi.comunedestinazione
+                                }
+                                if(servizio == 2 || servizio == 4){
+                                  calcolacostodistanza.Partenza=indirizzoalternativo;
+                                  calcolacostodistanza.Operazione="calcolacostodistanzataxi1";
+                                } else {
+                                  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                                  calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
+                                  calcolacostodistanza.Operazione="calcolacostodistanza";
+                                }
+
+                                let json_res = await richiesta(calcolacostodistanza);
+                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else {
+                                  setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                  setcheckcalcoladistanza(0);
+                                }
+                                setVisible12(false);
+                              }
+                            }>{indi.nomeluogo}</Button>
+                            <IconButton
+                              icon="eye"
+                              color={accent1}
+                              style={[ss.centro,ss.w15]}
+                              size={20}
+                              onPress={
+                                async ()=>{
+                                  if(typeof(indi.telreferente)!=="undefined"){
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione+". Telefono: "+indi.telreferente);
+                                  } else {
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione);
+                                  }
+                                  setVisible11(true);
+                                }
+                              }
+                            />
+                          </View>
+                        : null
+                      ))
+                    : null
+                  }
+                </View>
+                <Button onPress={hideDialog12}>Chiudi</Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={visible13} onDismiss={hideDialog13}>
+              <Dialog.Title>Luoghi Suggeriti</Dialog.Title>
+              <Dialog.Content>
+                <View>
+                  {
+                    typeof(luoghisuggeriti)!=="undefined" && luoghisuggeriti!=="undefined" && luoghisuggeriti.length>0 ? 
+                      luoghisuggeriti.map((indi, index) => (
+                        indi!==null ?
+                          <View style={{ flexDirection: 'row',width:"100%"}} key={index+"luoghisuggeriti"}>
+                            <Button  style={[ss.w100,ss.w85]} mode="outlined" onPress={
+                              async ()=>{
+                                setnomeluogo2(indi.nomeluogo);
+                                setdove2(indi.indirizzoluogo);
+                                setcomunedestinazione2(indi.comunedestinazione);
+                                settelreferente(indi.telreferente);
+                                let calcolacostodistanza={
+                                  "indirizzoluogo":dove+" "+comunedestinazione,
+                                  "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  "comunedestinazione":comunedestinazione,
+                                  "comunedestinazione2":indi.comunedestinazione
+                                }
+                                if(servizio == 2 || servizio == 4){
+                                  calcolacostodistanza.Partenza=indirizzoalternativo;
+                                  calcolacostodistanza.Operazione="calcolacostodistanzataxi1";
+                                } else {
+                                  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                                  calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
+                                  calcolacostodistanza.Operazione="calcolacostodistanza";
+                                }
+
+                                let json_res = await richiesta(calcolacostodistanza);
+                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else {
+                                  setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                  setcheckcalcoladistanza(0);
+                                }
+                                setVisible13(false);
+                              }
+                            }>{indi.nomeluogo}</Button>
+                            <IconButton
+                              icon="eye"
+                              color={accent1}
+                              style={[ss.centro,ss.w15]}
+                              size={20}
+                              onPress={
+                                async ()=>{
+                                  if(typeof(indi.telreferente)!=="undefined"){
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione+". Telefono: "+indi.telreferente);
+                                  } else {
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione);
+                                  }
+                                  setVisible11(true);
+                                }
+                              }
+                            />
+                          </View>
+                        : null
+                      ))
+                    : null
+                  }
+                </View>
+                <Button onPress={hideDialog13}>Chiudi</Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={visible14} onDismiss={hideDialog14}>
+              <Dialog.Title>Luoghi Suggeriti</Dialog.Title>
+              <Dialog.Content>
+                <View>
+                  {
+                    typeof(luoghisuggeriti)!=="undefined" && luoghisuggeriti!=="undefined" && luoghisuggeriti.length>0 ? 
+                      luoghisuggeriti.map((indi, index) => (
+                        indi!==null ?
+                          <View style={{ flexDirection: 'row',width:"100%"}} key={index+"luoghisuggeriti"}>
+                            <Button  style={[ss.w100,ss.w85]} mode="outlined" onPress={
+                              async ()=>{
+                                setindirizzoalternativo(indi.indirizzoluogo+" "+indi.comunedestinazione);
+                                if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
+                                  let calcolacostodistanza={
+                                    "Partenza":indi.indirizzoluogo,
+                                    "indirizzoluogo":dove+" "+comunedestinazione,
+                                    "Operazione":"calcolacostodistanzataxi1"
+                                  }
+                                  let json_res = await richiesta(calcolacostodistanza);
+                                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                                    setcostodistanza(0); 
+                                    setcheckcalcoladistanza(1);
+                                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  } else {
+                                    setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                                    setcheckcalcoladistanza(0);
+                                  }
+                                }
+                                
+                                setVisible14(false);
+                              }
+                            }>{indi.nomeluogo}</Button>
+                            <IconButton
+                              icon="eye"
+                              color={accent1}
+                              style={[ss.centro,ss.w15]}
+                              size={20}
+                              onPress={
+                                async ()=>{
+                                  if(typeof(indi.telreferente)!=="undefined"){
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione+". Telefono: "+indi.telreferente);
+                                  } else {
+                                    settestodettaglioindirizzo(indi.indirizzoluogo+" "+indi.comunedestinazione);
+                                  }
+                                  setVisible11(true);
+                                }
+                              }
+                            />
+                          </View>
+                        : null
+                      ))
+                    : null
+                  }
+                </View>
+                <Button onPress={hideDialog14}>Chiudi</Button>
               </Dialog.Content>
             </Dialog>
           </Portal>

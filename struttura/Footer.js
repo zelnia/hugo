@@ -19,8 +19,12 @@ export default function Footer() {
               size={35}
               onPress={async () => {
                 let idutente= await getData("@Id_User");
-                let nom= await getData("@Nominativo");
-                navigation.navigate('Hugo',{Id_Utente: idutente,Nominativo:nom});
+                if(idutente!==null){
+                  let nom= await getData("@Nominativo");
+                  navigation.navigate('Hugo',{Id_Utente: idutente,Nominativo:nom});
+                } else {
+                  navigation.navigate('Accesso');
+                }
               }}
             />
           </View>
@@ -34,7 +38,12 @@ export default function Footer() {
               color='#00a1ae'
               size={35}
               onPress={async () => {
-                navigation.navigate('Profilo');
+                let idutente= await getData("@Id_User");
+                if(idutente!==null){
+                  navigation.navigate('Profilo');
+                } else {
+                  navigation.navigate('Accesso');
+                }
               }}
             />
           </View>
@@ -48,7 +57,12 @@ export default function Footer() {
               color='#00a1ae'
               size={35}
               onPress={async () => {
-                navigation.navigate('History');
+                let idutente= await getData("@Id_User");
+                if(idutente!==null){
+                  navigation.navigate('History');
+                } else {
+                  navigation.navigate('Accesso');
+                }
               }}
             />
           </View>

@@ -125,19 +125,27 @@ export default function Profilo({ navigation, route }) {
             "Id_User":Id_User,
           }
           let datiutente = await richiesta(richiestautente,'apiHugo');
-          setutente(datiutente);
-          let richiestaindirizzi={
-            "Operazione":'getIndirizzi',
-            "Id_User":Id_User,
-          }
-          let datiindirizzi = await richiesta(richiestaindirizzi,'apiHugo');
-          if(typeof(datiindirizzi)!==null){
-            if (isActive) {
-              setindirizzi(datiindirizzi);
+          if(datiutente!==null){
+            setutente(datiutente);
+            let richiestaindirizzi={
+              "Operazione":'getIndirizzi',
+              "Id_User":Id_User,
             }
+            let datiindirizzi = await richiesta(richiestaindirizzi,'apiHugo');
+            if(typeof(datiindirizzi)!==null){
+              if (isActive) {
+                setindirizzi(datiindirizzi);
+              }
+            }
+          } else {
+            await AsyncStorage.clear().then(()=>{
+              navigation.navigate('LogIn');
+            });
           }
         } else {
-          navigation.navigate('Accesso');
+          await AsyncStorage.clear().then(()=>{
+            navigation.navigate('LogIn');
+          });
         }
       }
       fetchData();

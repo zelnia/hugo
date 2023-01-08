@@ -13,9 +13,12 @@ import {CosafaInterno} from './struttura/Altre_Componenti.js';
 import {richiesta,getLocal,getData} from './struttura/Utils.js';
 import Profilo from './Pagine/Profilo.js';
 import History from './Pagine/History.js';
+import Archivio from './Pagine/Archivio.js';
 import Preautorizzazione from './Pagine/Preautorizzazione.js';
 import Registrazione from './Pagine/Registrazione.js';
 import Richiesta_NCC from './Pagine/Richiesta_NCC.js';
+import Richiesta_AEI from './Pagine/Richiesta_AEI.js';
+import Richiesta_Dog from './Pagine/Richiesta_Dog.js';
 import Hugo from './Pagine/Hugo.js';
 import LogOut from './Pagine/LogOut.js';
 import LogIn from './Pagine/LogIn.js';
@@ -221,12 +224,15 @@ export default function App() {
         <Tab.Screen name="Hugo" component={Hugo}/>
         <Tab.Screen name="Profilo" component={Profilo}/>
         <Tab.Screen name="History" component={History}/>
+        <Tab.Screen name="Archivio" component={Archivio}/>
         <Tab.Screen name="Preautorizzazione" component={Preautorizzazione}/>
         <Tab.Screen name="LogOut" component={LogOut}/>
         <Tab.Screen name="LogIn" component={LogIn}/>
         <Tab.Screen name="RicaricaSaldo" component={RicaricaSaldo}/>
         <Tab.Screen name="Recuperapassword" component={Recuperapassword}/>
         <Tab.Screen name="SpecchiettoCosti" component={SpecchiettoCosti}/>
+        <Tab.Screen name="Richiesta dog sitter" component={Richiesta_AEI}/>
+        <Tab.Screen name="Richiesta assistenza anziani e invalidi" component={Richiesta_Dog}/>
       </Tab.Navigator>
     </NavigationContainer>
   );
