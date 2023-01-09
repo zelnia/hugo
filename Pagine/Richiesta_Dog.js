@@ -79,7 +79,7 @@ export default function Richiesta_Dog({ navigation, route }) {
   const [costototale, setcostototale] = useState(24);
   // const [duratatotale, setduratatotale] = useState("no");
   const [duratasosta, setduratasosta] = useState(0);
-  const [passeggeri, setpasseggeri] = useState('');
+  const [passeggeri, setpasseggeri] = useState(1);
   const [note, setnote] = useState('');
   const [soggetto, setsoggetto] = useState("Dog");
   const [opzionidog, setopzionidog] = useState("Pet sitting notturno");
@@ -124,13 +124,14 @@ export default function Richiesta_Dog({ navigation, route }) {
     let messaggioerrore="Per favore compila i seguenti campi:";
     if(viapartenza==""){messaggioerrore+=" 'Via di partenza'";checkgo=false;}
     if(cittapartenza==""){messaggioerrore+=" 'Città di partenza'";checkgo=false;}
-    if(viadestinazione==""){messaggioerrore+=" 'Via di destinazione'";checkgo=false;}
-    if(cittadestinazione==""){messaggioerrore+=" 'Città di destinazione'";checkgo=false;}
-
+    if(opzionidog==="Visita dal veterinaio" || opzionidog==="Tolettatura"){
+      if(viadestinazione==""){messaggioerrore+=" 'Via di destinazione'";checkgo=false;}
+      if(cittadestinazione==""){messaggioerrore+=" 'Città di destinazione'";checkgo=false;}
+    }
     if(passeggeri!=""){
       let passeggeri_fixed=parseInt(passeggeri.replace(/[^0-9]/g, ''));
       if(isNaN(passeggeri_fixed) || (passeggeri_fixed<0 || passeggeri_fixed>9)){
-        return alert ("Per favore compila i passeggeri indicando un numero da 0 a 9");
+        return alert ("Per favore compila il numero di animali indicando un numero da 0 a 9");
       }
     }
     if(ora!=""){
@@ -165,7 +166,7 @@ export default function Richiesta_Dog({ navigation, route }) {
       }
     }
     if(anno!=""){
-      let anno_fixed=parseInt(anno.replace(/[^0-9]/g, ''));
+      let anno_fixed=(isNaN(anno)?parseInt(anno.replace(/[^0-9]/g, '')):anno);
       if(isNaN(anno_fixed) || anno_fixed=="" || (anno_fixed<22 || anno_fixed>25)){
         return alert ("Per favore compila l'anno di partenza indicandolo nel formato a 2 cifre. Ad esempio 23 per indicare il 2023.");
       }

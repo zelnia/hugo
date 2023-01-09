@@ -63,7 +63,11 @@ export default function History({ navigation, route }) {
                 richiesta(richiestacancellaRitiro,'apiHugo')
                 .then(async (json) => {
                   alert("Ritiro cancellato");
-                  setritiri(json.reverse());
+                  if(Array.isArray(json) && json.length>0){
+                    setritiri(json.reverse());
+                  } else {
+                    setritiri([]);
+                  }
                 });
               } catch(e) {
                 console.log('Errore richiestacancellaRitiro', richiestacancellaRitiro);

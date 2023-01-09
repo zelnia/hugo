@@ -53,12 +53,18 @@ const Info = ({settestoinfo,tinfo,stili,setVisible7}) => {
 // }
 
 // OPZIONI SERVIZIO
-const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,setdove,dove,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto,setlat,setlon,Id_Utente,setrubrica,showDialog8,showDialog10,setcostodistanza, hugosceglie,sethugosceglie, dove2, setdove2, cosahugo2, setcosahugo2, nomeluogo2, setnomeluogo2, triplettadove, settriplettadove,comunedestinazione,setcomunedestinazione,comunedestinazione2,setcomunedestinazione2, ritiroconsegna, setritiroconsegna, testoritirooconsegna, settestoritirooconsegna,telreferente, settelreferente,richiestafattura,setrichiestafattura,showDialog12,showDialog13,showDialog14,setcheckcalcoladistanza}) => { 
+const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,sostiuisci,spesamax,coupon,setSostiuisci,setSpesamax,setcoupon,setCosa,duratasosta,setduratasosta,note2,setNote2,setdove,dove,indirizzoalternativo,setindirizzoalternativo,validaCoupon, telefono, settelefono, passeggeri, setpasseggeri,setAuto,auto,OpzioniAuto,setlat,setlon,Id_Utente,setrubrica,showDialog8,showDialog10,setcostodistanza, hugosceglie,sethugosceglie, dove2, setdove2, cosahugo2, setcosahugo2, nomeluogo2, setnomeluogo2, triplettadove, settriplettadove,comunedestinazione,setcomunedestinazione,comunedestinazione2,setcomunedestinazione2, ritiroconsegna, setritiroconsegna, testoritirooconsegna, settestoritirooconsegna,telreferente, settelreferente,richiestafattura,setrichiestafattura,showDialog12,showDialog13,showDialog14,setcheckcalcoladistanza,ccittaindirizzo,alertCittaDiversa,listaservizi,dispo}) => { 
   if(servizio=="no"){
     return (
       <></>
     );
   }
+  if(!Array.isArray(dispo) || (Array.isArray(dispo) && dispo.length<1)){
+    return (
+      <></>
+    );
+  }
+  // console.log('indirizzoalternativo', indirizzoalternativo);
   if(servizio==4){
     return ( //Hugò TAXI con sosta
       <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
@@ -82,20 +88,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale));
+                        setcheckcalcoladistanza(0); 
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale));
-                      setcheckcalcoladistanza(0); 
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -114,14 +130,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     latitude : location.coords.latitude,
                     longitude : location.coords.longitude
                   });
-                  let indirizzogeolocalizzato="";
-                  indirizzogeolocalizzato+=place[0].street+" ";
-                  indirizzogeolocalizzato+=place[0].streetNumber+" ";
-                  indirizzogeolocalizzato+=place[0].city+" ";
-                  indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
-                  setlat(location.coords.latitude);
-                  setlon(location.coords.longitude);
-                  setindirizzoalternativo(indirizzogeolocalizzato);
+                  if(place[0].city==ccittaindirizzo){
+                    let indirizzogeolocalizzato="";
+                    indirizzogeolocalizzato+=place[0].street+" ";
+                    indirizzogeolocalizzato+=place[0].streetNumber+" ";
+                    indirizzogeolocalizzato+=place[0].city+" ";
+                    indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                    setlat(location.coords.latitude);
+                    setlon(location.coords.longitude);
+                    setindirizzoalternativo(indirizzogeolocalizzato);
+                  } else {
+                    alertCittaDiversa(place);
+                  }
                 }
               } 
             >Geolocalizzati</Button>
@@ -162,20 +182,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcheckcalcoladistanza(0);
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
-                      setcheckcalcoladistanza(0);
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -210,20 +240,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcheckcalcoladistanza(0);
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
-                      setcheckcalcoladistanza(0);
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -357,20 +397,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcheckcalcoladistanza(0);
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
-                      setcheckcalcoladistanza(0);
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -389,14 +439,18 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     latitude : location.coords.latitude,
                     longitude : location.coords.longitude
                   });
-                  let indirizzogeolocalizzato="";
-                  indirizzogeolocalizzato+=place[0].street+" ";
-                  indirizzogeolocalizzato+=place[0].streetNumber+" ";
-                  indirizzogeolocalizzato+=place[0].city+" ";
-                  indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
-                  setlat(location.coords.latitude);
-                  setlon(location.coords.longitude);
-                  setindirizzoalternativo(indirizzogeolocalizzato);
+                  if(place[0].city==ccittaindirizzo){
+                    let indirizzogeolocalizzato="";
+                    indirizzogeolocalizzato+=place[0].street+" ";
+                    indirizzogeolocalizzato+=place[0].streetNumber+" ";
+                    indirizzogeolocalizzato+=place[0].city+" ";
+                    indirizzogeolocalizzato+="(Lat: "+location.coords.latitude+" Lon:"+location.coords.longitude+")";
+                    setlat(location.coords.latitude);
+                    setlon(location.coords.longitude);
+                    setindirizzoalternativo(indirizzogeolocalizzato);
+                  } else {
+                    alertCittaDiversa(place);
+                  }
                 }
               } 
             >Geolocalizzati</Button>
@@ -432,20 +486,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                        setcheckcalcoladistanza(0);
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale)); 
-                      setcheckcalcoladistanza(0);
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -458,20 +522,30 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               onBlur={
                 async ()=>{
                   if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
-                    let calcolacostodistanza={
-                      "Partenza":indirizzoalternativo,
-                      "indirizzoluogo":dove+" "+comunedestinazione,
-                      "Operazione":"calcolacostodistanzataxi1"
-                    }
-                    let json_res = await richiesta(calcolacostodistanza);
-                    if(json_res.risposta==="Indirizzo_non_trovato"){
-                      setcostodistanza(0); 
-                      setcheckcalcoladistanza(1);
-                      alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    if(Array.isArray(listaservizi[servizio].citta) && listaservizi[servizio].citta.includes(comunedestinazione)){
+                      let calcolacostodistanza={
+                        "Partenza":indirizzoalternativo,
+                        "indirizzoluogo":dove+" "+comunedestinazione,
+                        "Operazione":"calcolacostodistanzataxi1"
+                      }
+                      let json_res = await richiesta(calcolacostodistanza);
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                      } else {
+                        setcostodistanza(parseFloat(json_res.risposta.Totale));
+                        setcheckcalcoladistanza(0); 
+                      }
                     } else {
-                      setcostodistanza(parseFloat(json_res.risposta.Totale));
-                      setcheckcalcoladistanza(0); 
+                      alert("L'indirizzo di destinazione inserito non é supportato dal servizio. Per favore, prova con un servizio diverso.");
                     }
+                  } else if(indirizzoalternativo==="") {
+                    alert("Per favore compila l'indirizzo di partenza.");
                   }
                 }
               }
@@ -663,10 +737,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0); 
                           setcheckcalcoladistanza(1);
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                           setcheckcalcoladistanza(0);
@@ -695,14 +773,20 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0); 
                           setcheckcalcoladistanza(1);
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                           setcheckcalcoladistanza(0);
                         }
+                      } else if(indirizzoalternativo==="") {
+                        alert("Per favore compila l'indirizzo di partenza.");
                       }
                     }
                   }
@@ -776,10 +860,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                               "comunedestinazione":comunedestinazione,
                             }
                             let json_res = await richiesta(calcolacostodistanza);
-                            if(json_res.risposta==="Indirizzo_non_trovato"){
+                            if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                               setcostodistanza(0); 
                               setcheckcalcoladistanza(1);
-                              alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                              alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                            } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                              setcostodistanza(0); 
+                              setcheckcalcoladistanza(1);
+                              alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                             } else {
                               setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                               setcheckcalcoladistanza(0);
@@ -821,7 +909,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                         // onEndEditing={
                         onBlur={
                           async () => {
-                            if(dove!="" && dove2!="" && comunedestinazione!=="" && comunedestinazione2!==""){
+                            if(dove!=="" && dove2!=="" && comunedestinazione!=="" && comunedestinazione2!==""){
                               let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                               let calcolacostodistanza={
                                 "UltimoIndirizzo":UltimoIndirizzo,
@@ -832,10 +920,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "comunedestinazione2":comunedestinazione2
                               }
                               let json_res = await richiesta(calcolacostodistanza);
-                              if(json_res.risposta==="Indirizzo_non_trovato"){
+                              if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                 setcostodistanza(0); 
                                 setcheckcalcoladistanza(1);
-                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                              } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                setcostodistanza(0); 
+                                setcheckcalcoladistanza(1);
+                                alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                               } else {
                                 setcostodistanza(parseFloat(json_res.risposta.Totale));
                                 setcheckcalcoladistanza(0); 
@@ -862,10 +954,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "comunedestinazione2":comunedestinazione2
                               }
                               let json_res = await richiesta(calcolacostodistanza);
-                              if(json_res.risposta==="Indirizzo_non_trovato"){
+                              if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                 setcostodistanza(0); 
                                 setcheckcalcoladistanza(1);
-                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                              } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                setcostodistanza(0); 
+                                setcheckcalcoladistanza(1);
+                                alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                               } else {
                                 setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                 setcheckcalcoladistanza(0);
@@ -1042,7 +1138,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             onChangeText={dove => setdove(dove)}
             onBlur={
               async () => {
-                if(dove!="" && comunedestinazione!=""){
+                if(dove!=="" && comunedestinazione!==""){
                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
@@ -1055,10 +1151,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
-                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
                     setcheckcalcoladistanza(1);
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                     setcheckcalcoladistanza(0);
@@ -1087,10 +1187,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
-                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
                     setcheckcalcoladistanza(1);
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                     setcheckcalcoladistanza(0);
@@ -1155,10 +1259,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                         "comunedestinazione":comunedestinazione,
                       }
                       let json_res = await richiesta(calcolacostodistanza);
-                      if(json_res.risposta==="Indirizzo_non_trovato"){
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                         setcostodistanza(0); 
                         setcheckcalcoladistanza(1);
-                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                       } else {
                         setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                         setcheckcalcoladistanza(0);
@@ -1200,7 +1308,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   // onEndEditing={
                   onBlur={
                     async () => {
-                      if(dove!="" && dove2!="" && comunedestinazione!=="" && comunedestinazione2!==""){
+                      if(dove!=="" && dove2!=="" && comunedestinazione!=="" && comunedestinazione2!==""){
                         let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                         let calcolacostodistanza={
                           "UltimoIndirizzo":UltimoIndirizzo,
@@ -1211,10 +1319,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0);
                           setcheckcalcoladistanza(1); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                           setcheckcalcoladistanza(0);
@@ -1241,10 +1353,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0); 
                           setcheckcalcoladistanza(1);
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale));
                           setcheckcalcoladistanza(0); 
@@ -1370,7 +1486,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
             onChangeText={dove => setdove(dove)}
             onBlur={
               async () => {
-                if(dove!="" && comunedestinazione!=""){
+                if(dove!=="" && comunedestinazione!==""){
                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                   let calcolacostodistanza={
                     "UltimoIndirizzo":UltimoIndirizzo,
@@ -1383,10 +1499,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
-                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
                     setcheckcalcoladistanza(1);
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo, alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                     setcheckcalcoladistanza(0);
@@ -1415,10 +1535,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
                   let json_res = await richiesta(calcolacostodistanza);
-                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
                     setcheckcalcoladistanza(1);
-                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                   } else {
                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                     setcheckcalcoladistanza(0);
@@ -1483,10 +1607,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                         "Operazione":"calcolacostodistanza"
                       }
                       let json_res = await richiesta(calcolacostodistanza);
-                      if(json_res.risposta==="Indirizzo_non_trovato"){
+                      if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                         setcostodistanza(0); 
                         setcheckcalcoladistanza(1);
-                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                      } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                        setcostodistanza(0); 
+                        setcheckcalcoladistanza(1);
+                        alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                       } else {
                         setcostodistanza(parseFloat(json_res.risposta.Totale));
                         setcheckcalcoladistanza(0); 
@@ -1528,7 +1656,7 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   // onEndEditing={
                   onBlur={
                     async () => {
-                      if(dove!="" && dove2!="" && comunedestinazione!=="" && comunedestinazione2!==""){
+                      if(dove!=="" && dove2!=="" && comunedestinazione!=="" && comunedestinazione2!==""){
                         let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                         let calcolacostodistanza={
                           "UltimoIndirizzo":UltimoIndirizzo,
@@ -1539,10 +1667,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0); 
                           setcheckcalcoladistanza(1);
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                           setcheckcalcoladistanza(0);
@@ -1569,10 +1701,14 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione2":comunedestinazione2
                         }
                         let json_res = await richiesta(calcolacostodistanza);
-                        if(json_res.risposta==="Indirizzo_non_trovato"){
+                        if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0);
                           setcheckcalcoladistanza(1); 
-                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                          alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                        } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                          setcostodistanza(0); 
+                          setcheckcalcoladistanza(1);
+                          alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                         } else {
                           setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                           setcheckcalcoladistanza(0);
@@ -1641,6 +1777,7 @@ export default function Hugo({ navigation, route }) {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
+  // Dialog Lista indirizzi predefiniti
   const [visible2, setVisible2] = React.useState(false);
   const showDialog2 = () => setVisible2(true);
   const hideDialog2 = () => setVisible2(false);
@@ -1657,6 +1794,7 @@ export default function Hugo({ navigation, route }) {
   const showDialog5 = () => setVisible5(true);
   const hideDialog5 = () => setVisible5(false);
 
+  // Dialog nuovo indirizzo
   const [visible6, setVisible6] = React.useState(false);
   const showDialog6 = () => setVisible6(true);
   const hideDialog6 = () => setVisible6(false);
@@ -1729,6 +1867,35 @@ export default function Hugo({ navigation, route }) {
             } catch(e) {
               // remove error
             }
+          } 
+        }
+      ]
+    );
+  } 
+  function alertCittaDiversa (place) {
+    Alert.alert(
+      "Citta inserita esterna all'area del servizio",
+      "La cittá inserita sembra essere diversa da quella selezionata per il servizio. Puoi verificare la disponibilitá e i servizi associati a questa cittá inserendo un nuovo indirizzo predefinito cliccando ok. Altrimenti annulla e riprova inserendo un indirizzo diverso.",
+      [
+        {
+          text: "Annulla",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { 
+          text: "OK", 
+          onPress: async () => {
+            setNuovoindirizzo(place[0].street);
+            setNuovacitta(place[0].city);
+            setCivico(place[0].streetNumber);
+            setNuovcap(place[0].postalCode);
+            setNuovaprovincia(place[0].region);
+            let Id_User = await getData('@Id_User');
+            let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+            let listaindirizzi = await richiesta(richiestaindi);
+            setIndirizzi(listaindirizzi);
+            setVisible2(true);
+            setVisible6(true);
           } 
         }
       ]
@@ -1962,18 +2129,14 @@ export default function Hugo({ navigation, route }) {
       if(servizio==4){
         richiestaprenotazione["duratasosta"]=duratasosta;
       }
-      // if(servizio==2 || servizio==4){
-      //   if(dove==""){checkgo=false;errore+="Per favore scegli un indirizzo di destinazione. \r\n"}
-      //   if(comunedestinazione==""){checkgo=false;errore+="Per favore scegli un comune di destinazione. \r\n"}
-      // }
-      if(servizio==6){
+      if(servizio==6 || servizio==7){
         if(ritiroconsegna){
           richiestaprenotazione["indirizzo"]=dove+" "+comunedestinazione;
           richiestaprenotazione["dove"]=descrizioneindirizzo;
         }
         if(dove==""){checkgo=false;errore+="Per favore scegli un indirizzo di destinazione. \r\n"}
         if(comunedestinazione==""){checkgo=false;errore+="Per favore scegli un comune di destinazione. \r\n"}
-        if(cosa==""){checkgo=false;errore+="Per favore specifica cosa vuoi ritirato. \r\n"}
+        if(cosa==""){checkgo=false;errore+="Per favore specifica cosa vuoi ritirato o consegnato. \r\n"}
       }
       if(metodo_pagamento=="no"){
         checkgo=false;
@@ -2129,6 +2292,7 @@ export default function Hugo({ navigation, route }) {
       setlistaservizi(elencoservizi);
 
       let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+      // console.log('(typeof(UltimoIndirizzo)!=="undefined" && UltimoIndirizzo!==null && typeof(listaindirizzi)!=="undefined" &&  listaindirizzi!==null && Array.isArray(listaindirizzi) && listaindirizzi.length>1)', (typeof(UltimoIndirizzo)!=="undefined" && UltimoIndirizzo!==null && typeof(listaindirizzi)!=="undefined" &&  listaindirizzi!==null && Array.isArray(listaindirizzi) && listaindirizzi.length>1));
       if(typeof(UltimoIndirizzo)!=="undefined" && UltimoIndirizzo!==null && typeof(listaindirizzi)!=="undefined" &&  listaindirizzi!==null && Array.isArray(listaindirizzi) && listaindirizzi.length>1){
         let indirizzoscelto = listaindirizzi.filter(indirizzi => indirizzi.Id == UltimoIndirizzo);
         if(typeof(indirizzoscelto)!=="undefined" && indirizzoscelto!==null && indirizzoscelto.length==1 && typeof(indirizzoscelto[0])!=="undefined" && typeof(indirizzoscelto[0].Citta)!=="undefined" && typeof(indirizzoscelto[0].Via)!=="undefined"){
@@ -2137,12 +2301,15 @@ export default function Hugo({ navigation, route }) {
           setindirizzoalternativo(indirizzoscelto[0].Via+" "+indirizzoscelto[0].Civico+" "+indirizzoscelto[0].Citta);
         }
       } else {
+        // console.log('(listaindirizzi.length==1)', (listaindirizzi.length==1));
         if(listaindirizzi.length==1){
           setIndirizzo(listaindirizzi[0].Id);
+          AsyncStorage.setItem('@UltimoIndirizzo', listaindirizzi[0].Id);
           if(cittaindirizzo==null){
             setccittaindirizzo(listaindirizzi[0].Citta);
-            setindirizzoalternativo(listaindirizzi[0].Via+" "+listaindirizzi[0].Civico+" "+listaindirizzi[0].Citta);
+            // console.log('listaindirizzi[0].Via+" "+listaindirizzi[0].Civico+" "+listaindirizzi[0].Citta', listaindirizzi[0].Via+" "+listaindirizzi[0].Civico+" "+listaindirizzi[0].Citta);
           }
+          setindirizzoalternativo(listaindirizzi[0].Via+" "+listaindirizzi[0].Civico+" "+listaindirizzi[0].Citta);
         }
       }
       
@@ -2193,7 +2360,7 @@ export default function Hugo({ navigation, route }) {
         } else {
           totserv+=totserv=element["costo"];
         }
-        setcostoservizio(totserv);
+        setcostoservizio(parseFloat(totserv));
         return costoserv=totserv;
       }
     });
@@ -2211,6 +2378,7 @@ export default function Hugo({ navigation, route }) {
         costospesamax=parseFloat(spesamax);
       }
     }
+    // console.log('costodistanza', costodistanza);
     settotale((servizio!="no"?costoserv:0)+costogestioneincassi+costospesamax+(duratasosta/30*costobasesosta)-scontocoupon+mancia+costodistanza);
   }, [indirizzo,servizio,spesamax,duratasosta,scontocoupon,mancia,costodistanza,ccittaindirizzo,comunedestinazione2,dove2,costoservizio]);
 
@@ -2267,6 +2435,7 @@ export default function Hugo({ navigation, route }) {
     setrichiestafattura(0);
     sethugosceglie(1);
     settriplettadove(false);
+    // console.log('listaservizi[servizio].citta', listaservizi[servizio].citta);
     switch (servizio) {
       case 1:
         setcheckdomani(true);
@@ -2492,7 +2661,38 @@ export default function Hugo({ navigation, route }) {
                             value={nuovenoteindirizzo}
                             onChangeText={nuovenoteindirizzo => setNuovenoteindirizzo(nuovenoteindirizzo)}
                           />   
-                        </View>  
+                        </View> 
+                        <Button 
+                          // Geolocalizzati (crea indirizzo)
+                          icon="map-marker"
+                          onPress={
+                            async () => {
+                              let { status } = await Location.requestForegroundPermissionsAsync();
+                              if (status !== 'granted') {
+                                setErrorMsg('Non è possibile proseguire senza il permesso per identificare la posizione.');
+                                return;
+                              }
+                              let location = await Location.getCurrentPositionAsync({});
+                              let place = await Location.reverseGeocodeAsync({
+                                latitude : location.coords.latitude,
+                                longitude : location.coords.longitude
+                              });
+                              let indirizzogeolocalizzato="";
+                              indirizzogeolocalizzato+=place[0].street+" ";
+                              indirizzogeolocalizzato+=place[0].streetNumber+" ";
+                              indirizzogeolocalizzato+=place[0].city;
+                              setlat(location.coords.latitude);
+                              setlon(location.coords.longitude);
+                              setindirizzoalternativo(indirizzogeolocalizzato);
+                              setNuovoindirizzo(place[0].street);
+                              setNuovacitta(place[0].city);
+                              setCivico(place[0].streetNumber);
+                              setNuovcap(place[0].postalCode);
+                              setNuovaprovincia(place[0].region);
+                              
+                            }
+                          } 
+                        >Geolocalizzati</Button> 
                         <Button 
                           style={[ss.w100, ss.mt15]} 
                           mode="contained" 
@@ -2547,7 +2747,7 @@ export default function Hugo({ navigation, route }) {
                   }
                 }  
                 mode="contained"  style={[ss.w100, ss.mt10]}
-              >Scegli indirizzo *</Button>
+              >Scegli indirizzo predefinito*</Button>
               {
                 typeof(descrizioneindirizzo)!=="undefined" && descrizioneindirizzo!==null && descrizioneindirizzo!=="no" ?
                   <View style={[ss.my10,ss.w100]}>
@@ -2558,477 +2758,443 @@ export default function Hugo({ navigation, route }) {
             </Surface>
             {
               (indirizzo!=="no" && indirizzo!=="" && indirizzo!==null) ?
-                <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-                  <View style={{ flexDirection: 'row'}}>
-                    <Text style={[ss.h1,ss.mt15]}>Scegli un servizio *:</Text>
-                  </View>
-                  <View style={ss.mt15}>
-                    {
-                      listaservizi.length>0 ?
-                        <>
+                listaservizi.length>0 ?
+                  <>
+                    <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+                      <View style={{ flexDirection: 'row'}}>
+                        <Text style={[ss.h1,ss.mt15]}>Scegli un servizio *:</Text>
+                      </View>
+                      <View style={ss.mt15}>
+                        {
+                          listaservizi.map((s, index) => (
+                            s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [0,1,5,6,7].includes(s["id"])?
+                              <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
+                            :
+                              null
+                          ))
+                        }
+                        <View style={ss.mt15}>
                           {
                             listaservizi.map((s, index) => (
-                              s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [0,1,5,6,7].includes(s["id"])?
+                              s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [8].includes(s["id"])?
                                 <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
                               :
                                 null
                             ))
                           }
-                          {
-                            <View style={ss.mt15}>
-                              {
-                                listaservizi.map((s, index) => (
-                                  s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [8].includes(s["id"])?
-                                    <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
-                                  :
-                                    null
-                                ))
-                              }
-                            </View>
-                          }
-                          {
-                            <View style={ss.mt15}>
-                              {
-                                listaservizi.map((s, index) => (
-                                  s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [2,3,4].includes(s["id"])?
-                                    <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
-                                  :
-                                    null
-                                ))
-                              }
-                            </View>
-                          }
-                          
-                          {
-                            <View style={ss.mt15}>
-                              {
-                                listaservizi.map((s, index) => (
-                                  s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [9].includes(s["id"])?
-                                    <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
-                                  :
-                                    null
-                                ))
-                              }
-                            </View>
-                          }
-                        </>
-                        // <RadioButton.Group onValueChange={servizio => {checkservizio(servizio);}} value={servizio}>
-                        //   {
-                        //     listaservizi.map((s, index) => (
-                        //       s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [0,1,5,6].includes(s["id"])?
-                        //         <RadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"ser"+s["id"]}/>
-                        //       :
-                        //         null
-                        //     ))
-                        //   }
-                        //   <View style={ss.mt15}>
-                        //     {
-                        //       listaservizi.map((s, index) => (
-                        //         s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [2,3,4].includes(s["id"])?
-                        //           <RadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"ser"+s["id"]}/>
-                        //         :
-                        //           null
-                        //       ))
-                        //     }
-                        //   </View>
-                        // </RadioButton.Group>
-                      :
-                        <View style={{ flexDirection: 'row'}}>
-                          <Text style={[ss.h3,ss.mt15]}>Al momento non ci sono servizi attivi per questa cittá. Prova inserendo un indirizzo diverso.</Text>
                         </View>
-                    }
-                  </View>
-                </Surface>
-              : null
-            }
-            {
-              servizio!="no" && servizio!=3 ?
-                <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-                  {
-                    (typeof(dispo)!="undefined" && dispo.length) ?
-                      <View>
-                        {/* <Button   color={accent1}
-                        onPress={
-                          async () => {
-                            let Id_User = await getData('@Id_User');
-                            let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
-                            let listaindirizzi = await richiesta(richiestaindi);
-                            setIndirizzi(listaindirizzi);
-                            showDialog2();
-                          }
-                        }  
-                        mode="contained"  style={[ss.w100, ss.mt10]}>Scegli indirizzo *</Button>
-                        <View style={[ss.my10,ss.w100]}>
-                          <Text style={[{ fontSize: 20 },ss.mt5,ss.textcentro]}>{descrizioneindirizzo}</Text>
-                        </View>
-                        <Divider /> */}
-                        <View style={[{ flexDirection: 'row'}, ss.mt10]}>
-                          <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
-                          <Text style={[ss.h4,ss.mt5]}>Scegli un orario {testooggidomani}*</Text>
-                        </View>
-                        <View>
+                        <View style={ss.mt15}>
                           {
-                            dispo.map((Ora, index) => (
-                              <View style={[{ flexDirection: 'row', justifyContent:'flex-end' }]} key={index}>
-                                {
-                                  Ora[1].map((Ora2, index2) => (
-                                    ! checkdomani ?
-                                      ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
-                                        <TouchableOpacity
-                                          key={index+"-"+index2}
-                                          onPress={() => {
-                                            setora(Ora2)
-                                          }}
-                                          style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
-                                        >
-                                          <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
-                                        </TouchableOpacity>
-                                      :
-                                        <View style={[{ backgroundColor: 'white', width:'25%' }]} 
-                                        key={index+"no"+index2}>
-                                          {/* <Text style={ss.h4}>     </Text> */}
-                                        </View>
-                                    :
-                                      (Ora2!="No") ?
-                                        <TouchableOpacity
-                                          key={index+"-"+index2}
-                                          onPress={() => {
-                                            setora(Ora2)
-                                          }}
-                                          style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
-                                        >
-                                          <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
-                                        </TouchableOpacity>
-                                      :
-                                        <View style={[{ backgroundColor: 'white', width:'25%' }]} key={index+"no"+index2}>
-                                          // <Text style={ss.h4}>   </Text>
-                                        </View>
-
-                                  ))
-                                }
-                              </View>
+                            listaservizi.map((s, index) => (
+                              s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [2,3,4].includes(s["id"])?
+                                <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
+                              :
+                                null
+                            ))
+                          }
+                        </View>
+                        <View style={ss.mt15}>
+                          {
+                            listaservizi.map((s, index) => (
+                              s["attivo"] && s["citta"].includes(ccittaindirizzo.trim()) &&  [9].includes(s["id"])?
+                                <NuovoRadioServizio info={s["info"]} id={s["id"]} etichetta={s["etichetta"]} costo={s["costo"]} key={"nser"+s["id"]} selezionato={s["id"]==servizio?true:false} percorso={percorsi_immagini_servizi[s["id"]]}/>
+                              :
+                                null
                             ))
                           }
                         </View>
                       </View>
-                    :
-                      (attivitabase!="no") ?
-                        (dispo=="") ?
-                          <View>
-                            <Text style={ss.h4}>Al momento non ci sono Riders disponibili. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text>
-                            <Button  color={accent1} 
-                            // color="#00a1ae" 
-                            onPress={
-                              async () => {
-                                let Id_User = await getData('@Id_User');
-                                let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
-                                let listaindirizzi = await richiesta(richiestaindi);
-                                setIndirizzi(listaindirizzi);
-                                showDialog2();
-                              }
-                            }  
-                            mode="contained"  style={[ss.w100, ss.mt10]}>Scegli indirizzo *</Button>
-                          </View>
-                        :
-                          <View><Text style={ss.h4}>Nessuna disponibilita. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text></View>
-                      :
-                        <View>
-                          <Text style={[ss.h4, ss.textcentro]}>Seleziona un servizio e un indirizzo per vedere le nostre disponibilità di consegna.</Text>
-                          <Button   color={accent1}
-                            //color="#00a1ae"
-                            onPress={
-                              async () => {
-                                let Id_User = await getData('@Id_User');
-                                let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
-                                let listaindirizzi = await richiesta(richiestaindi);
-                                setIndirizzi(listaindirizzi);
-                                showDialog2();
-                              }
-                            }  
-                            mode="contained"  style={[ss.w100, ss.mt10]}>Scegli un indirizzo di consegna *</Button>
-                        </View>
-                  }
-                </Surface>
+                    </Surface>
+                    {
+                      servizio!="no" && servizio!=3 ?
+                        <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+                          {
+                            (typeof(dispo)!="undefined" && dispo.length) ?
+                              <View>
+                                <View style={[{ flexDirection: 'row'}, ss.mt10]}>
+                                  <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="L'orario scelto è l'ora in cui il rider effettuerà il servizio" />
+                                  <Text style={[ss.h4,ss.mt5]}>Scegli un orario {testooggidomani}*</Text>
+                                </View>
+                                <View>
+                                  {
+                                    dispo.map((Ora, index) => (
+                                      <View style={[{ flexDirection: 'row', justifyContent:'flex-end' }]} key={index}>
+                                        {
+                                          Ora[1].map((Ora2, index2) => (
+                                            ! checkdomani ?
+                                              ((adessocondelta.getTime() < Date.parse(oggi.getDate()+' '+monthNames[oggi.getMonth()]+' '+oggi.getFullYear()+' '+Ora2+':00')) && Ora2!="No") ?
+                                                <TouchableOpacity
+                                                  key={index+"-"+index2}
+                                                  onPress={() => {
+                                                    setora(Ora2)
+                                                  }}
+                                                  style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
+                                                >
+                                                  <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
+                                                </TouchableOpacity>
+                                              :
+                                                <View style={[{ backgroundColor: 'white', width:'25%' }]} 
+                                                key={index+"no"+index2}>
+                                                  {/* <Text style={ss.h4}>     </Text> */}
+                                                </View>
+                                            :
+                                              (Ora2!="No") ?
+                                                <TouchableOpacity
+                                                  key={index+"-"+index2}
+                                                  onPress={() => {
+                                                    setora(Ora2)
+                                                  }}
+                                                  style={[{ width:'25%' }, ss.p10, ss.centro,ss.bordogrigio, (Ora2==oraprenotazione) ? ss.bgverdemare : ss.bglightgrey]}
+                                                >
+                                                  <Text style={[ss.h4, (Ora2==oraprenotazione) ? ss.labelselected : null]}>{Ora2}</Text>
+                                                </TouchableOpacity>
+                                              :
+                                                <View style={[{ backgroundColor: 'white', width:'25%' }]} key={index+"no"+index2}>
+                                                  // <Text style={ss.h4}>   </Text>
+                                                </View>
+        
+                                          ))
+                                        }
+                                      </View>
+                                    ))
+                                  }
+                                </View>
+                              </View>
+                            :
+                              (attivitabase!="no") ?
+                                (dispo=="" || (Array.isArray(dispo) && dispo.length<1)) ?
+                                  <View>
+                                    <Text style={ss.h4}>Al momento non ci sono Riders disponibili. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text>
+                                    <Button  color={accent1} 
+                                    // color="#00a1ae" 
+                                    onPress={
+                                      async () => {
+                                        let Id_User = await getData('@Id_User');
+                                        let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+                                        let listaindirizzi = await richiesta(richiestaindi);
+                                        setIndirizzi(listaindirizzi);
+                                        showDialog2();
+                                      }
+                                    }  
+                                    mode="contained"  style={[ss.w100, ss.mt10]}>Scegli indirizzo *</Button>
+                                  </View>
+                                :
+                                  <View><Text style={ss.h4}>Nessuna disponibilita. Riprova più tardi o verifica che l'indirizzo inserito sia corretto.</Text></View>
+                              :
+                                <View>
+                                  <Text style={[ss.h4, ss.textcentro]}>Seleziona un servizio e un indirizzo per vedere le nostre disponibilità di consegna.</Text>
+                                  <Button   color={accent1}
+                                    //color="#00a1ae"
+                                    onPress={
+                                      async () => {
+                                        let Id_User = await getData('@Id_User');
+                                        let richiestaindi={"Operazione":'getIndirizzi',"Id_User":Id_User}
+                                        let listaindirizzi = await richiesta(richiestaindi);
+                                        setIndirizzi(listaindirizzi);
+                                        showDialog2();
+                                      }
+                                    }  
+                                    mode="contained"  style={[ss.w100, ss.mt10]}>Scegli un indirizzo di consegna *</Button>
+                                </View>
+                          }
+                        </Surface>
+                      : null
+                    }
+                    {
+                      indirizzo!="no" && servizio!="no" && servizio!=3 ?
+                        <>
+                          <MostraOpzioniServizio 
+                            servizio={servizio} 
+                            setVisible7={setVisible7} 
+                            cosa={cosa} 
+                            setCosa={setCosa} 
+                            Info={Info} 
+                            settestoinfo={settestoinfo}
+                            sostiuisci={sostiuisci} 
+                            setSostiuisci={setSostiuisci} 
+                            spesamax={spesamax} 
+                            setSpesamax={setSpesamax} 
+                            coupon={coupon} 
+                            setcoupon={setcoupon} 
+                            duratasosta={duratasosta} 
+                            setduratasosta={setduratasosta} 
+                            indirizzoalternativo={indirizzoalternativo} 
+                            setindirizzoalternativo={setindirizzoalternativo} 
+                            note2={note2} 
+                            setNote2={setNote2} 
+                            setdove={setdove} 
+                            dove={dove} 
+                            validaCoupon={validaCoupon} 
+                            telefono={telefono} 
+                            settelefono={settelefono}  
+                            passeggeri={passeggeri} 
+                            setpasseggeri={setpasseggeri} 
+                            auto={auto} 
+                            setAuto={setAuto} 
+                            OpzioniAuto={OpzioniAuto}
+                            setlat={setlat} 
+                            setlon={setlon} 
+                            Id_Utente={Id_Utente}
+                            setrubrica={setrubrica}
+                            showDialog8={showDialog8}
+                            showDialog10={showDialog10}
+                            setcostodistanza={setcostodistanza}
+                            hugosceglie={hugosceglie}
+                            sethugosceglie={sethugosceglie}
+                            triplettadove={triplettadove}
+                            settriplettadove={settriplettadove}
+                            dove2={dove2}
+                            setdove2={setdove2}
+                            cosahugo2={cosahugo2}
+                            setcosahugo2={setcosahugo2}
+                            nomeluogo2={nomeluogo2}
+                            setnomeluogo2={setnomeluogo2}
+                            comunedestinazione={comunedestinazione}
+                            setcomunedestinazione={setcomunedestinazione}
+                            comunedestinazione2={comunedestinazione2}
+                            setcomunedestinazione2={setcomunedestinazione2}
+                            ritiroconsegna={ritiroconsegna} 
+                            setritiroconsegna={setritiroconsegna} 
+                            testoritirooconsegna={testoritirooconsegna} 
+                            settestoritirooconsegna={settestoritirooconsegna}
+                            telreferente={telreferente}
+                            settelreferente={settelreferente}
+                            richiestafattura={richiestafattura}
+                            setrichiestafattura={setrichiestafattura}
+                            showDialog12={showDialog12}
+                            showDialog13={showDialog13}
+                            showDialog14={showDialog14}
+                            setcheckcalcoladistanza={setcheckcalcoladistanza}
+                            ccittaindirizzo={ccittaindirizzo}
+                            alertCittaDiversa={alertCittaDiversa}
+                            listaservizi={listaservizi}
+                            dispo={dispo}
+                          />
+                          { 
+                            Array.isArray(dispo) && dispo.length>0 ?
+                              <>
+                                <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
+                                  <View style={[{flexDirection: 'row'},ss.w100]}>
+                                    <View style={{width:'40%',flexDirection: 'row'}}>
+                                      <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Hugò ti chiamerà prima di effettuare il servizio richiesto per dargli ulteriori dettagli" />
+                                      <Text style={[{alignSelf: "center"},ss.gra]}>Vuoi essere chiamato da Hugò?</Text>
+                                      {/* <Checkbox
+                                        status={chiamami ? 'checked' : 'unchecked'}
+                                        onPress={() => {
+                                          setChiamami(!chiamami);
+                                        }}
+                                      /> */}
+                                    </View>
+                                    <View style={{width:'60%',flexDirection: "row-reverse"}}>
+                                      <RadioButton.Group 
+                                        onValueChange={
+                                          chiamami => {
+                                            setChiamami(chiamami);
+                                          }
+                                        } value={chiamami}
+                                      >
+                                        <View style={[ss.row]}>
+                                          <RadioButton.Item label="Si" value={true} style={{padding:0}} />            
+                                          <RadioButton.Item label="No" value={false} style={{padding:0}} />            
+                                        </View>
+                                      </RadioButton.Group>
+                                    </View>
+                                  </View>
+                                  <View  style={[ss.p3,ss.w100]}>
+                                    <Divider />
+                                  </View>
+                                  <Text style={[ss.w100,ss.gra, ss.textcentro, ss.mt10]}>Mancia</Text> 
+                                  <View style={[ss.row,ss.centro,ss.w100]}>
+                                    <Button color={accent1} onPress={() => {1 === mancia ? setMancia(0): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
+                                    <Button color={accent1} onPress={() => {2 === mancia ? setMancia(0): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
+                                    <Button color={accent1} onPress={() => {5 === mancia ? setMancia(0): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
+                                    <Button color={accent1} onPress={() => {10 === mancia ? setMancia(0): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
+                                  </View>
+                                </Surface>
+              
+                                    
+                                
+                                <Button  color={accent1}
+                                //color="#00a1ae" 
+                                onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
+                                <Portal>
+                                  {/* style={[{justifyContent:"start"}, ss.p10]} */}
+                                  <Modal visible={visible3} onDismiss={hideDialog3}  style={[ss.p10]} contentContainerStyle={[{backgroundColor:"#fff"}, ss.p25]}>
+                                    <Text style={ss.h2}>Inserisci note</Text>
+                                    <TextInput
+                                      multiline = {true}
+                                      mode='outlined'
+                                      numberOfLines = {4}
+                                      label="Note"
+                                      value={note}
+                                      onChangeText={note => setNote(note)}
+                                    />
+                                    <Button style={[ss.w100, ss.mt15]} color={accent1} mode="contained" onPress={hideDialog3}>OK</Button>
+                                  </Modal>
+                                </Portal> 
+                                <Surface style={[ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
+                                  {
+                                    costoservizio>0?
+                                      <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                                        <View style={ss.w50}>
+                                          <Text style={ss.h2}>Costo servizio: </Text> 
+                                        </View>
+                                        <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                          <Text style={ss.h2}> €</Text> 
+                                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                                        </View>
+                                      </View>
+                                    : null
+                                  }
+                                  {
+                                    costodistanza>0?
+                                      <>
+                                        <View style={[{ flexDirection: 'row'},ss.w100,ss.py10]}>
+                                          <View style={ss.w50}>
+                                            <Text style={ss.h2}>Costo distanza: </Text> 
+                                          </View>
+                                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                            <Text style={ss.h2}> € *</Text> 
+                                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costodistanza.toFixed(2)}</Text>
+                                          </View>
+                                        </View>
+                                        <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
+                                          <Text  style={[ss.textcentro,ss.w100,ss.centro]}>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
+                                          <Button  color={accent1} mode="text">Ricalcola</Button>
+                                        </View>
+                                      </>
+                                    : null
+                                  }
+                                  {
+                                    checkcalcoladistanza>0?
+                                      <>
+                                        <View style={[{ flexDirection: 'row'},ss.w100,ss.py10]}>
+                                          <View style={ss.w100}>
+                                            <Text style={[{color:"red"},ss.textcentro,ss.w100,ss.h2]}>ATTENZIONE:</Text> 
+                                          </View>
+                                        </View>
+                                        <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
+                                          <Text  style={[ss.textcentro,ss.w100,ss.centro]}>Non siamo riusciti a calcolare il costo della distanza: assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
+                                          <Button  color={accent1} mode="text">Ricalcola</Button>
+                                        </View>
+                                      </>
+                                    : null
+                                  }
+                                  {
+                                    duratasosta>0?
+                                      <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                                        <View style={ss.w50}>
+                                          <Text style={ss.h2}>Costo sosta: </Text> 
+                                        </View>
+                                        <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                          <Text style={ss.h2}> €</Text> 
+                                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{(duratasosta/30*costobasesosta).toFixed(2)}</Text>
+                                        </View>
+                                      </View>
+                                    : null
+                                  }
+                                  {/* {
+                                    costoservizio>0?
+                                      <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
+                                        <Text style={ss.h2}>Costo servizio: </Text>
+                                        <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
+                                        <Text style={ss.h2}> €</Text>
+                                      </View>
+                                    : null
+                                  } */}
+                                  {
+                                    spesamax!=0?
+                                      <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                                        <View style={ss.w50}>
+                                          <Text style={ss.h2}>Spesa massima: </Text> 
+                                        </View>
+                                        <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                          <Text style={ss.h2}> €</Text> 
+                                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
+                                        </View>
+                                      </View>
+                                    : null
+                                  }
+                                  {/* {
+                                    spesamax!=0?
+                                      <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
+                                        <Text style={ss.h2}>Spesa massima: </Text>
+                                        <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
+                                        <Text style={ss.h2}> €</Text>
+                                      </View>
+                                    : null
+                                  } */}
+                                  {
+                                    mancia>0?
+                                      <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                                        <View style={ss.w50}>
+                                          <Text style={ss.h2}>Mancia: </Text> 
+                                        </View>
+                                        <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                          <Text style={ss.h2}> €</Text> 
+                                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{mancia.toFixed(2)}</Text>
+                                        </View>
+                                      </View>
+                                    : null
+                                  }
+                                  {
+                                    scontocoupon>0?
+                                      <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
+                                        <View style={ss.w50}>
+                                          <Text style={ss.h2}>Coupon: </Text> 
+                                        </View>
+                                        <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
+                                          <Text style={ss.h2}> €</Text> 
+                                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>- {scontocoupon.toFixed(2)}</Text>
+                                        </View>
+                                      </View>
+                                    : null
+                                  }
+                                  <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro,ss.py10]}>
+                                    <Text style={ss.h2}>Totale: </Text>
+                                    <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{parseFloat(totale).toFixed(2)}</Text>
+                                    <Text style={ss.h2}> €</Text>
+                                  </View>
+                                </Surface>
+                                
+                                <Button  color={accent1}
+                                //color="#00a1ae" 
+                                onPress={async ()=>{
+                                  if(typeof(richestaaggiornamento.id_attivita_base)!=="undefined" && richestaaggiornamento.id_attivita_base !="undefined" && richestaaggiornamento.id_attivita_base !="no"){
+                                    let json_res = await richiesta(richestaaggiornamento);
+                                    aggiornaPagina(json_res);
+                                  }
+                                  showDialog5();
+                                }}  
+                                mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
+                                
+                                <TouchableOpacity
+                                  onPress={
+                                    () => {
+                                      inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax,coupon, indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri,richiestafattura);
+                                    }
+                                  }
+                                  style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
+                                  <Text style={[{ color: '#fff' },ss.h4]}>ACQUISTA</Text>
+                                </TouchableOpacity>
+                                <Button  style={[ss.w100, ss.mt15]} mode="outlined" onPress={()=>{Linking.openURL("https://hugopersonalshopper.it/Termini.pdf");}}>Termini e condizioni d'uso</Button>
+                              </>
+                            : null
+                          }
+                        </>
+                      : 
+                        indirizzo!="no" && servizio!="no" && servizio==3 ?
+                            <View>
+                              <Text>Servizio NCC</Text>
+                            </View>
+                        : null
+                    }
+                  </>                          
+                :
+                  <View style={{ flexDirection: 'row'}}>
+                    <Text style={[ss.h3,ss.mt15]}>Al momento non ci sono servizi attivi per questa cittá. Prova inserendo un indirizzo diverso.</Text>
+                  </View>
               : null
-            }
-            {
-              indirizzo!="no" && servizio!="no" && servizio!=3 ?
-                <>
-                  <MostraOpzioniServizio 
-                    servizio={servizio} 
-                    setVisible7={setVisible7} 
-                    cosa={cosa} 
-                    setCosa={setCosa} 
-                    Info={Info} 
-                    settestoinfo={settestoinfo}
-                    sostiuisci={sostiuisci} 
-                    setSostiuisci={setSostiuisci} 
-                    spesamax={spesamax} 
-                    setSpesamax={setSpesamax} 
-                    coupon={coupon} 
-                    setcoupon={setcoupon} 
-                    duratasosta={duratasosta} 
-                    setduratasosta={setduratasosta} 
-                    indirizzoalternativo={indirizzoalternativo} 
-                    setindirizzoalternativo={setindirizzoalternativo} 
-                    note2={note2} 
-                    setNote2={setNote2} 
-                    setdove={setdove} 
-                    dove={dove} 
-                    validaCoupon={validaCoupon} 
-                    telefono={telefono} 
-                    settelefono={settelefono}  
-                    passeggeri={passeggeri} 
-                    setpasseggeri={setpasseggeri} 
-                    auto={auto} 
-                    setAuto={setAuto} 
-                    OpzioniAuto={OpzioniAuto}
-                    setlat={setlat} 
-                    setlon={setlon} 
-                    Id_Utente={Id_Utente}
-                    setrubrica={setrubrica}
-                    showDialog8={showDialog8}
-                    showDialog10={showDialog10}
-                    setcostodistanza={setcostodistanza}
-                    hugosceglie={hugosceglie}
-                    sethugosceglie={sethugosceglie}
-                    triplettadove={triplettadove}
-                    settriplettadove={settriplettadove}
-                    dove2={dove2}
-                    setdove2={setdove2}
-                    cosahugo2={cosahugo2}
-                    setcosahugo2={setcosahugo2}
-                    nomeluogo2={nomeluogo2}
-                    setnomeluogo2={setnomeluogo2}
-                    comunedestinazione={comunedestinazione}
-                    setcomunedestinazione={setcomunedestinazione}
-                    comunedestinazione2={comunedestinazione2}
-                    setcomunedestinazione2={setcomunedestinazione2}
-                    ritiroconsegna={ritiroconsegna} 
-                    setritiroconsegna={setritiroconsegna} 
-                    testoritirooconsegna={testoritirooconsegna} 
-                    settestoritirooconsegna={settestoritirooconsegna}
-                    telreferente={telreferente}
-                    settelreferente={settelreferente}
-                    richiestafattura={richiestafattura}
-                    setrichiestafattura={setrichiestafattura}
-                    showDialog12={showDialog12}
-                    showDialog13={showDialog13}
-                    showDialog14={showDialog14}
-                    setcheckcalcoladistanza={setcheckcalcoladistanza}
-                  />
-                  <Surface style={[ss.surface1,ss.mt15,ss.w100]} elevation={4}>
-                    <View style={[{flexDirection: 'row'},ss.w100]}>
-                      <View style={{width:'40%',flexDirection: 'row'}}>
-                        <Info setVisible7={setVisible7} settestoinfo={settestoinfo} tinfo="Hugò ti chiamerà prima di effettuare il servizio richiesto per dargli ulteriori dettagli" />
-                        <Text style={[{alignSelf: "center"},ss.gra]}>Vuoi essere chiamato da Hugò?</Text>
-                        {/* <Checkbox
-                          status={chiamami ? 'checked' : 'unchecked'}
-                          onPress={() => {
-                            setChiamami(!chiamami);
-                          }}
-                        /> */}
-                      </View>
-                      <View style={{width:'60%',flexDirection: "row-reverse"}}>
-                        <RadioButton.Group 
-                          onValueChange={
-                            chiamami => {
-                              setChiamami(chiamami);
-                            }
-                          } value={chiamami}
-                        >
-                          <View style={[ss.row]}>
-                            <RadioButton.Item label="Si" value={true} style={{padding:0}} />            
-                            <RadioButton.Item label="No" value={false} style={{padding:0}} />            
-                          </View>
-                        </RadioButton.Group>
-                      </View>
-                    </View>
-                    <View  style={[ss.p3,ss.w100]}>
-                      <Divider />
-                    </View>
-                    <Text style={[ss.w100,ss.gra, ss.textcentro, ss.mt10]}>Mancia</Text> 
-                    <View style={[ss.row,ss.centro,ss.w100]}>
-                      <Button color={accent1} onPress={() => {1 === mancia ? setMancia(0): setMancia(1);}} style={[(1 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={1 === mancia ? ss.labelselected : ss.unselected} mode="outlined">1€</Button>
-                      <Button color={accent1} onPress={() => {2 === mancia ? setMancia(0): setMancia(2);}} style={[(2 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={2 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">2€</Button>
-                      <Button color={accent1} onPress={() => {5 === mancia ? setMancia(0): setMancia(5);}} style={[(5 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={5 === mancia ? ss.labelselected : ss.unselected}   mode="outlined">5€</Button>
-                      <Button color={accent1} onPress={() => {10 === mancia ? setMancia(0): setMancia(10);}}  style={[(10 === mancia ? ss.selected : ss.unselected),ss.w25]} labelStyle={10 === mancia ? ss.labelselected : ss.unselected}  mode="outlined">10€</Button>
-                    </View>
-                  </Surface>
-
-                      
-                  
-                  <Button  color={accent1}
-                  //color="#00a1ae" 
-                  onPress={showDialog3}  mode="contained"  style={[ss.w100,ss.mt15]}>Note per Hugò</Button>
-                  <Portal>
-                    {/* style={[{justifyContent:"start"}, ss.p10]} */}
-                    <Modal visible={visible3} onDismiss={hideDialog3}  style={[ss.p10]} contentContainerStyle={[{backgroundColor:"#fff"}, ss.p25]}>
-                      <Text style={ss.h2}>Inserisci note</Text>
-                      <TextInput
-                        multiline = {true}
-                        mode='outlined'
-                        numberOfLines = {4}
-                        label="Note"
-                        value={note}
-                        onChangeText={note => setNote(note)}
-                      />
-                      <Button style={[ss.w100, ss.mt15]} color={accent1} mode="contained" onPress={hideDialog3}>OK</Button>
-                    </Modal>
-                  </Portal> 
-                  <Surface style={[ss.surface2,ss.mt15,ss.w100,ss.textcentro]} elevation={4}>
-                    {
-                      costoservizio>0?
-                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
-                          <View style={ss.w50}>
-                            <Text style={ss.h2}>Costo servizio: </Text> 
-                          </View>
-                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                            <Text style={ss.h2}> €</Text> 
-                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      : null
-                    }
-                    {
-                      costodistanza>0?
-                        <>
-                          <View style={[{ flexDirection: 'row'},ss.w100,ss.py10]}>
-                            <View style={ss.w50}>
-                              <Text style={ss.h2}>Costo distanza: </Text> 
-                            </View>
-                            <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                              <Text style={ss.h2}> € *</Text> 
-                              <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costodistanza.toFixed(2)}</Text>
-                            </View>
-                          </View>
-                          <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
-                            <Text  style={[ss.textcentro,ss.w100,ss.centro]}>*Assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
-                            <Button  color={accent1} mode="text">Ricalcola</Button>
-                          </View>
-                        </>
-                      : null
-                    }
-                    {
-                      checkcalcoladistanza>0?
-                        <>
-                          <View style={[{ flexDirection: 'row'},ss.w100,ss.py10]}>
-                            <View style={ss.w100}>
-                              <Text style={[{color:"red"},ss.textcentro,ss.w100,ss.h2]}>ATTENZIONE:</Text> 
-                            </View>
-                          </View>
-                          <View  style={[ss.textcentro,ss.w100,ss.bordoBottomGrigio]}>
-                            <Text  style={[ss.textcentro,ss.w100,ss.centro]}>Non siamo riusciti a calcolare il costo della distanza: assicurati di aver inserito l'indirizzo corretto specificando il comune di destinazione. </Text>
-                            <Button  color={accent1} mode="text">Ricalcola</Button>
-                          </View>
-                        </>
-                      : null
-                    }
-                    {
-                      duratasosta>0?
-                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
-                          <View style={ss.w50}>
-                            <Text style={ss.h2}>Costo sosta: </Text> 
-                          </View>
-                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                            <Text style={ss.h2}> €</Text> 
-                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{(duratasosta/30*costobasesosta).toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      : null
-                    }
-                    {/* {
-                      costoservizio>0?
-                        <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
-                          <Text style={ss.h2}>Costo servizio: </Text>
-                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{costoservizio.toFixed(2)}</Text>
-                          <Text style={ss.h2}> €</Text>
-                        </View>
-                      : null
-                    } */}
-                    {
-                      spesamax!=0?
-                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
-                          <View style={ss.w50}>
-                            <Text style={ss.h2}>Spesa massima: </Text> 
-                          </View>
-                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                            <Text style={ss.h2}> €</Text> 
-                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      : null
-                    }
-                    {/* {
-                      spesamax!=0?
-                        <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro]}>
-                          <Text style={ss.h2}>Spesa massima: </Text>
-                          <Text style={[{ fontWeight: 'bold' },ss.h2]}>{parseFloat(spesamax.replace(/,/g, '.')).toFixed(2)}</Text>
-                          <Text style={ss.h2}> €</Text>
-                        </View>
-                      : null
-                    } */}
-                    {
-                      mancia>0?
-                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
-                          <View style={ss.w50}>
-                            <Text style={ss.h2}>Mancia: </Text> 
-                          </View>
-                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                            <Text style={ss.h2}> €</Text> 
-                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>{mancia.toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      : null
-                    }
-                    {
-                      scontocoupon>0?
-                        <View style={[{ flexDirection: 'row'},ss.w100,ss.bordoBottomGrigio,ss.py10]}>
-                          <View style={ss.w50}>
-                            <Text style={ss.h2}>Coupon: </Text> 
-                          </View>
-                          <View  style={[{ flexDirection: 'row-reverse',textAlign:"end"}, ss.w50]}>
-                            <Text style={ss.h2}> €</Text> 
-                            <Text style={[{ fontWeight: 'bold' },ss.h2]}>- {scontocoupon.toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      : null
-                    }
-                    <View style={[{ flexDirection: 'row',alignItems:'center'},ss.w100,ss.textcentro,ss.py10]}>
-                      <Text style={ss.h2}>Totale: </Text>
-                      <Text style={[{ fontWeight: 'bold' }, ss.hextra]}>{parseFloat(totale).toFixed(2)}</Text>
-                      <Text style={ss.h2}> €</Text>
-                    </View>
-                  </Surface>
-                  
-                  <Button  color={accent1}
-                  //color="#00a1ae" 
-                  onPress={async ()=>{
-                    if(typeof(richestaaggiornamento.id_attivita_base)!=="undefined" && richestaaggiornamento.id_attivita_base !="undefined" && richestaaggiornamento.id_attivita_base !="no"){
-                      let json_res = await richiesta(richestaaggiornamento);
-                      aggiornaPagina(json_res);
-                    }
-                    showDialog5();
-                  }}  
-                  mode="contained"  style={[ss.w100,ss.mt15]}>Metodo di pagamento *</Button>
-                   
-                  <TouchableOpacity
-                    onPress={
-                      () => {
-                        inviaPrenotazione(indirizzo, servizio, metodo_pagamento, note, note2, dove, cosa, mancia, auto, chiamami, sostiuisci, spesamax,coupon, indirizzoalternativo, oraprenotazione, dove2, cosahugo2, nomeluogo2, comunedestinazione, comunedestinazione2,telreferente,duratasosta,passeggeri,richiestafattura);
-                      }
-                    }
-                    style={[{ backgroundColor: '#00a1ae' }, ss.mt15, ss.py10, ss.w100, ss.centro]}>
-                    <Text style={[{ color: '#fff' },ss.h4]}>ACQUISTA</Text>
-                  </TouchableOpacity>
-                  <Button  style={[ss.w100, ss.mt15]} mode="outlined" onPress={()=>{Linking.openURL("https://hugopersonalshopper.it/Termini.pdf");}}>Termini e condizioni d'uso</Button>
-                </>
-              : 
-                indirizzo!="no" && servizio!="no" && servizio==3 ?
-                    <View>
-                      <Text>Servizio NCC</Text>
-                    </View>
-                : null
             }
             <TouchableOpacity
               onPress={() => {
@@ -3141,10 +3307,14 @@ export default function Hugo({ navigation, route }) {
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
-                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                   setcostodistanza(0); 
                                   setcheckcalcoladistanza(1);
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                   setcheckcalcoladistanza(0);
@@ -3242,10 +3412,14 @@ export default function Hugo({ navigation, route }) {
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
-                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                   setcostodistanza(0); 
                                   setcheckcalcoladistanza(1);
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                   setcheckcalcoladistanza(0);
@@ -3328,10 +3502,14 @@ export default function Hugo({ navigation, route }) {
                                 settelreferente(indi.telreferente);
                                 setcomunedestinazione(indi.comunedestinazione);
                                 let calcolacostodistanza={
-                                  "indirizzoluogo":dove+" "+comunedestinazione,
-                                  "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
-                                  "comunedestinazione":comunedestinazione,
-                                  "comunedestinazione2":indi.comunedestinazione
+                                  // "indirizzoluogo":dove+" "+comunedestinazione,
+                                  "indirizzoluogo":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  // "comunedestinazione":comunedestinazione,
+                                  "comunedestinazione":indi.comunedestinazione
+                                  // "indirizzoluogo":dove+" "+comunedestinazione,
+                                  // "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
+                                  // "comunedestinazione":comunedestinazione,
+                                  // "comunedestinazione2":indi.comunedestinazione
                                 }
                                 if(servizio == 2 || servizio == 4){
                                   calcolacostodistanza.Partenza=indirizzoalternativo;
@@ -3343,10 +3521,14 @@ export default function Hugo({ navigation, route }) {
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
-                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita"){
                                   setcostodistanza(0); 
                                   setcheckcalcoladistanza(1);
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                   setcheckcalcoladistanza(0);
@@ -3412,10 +3594,14 @@ export default function Hugo({ navigation, route }) {
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
-                                if(json_res.risposta==="Indirizzo_non_trovato"){
+                                if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                   setcostodistanza(0); 
                                   setcheckcalcoladistanza(1);
-                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                  setcostodistanza(0); 
+                                  setcheckcalcoladistanza(1);
+                                  alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                                 } else {
                                   setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                   setcheckcalcoladistanza(0);
@@ -3464,19 +3650,25 @@ export default function Hugo({ navigation, route }) {
                                 setindirizzoalternativo(indi.indirizzoluogo+" "+indi.comunedestinazione);
                                 if(dove!=="" && dove!=="no" && indirizzoalternativo!="" && comunedestinazione!=""){
                                   let calcolacostodistanza={
-                                    "Partenza":indi.indirizzoluogo,
+                                    "Partenza":indi.indirizzoluogo+" "+indi.comunedestinazione,
                                     "indirizzoluogo":dove+" "+comunedestinazione,
                                     "Operazione":"calcolacostodistanzataxi1"
                                   }
                                   let json_res = await richiesta(calcolacostodistanza);
-                                  if(json_res.risposta==="Indirizzo_non_trovato"){
+                                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                     setcostodistanza(0); 
                                     setcheckcalcoladistanza(1);
-                                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                                    setcostodistanza(0); 
+                                    setcheckcalcoladistanza(1);
+                                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
                                   } else {
                                     setcostodistanza(parseFloat(json_res.risposta.Totale)); 
                                     setcheckcalcoladistanza(0);
                                   }
+                                } else if(indirizzoalternativo==="") {
+                                  alert("Per favore compila l'indirizzo di partenza..");
                                 }
                                 
                                 setVisible14(false);
