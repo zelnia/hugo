@@ -84,7 +84,7 @@ export default function LogIn({ navigation }) {
                             <Text style={{ fontSize: 20, color: '#fff' }}>Accedi</Text>
                             </TouchableOpacity>
                             <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100, ss.mt15]}>Oppure Registrati</Button>
-                            <Button icon="phone" color="#00a1ae" onPress={()=>{Linking.openURL("https://wa.me/+393333256236");}}  mode="outlined"  style={[ss.w100]}>Vorresti parlare con Hugò? Clicca per messaggiare con lui!</Button>
+                            <Button icon="phone" color="#00a1ae" onPress={()=>{Linking.openURL("https://wa.me/+393665216365");}}  mode="outlined"  style={[ss.w100]}>Vorresti parlare con Hugò? Clicca per messaggiare con lui!</Button>
                         </View>
                     </View>
                     </View>

@@ -81,8 +81,8 @@ export default function Registrazione({ navigation, route }) {
     try {
       let richiestaregistrazione= {
         "Operazione":'Registrazione',
-        "nome":nome,
-        "email":email,
+        "nome":nome.trim(),
+        "email":email.trim(),
         "pwd":pwd,
         "indirizzo":indirizzo,
         "civico":civico,
@@ -91,10 +91,10 @@ export default function Registrazione({ navigation, route }) {
         "cap":cap,
         "note":note,
         "Note_Indirizzo":Note_Indirizzo,
-        "telefono":telefono,
+        "telefono":telefono.trim(),
         "codiceamico":codiceamico,
-        "piva":iva,
-        "cupa":cupa,
+        "piva":iva.trim(),
+        "cupa":cupa.trim(),
       }
       let checkgo=true;
       let errore="";
@@ -107,9 +107,28 @@ export default function Registrazione({ navigation, route }) {
         if(Reguistrazione.risposta=="registrazione_avvenuta"){
           alert("Registrazione riuscita");
           navigation.navigate('Accesso')
+        } else {
+          alert(Reguistrazione.risposta); 
         }
       } else {
         alert(errore);
+      }
+    } catch (error) {
+      console.log('errore: ', error);
+    }
+  }
+  async function checkUtenza (){
+    try {
+      let richiestaCheckUtenza= {
+        "Operazione":'checkUtenza',
+        "email":email.trim(),
+        "telefono":telefono.trim(),
+        "piva":iva.trim(),
+        "cupa":cupa.trim(),
+      }
+      let check=await richiesta(richiestaCheckUtenza);
+      if(check.risposta=="utenza_esistente"){
+        alert("Utente giá presente in anagrafica.");
       }
     } catch (error) {
       console.log('errore: ', error);
@@ -131,6 +150,7 @@ export default function Registrazione({ navigation, route }) {
                       setemail(email)
                     }}
                     value={email ?? ""}
+                    onBlur={checkUtenza}
                   />
                   <TextInput
                     style={[ss.w100,ss.mt15]}
@@ -221,6 +241,7 @@ export default function Registrazione({ navigation, route }) {
                       settelefono(telefono)
                     }}
                     value={telefono ?? ""}
+                    onBlur={checkUtenza}
                   />
                   <Button mode="outlined"  style={[ss.w100,ss.mt15]}
                    onPress={() => {verificasms(telefono);}}
@@ -346,6 +367,7 @@ export default function Registrazione({ navigation, route }) {
                         setiva(iva)
                       }}
                       value={iva ?? ""}
+                      onBlur={checkUtenza}
                     />
                     <TextInput
                       style={[ss.w100,ss.mt15]}
@@ -354,6 +376,7 @@ export default function Registrazione({ navigation, route }) {
                         setcupa(cupa)
                       }}
                       value={cupa ?? ""}
+                      onBlur={checkUtenza}
                     />
                   </Surface>
                   <Button mode="contained"  style={[ss.w100,ss.mt15]}

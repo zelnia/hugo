@@ -919,6 +919,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "comunedestinazione":comunedestinazione,
                                 "comunedestinazione2":comunedestinazione2
                               }
+                              if((servizio==6 || servizio == 7) && ritiroconsegna){
+                                calcolacostodistanza.ritiroconsegna="si";
+                              }
                               let json_res = await richiesta(calcolacostodistanza);
                               if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                                 setcostodistanza(0); 
@@ -952,6 +955,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                                 "Operazione":"calcolacostodistanza",
                                 "comunedestinazione":comunedestinazione,
                                 "comunedestinazione2":comunedestinazione2
+                              }
+                              if((servizio==6 || servizio == 7) && ritiroconsegna){
+                                calcolacostodistanza.ritiroconsegna="si";
                               }
                               let json_res = await richiesta(calcolacostodistanza);
                               if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
@@ -1081,6 +1087,35 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               async (ritiroconsegna)=>{
                 setritiroconsegna(ritiroconsegna)
                 settestoritirooconsegna(ritiroconsegna?"consegnare":"ritirare");
+                if(dove!=="" && dove!=="no" && comunedestinazione!=""){
+                  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                  let calcolacostodistanza={
+                    "UltimoIndirizzo":UltimoIndirizzo,
+                    "indirizzoluogo":dove+" "+comunedestinazione,
+                    "Operazione":"calcolacostodistanza",
+                    "comunedestinazione":comunedestinazione,
+                  }
+                  if(dove2!=="" && comunedestinazione2!==""){
+                    calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
+                  }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
+                  }
+                  let json_res = await richiesta(calcolacostodistanza);
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                  } else {
+                    setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
+                  }
+                }
               }
             }
           >
@@ -1150,6 +1185,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
+                  }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
@@ -1185,6 +1223,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
+                  }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
@@ -1318,6 +1359,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione":comunedestinazione,
                           "comunedestinazione2":comunedestinazione2
                         }
+                        if((servizio==6 || servizio == 7) && ritiroconsegna){
+                          calcolacostodistanza.ritiroconsegna="si";
+                        }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0);
@@ -1351,6 +1395,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "Operazione":"calcolacostodistanza",
                           "comunedestinazione":comunedestinazione,
                           "comunedestinazione2":comunedestinazione2
+                        }
+                        if((servizio==6 || servizio == 7) && ritiroconsegna){
+                          calcolacostodistanza.ritiroconsegna="si";
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
@@ -1429,6 +1476,35 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
               async (ritiroconsegna)=>{
                 setritiroconsegna(ritiroconsegna)
                 settestoritirooconsegna(ritiroconsegna?"consegnare":"ritirare");
+                if(dove!=="" && dove!=="no" && comunedestinazione!=""){
+                  let UltimoIndirizzo = await getData('@UltimoIndirizzo');
+                  let calcolacostodistanza={
+                    "UltimoIndirizzo":UltimoIndirizzo,
+                    "indirizzoluogo":dove+" "+comunedestinazione,
+                    "Operazione":"calcolacostodistanza",
+                    "comunedestinazione":comunedestinazione,
+                  }
+                  if(dove2!=="" && comunedestinazione2!==""){
+                    calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                    calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
+                  }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
+                  }
+                  let json_res = await richiesta(calcolacostodistanza);
+                  if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo indicato. Controlla che sia l'indirizzo di partenza che quelli di destinazione, o un eventuale indirizzo alternativo, siano corretti oppure potrebbero essere applicati altri costi alla fine del servizio.");
+                  } else if(json_res.risposta==="Indirizzo_Partenza_Non_Trovato"){
+                    setcostodistanza(0); 
+                    setcheckcalcoladistanza(1);
+                    alert("Non siamo riusciti a trovare l'indirizzo predefinito, probabilmente perché é stato cancellato dai nostri server da un altro sito del circuito ristostore o usando quest'app su un altro dispositivo. Per favore ricrea il tuo indirizzo predefinito e riprova.");
+                  } else {
+                    setcostodistanza(parseFloat(json_res.risposta.Totale)); 
+                    setcheckcalcoladistanza(0);
+                  }
+                }
               }
             }
           >
@@ -1498,6 +1574,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                   }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
+                  }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                     setcostodistanza(0); 
@@ -1533,6 +1612,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                   if(dove2!=="" && comunedestinazione2!==""){
                     calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
                     calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
+                  }
+                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                    calcolacostodistanza.ritiroconsegna="si";
                   }
                   let json_res = await richiesta(calcolacostodistanza);
                   if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
@@ -1666,6 +1748,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "comunedestinazione":comunedestinazione,
                           "comunedestinazione2":comunedestinazione2
                         }
+                        if((servizio==6 || servizio == 7) && ritiroconsegna){
+                          calcolacostodistanza.ritiroconsegna="si";
+                        }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
                           setcostodistanza(0); 
@@ -1699,6 +1784,9 @@ const MostraOpzioniServizio = ({servizio,cosa, setVisible7, settestoinfo, Info,s
                           "Operazione":"calcolacostodistanza",
                           "comunedestinazione":comunedestinazione,
                           "comunedestinazione2":comunedestinazione2
+                        }
+                        if((servizio==6 || servizio == 7) && ritiroconsegna){
+                          calcolacostodistanza.ritiroconsegna="si";
                         }
                         let json_res = await richiesta(calcolacostodistanza);
                         if(json_res.risposta==="Indirizzo_non_trovato" || json_res.risposta==="Operazione_non_riuscita" ){
@@ -2084,11 +2172,15 @@ export default function Hugo({ navigation, route }) {
         "richiestafattura":richiestafattura,
         "checkdcalcoladistanza":checkcalcoladistanza,
       }
-      if(dove!=="" && dove!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2))){
+      // console.log('((servizio == 4 || servizio == 2))', ((servizio == 4 || servizio == 2)));
+      // console.log('((hugosceglie))', (hugosceglie));
+      // console.log('((hugosceglie===0 || (servizio == 4 || servizio == 2)))', ((hugosceglie===0 || (servizio == 4 || servizio == 2))));
+      // console.log('(dove!=="" && dove!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2)))', (dove!=="" && dove!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2))));
+      if(dove!=="" && dove!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2 || servizio == 6 || servizio == 7))){
         richiestaprenotazione["dove"]=dove+" "+comunedestinazione;
         richiestaprenotazione["note2"]=note2;
       }
-      if(dove2!=="" && dove2!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2))){
+      if(dove2!=="" && dove2!==" " && (hugosceglie===0 || (servizio == 4 || servizio == 2 || servizio == 6 || servizio == 7))){
         richiestaprenotazione["dove2"]=dove2+" "+comunedestinazione2;
         richiestaprenotazione["cosahugo2"]=cosahugo2;
         richiestaprenotazione["nomeluogo2"]=nomeluogo2;
@@ -2149,11 +2241,19 @@ export default function Hugo({ navigation, route }) {
         switch (metodo_pagamento) {
           case 0:
             let acquisto=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
-            Linking.openURL(acquisto.PaginaAcquisto);
+            if(typeof(acquisto.PaginaAcquisto)!=="undefined" && acquisto.PaginaAcquisto!==null && acquisto.PaginaAcquisto!==""){
+              Linking.openURL(acquisto.PaginaAcquisto);
+            } else {
+              console.log('acquisto', acquisto);
+            }
             break;
           case "0":
               let acquisto2=await richiesta(richiestaprenotazione,false,"https://ristostore.it/Pagamenti/AcquistoHugo");
-              Linking.openURL(acquisto2.PaginaAcquisto);
+              if(typeof(acquisto2.PaginaAcquisto)!=="undefined" && acquisto2.PaginaAcquisto!==null && acquisto2.PaginaAcquisto!==""){
+                Linking.openURL(acquisto2.PaginaAcquisto);
+              } else {
+                console.log('acquisto2', acquisto2);
+              }
               break;
           case "1":
             let Preautorizzazione = await getData('@Preautorizzazione');
@@ -3279,7 +3379,7 @@ export default function Hugo({ navigation, route }) {
           </Portal>
           <Portal>
             <Dialog visible={visible8} onDismiss={hideDialog8}>
-              <Dialog.Title>Rubrica</Dialog.Title>
+              <Dialog.Title>Rubrica Indirizzi</Dialog.Title>
               <Dialog.Content>
                 <View>
                   {
@@ -3297,6 +3397,10 @@ export default function Hugo({ navigation, route }) {
                                   "indirizzoluogo":indi.indirizzoluogo+" "+indi.comunedestinazione,
                                   "comunedestinazione":indi.comunedestinazione,
                                 }
+                                if(dove2!=="" && comunedestinazione2!==""){
+                                  calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                                  calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
+                                }
                                 if(servizio == 2 || servizio == 4){
                                   calcolacostodistanza.Partenza=indirizzoalternativo;
                                   calcolacostodistanza.Operazione="calcolacostodistanzataxi1";
@@ -3304,6 +3408,9 @@ export default function Hugo({ navigation, route }) {
                                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                                   calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
                                   calcolacostodistanza.Operazione="calcolacostodistanza";
+                                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                                    calcolacostodistanza.ritiroconsegna="si";
+                                  }
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
@@ -3409,6 +3516,9 @@ export default function Hugo({ navigation, route }) {
                                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                                   calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
                                   calcolacostodistanza.Operazione="calcolacostodistanza";
+                                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                                    calcolacostodistanza.ritiroconsegna="si";
+                                  }
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
@@ -3502,14 +3612,12 @@ export default function Hugo({ navigation, route }) {
                                 settelreferente(indi.telreferente);
                                 setcomunedestinazione(indi.comunedestinazione);
                                 let calcolacostodistanza={
-                                  // "indirizzoluogo":dove+" "+comunedestinazione,
                                   "indirizzoluogo":indi.indirizzoluogo+" "+indi.comunedestinazione,
-                                  // "comunedestinazione":comunedestinazione,
                                   "comunedestinazione":indi.comunedestinazione
-                                  // "indirizzoluogo":dove+" "+comunedestinazione,
-                                  // "indirizzoluogo2":indi.indirizzoluogo+" "+indi.comunedestinazione,
-                                  // "comunedestinazione":comunedestinazione,
-                                  // "comunedestinazione2":indi.comunedestinazione
+                                }
+                                if(dove2!=="" && comunedestinazione2!==""){
+                                  calcolacostodistanza["indirizzoluogo2"]=dove2+" "+comunedestinazione2;
+                                  calcolacostodistanza["comunedestinazione2"]=comunedestinazione2;
                                 }
                                 if(servizio == 2 || servizio == 4){
                                   calcolacostodistanza.Partenza=indirizzoalternativo;
@@ -3518,6 +3626,9 @@ export default function Hugo({ navigation, route }) {
                                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                                   calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
                                   calcolacostodistanza.Operazione="calcolacostodistanza";
+                                  if((servizio==6 || servizio == 7) && ritiroconsegna){
+                                    calcolacostodistanza.ritiroconsegna="si";
+                                  }
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);
@@ -3591,6 +3702,11 @@ export default function Hugo({ navigation, route }) {
                                   let UltimoIndirizzo = await getData('@UltimoIndirizzo');
                                   calcolacostodistanza.UltimoIndirizzo=UltimoIndirizzo;
                                   calcolacostodistanza.Operazione="calcolacostodistanza";
+                                  if(servizio==6 || servizio == 7){
+                                    if(ritiroconsegna){
+                                      calcolacostodistanza.ritiroconsegna="si";
+                                    }
+                                  }
                                 }
 
                                 let json_res = await richiesta(calcolacostodistanza);

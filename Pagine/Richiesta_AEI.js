@@ -150,8 +150,8 @@ export default function Richiesta_AEI({ navigation, route }) {
       }
     }
     if(mese!==""){
-      console.log('mese', mese);
-      let mese_fixed=parseInt(mese.toString().replace(/[^0-9]/g, ''));
+      // console.log('mese', mese);
+      let mese_fixed=(isNaN(mese)?parseInt(mese.toString().replace(/[^0-9]/g, '')):mese);
       if(isNaN(mese_fixed) || mese_fixed=="" || (mese_fixed<1 || mese_fixed>12)){
         return alert ("Per favore compila il mese di partenza indicandolo nel formato a 2 cifre. Ad esempio 02 per indicare Febbraio.");
       }
@@ -169,7 +169,7 @@ export default function Richiesta_AEI({ navigation, route }) {
       }
     }
     if(anno!=""){
-      let anno_fixed=parseInt(anno.replace(/[^0-9]/g, ''));
+      let anno_fixed=(isNaN(anno)?parseInt(anno.replace(/[^0-9]/g, '')):anno);
       if(isNaN(anno_fixed) || anno_fixed=="" || (anno_fixed<22 || anno_fixed>25)){
         return alert ("Per favore compila l'anno di partenza indicandolo nel formato a 2 cifre. Ad esempio 23 per indicare il 2023.");
       }
@@ -206,7 +206,11 @@ export default function Richiesta_AEI({ navigation, route }) {
 
       if(metodo_pagamento==0 || metodo_pagamento=="0"){
         let acquisto=await richiesta(richiestaRichiesta,false,"https://ristostore.it/Pagamenti/AcquistoNCCHugo");
-        Linking.openURL(acquisto.PaginaAcquisto);
+        if(typeof(acquisto.PaginaAcquisto)!=="undefined" && acquisto.PaginaAcquisto!==null && acquisto.PaginaAcquisto!==""){
+          Linking.openURL(acquisto.PaginaAcquisto);
+        } else {
+          console.log('acquisto', acquisto);
+        }
       } else {
         let jrichiestaRichiesta = await richiesta(richiestaRichiesta);
         if(jrichiestaRichiesta){

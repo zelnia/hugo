@@ -81,35 +81,43 @@ export default function Profilo({ navigation, route }) {
     );
   } 
     
-  const alertCancellaPreautorizzazione = () => Alert.alert(
-    "Cancellazione Preautorizzazione",
-    "Questa operazone cancellerà la preautorizzazione, inclusi i dati della tua carta, per il tuo utente. Sei sicuro?",
-    [
-      {
-        text: "No",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel"
-      },
-      { 
-        text: "OK", 
-        onPress: async () => {
-          let Id_User = await getData('@Id_User');
-          let richiestacancellapreautorizzazione={
-            "Operazione":'cancellaPreautorizzazione',
-            "Id_User":Id_User,
-          }
-          try {
-            richiesta(richiestacancellapreautorizzazione,'apiHugo')
-            .then(async (json) => {
-              alert("Operazione effettuata");
-            });
-          } catch(e) {
-            // remove error
-          }
-        } 
+  async function cancellapre(){
+      let Id_User = await getData('@Id_User');
+      let richiestacancellapreautorizzazione={
+        "Operazione":'cancellaPreautorizzazione',
+        "Id_User":Id_User,
       }
-    ]
-  );
+      try {
+        richiesta(richiestacancellapreautorizzazione,'apiHugo')
+        .then(async (json) => {
+          AsyncStorage.setItem('@Preautorizzazione', 'no');
+          alert("Operazione effettuata");
+        });
+      } catch(e) {
+        // remove error
+      }
+  }
+  function alertCancellaPreautorizzazione(test=false){
+    if(test){
+      cancellapre();
+    } else {
+      Alert.alert(
+        "Cancellazione Preautorizzazione",
+        "Questa operazone cancellerà la preautorizzazione, inclusi i dati della tua carta, per il tuo utente. Sei sicuro?",
+        [
+          {
+            text: "No",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { 
+            text: "OK", 
+            onPress: ()=>{cancellapre();}
+          }
+        ]
+      );
+    }
+  }
 
 
    //  useEffect(() => {
@@ -164,7 +172,6 @@ export default function Profilo({ navigation, route }) {
             <EtichettaSurface etichetta="Email:">{utente.Email}</EtichettaSurface>
             <EtichettaSurface etichetta="Telefono:">{utente.Telefono}</EtichettaSurface>
             <EtichettaSurface etichetta="Codice Amico:">{utente.Codice_Amico}</EtichettaSurface>
-            <EtichettaSurface etichetta="Telefono:">{utente.Telefono}</EtichettaSurface>
             <EtichettaSurface etichetta="Saldo:">{utente.Saldo} €</EtichettaSurface>
           </View>
           <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
@@ -174,7 +181,9 @@ export default function Profilo({ navigation, route }) {
             <Button onPress={async () => {navigation.navigate('Preautorizzazione');}}  mode="contained"  style={[ss.w100]}>Imposta Preautorizzazione</Button>
           </View>
           <View style={[ss.centro,ss.w100,ss.mb15,ss.px5]}>
-            <Button onPress={alertCancellaPreautorizzazione}  mode="outlined"  style={[ss.w100]}>Cancella preautorizzazione</Button>
+            <Button 
+            onPress={()=>{alertCancellaPreautorizzazione()}} 
+             mode="outlined"  style={[ss.w100]}>Cancella preautorizzazione</Button>
           </View>
           <Divider />
           <View style={[ss.centro,ss.w100,ss.px5]}>

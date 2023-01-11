@@ -38,7 +38,7 @@ export default function Recuperapassword({ navigation }) {
                             },'apiHugo')
                             .then(async (json) => {
                                 await AsyncStorage.clear().then(()=>{
-                                    alert("Controlla la tua email per ricevere la password provvisoria");
+                                    alert("Controlla la tua email per ricevere la password provvisoria. Se non la trovi, prova a verificare che non sia finita in qualche cartella o nella sezione spam.");
                                     navigation.navigate('LogIn');
                                 });
                             });

@@ -186,7 +186,7 @@ function Accesso({ navigation }) {
                     </TouchableOpacity>
                     <Button onPress={async () => {navigation.navigate('Recuperapassword');}}  mode="outlined"  style={[ss.w100, ss.mt15]}>Recupera la password</Button>
                     <Button onPress={async () => {navigation.navigate('Registrazione');}}  mode="contained"  style={[ss.w100]}>Oppure Registrati</Button>
-                    <Button icon="phone" color="#00a1ae" onPress={()=>{Linking.openURL("https://wa.me/+393333256236");}}  mode="outlined"  style={[ss.w100]}>Vorresti parlare con Hugò? Clicca per messaggiare con lui!</Button>
+                    <Button icon="phone" color="#00a1ae" onPress={()=>{Linking.openURL("https://wa.me/+393665216365");}}  mode="outlined"  style={[ss.w100]}>Vorresti parlare con Hugò? Clicca per messaggiare con lui!</Button>
 
                     <View style={[ss.centro,ss.w100,ss.mt15]}>
                       <Button color="#00a1ae" onPress={()=>{Linking.openURL('https://hugopersonalshopper.it/candidatura.html');}}  mode="outlined"  style={[ss.w100]}>Diventa un Hugò</Button>

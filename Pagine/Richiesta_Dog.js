@@ -129,7 +129,7 @@ export default function Richiesta_Dog({ navigation, route }) {
       if(cittadestinazione==""){messaggioerrore+=" 'Città di destinazione'";checkgo=false;}
     }
     if(passeggeri!=""){
-      let passeggeri_fixed=parseInt(passeggeri.replace(/[^0-9]/g, ''));
+      let passeggeri_fixed=(isNaN(passeggeri)?parseInt(passeggeri.replace(/[^0-9]/g, '')):passeggeri);
       if(isNaN(passeggeri_fixed) || (passeggeri_fixed<0 || passeggeri_fixed>9)){
         return alert ("Per favore compila il numero di animali indicando un numero da 0 a 9");
       }
@@ -147,8 +147,7 @@ export default function Richiesta_Dog({ navigation, route }) {
       }
     }
     if(mese!==""){
-      console.log('mese', mese);
-      let mese_fixed=parseInt(mese.toString().replace(/[^0-9]/g, ''));
+      let mese_fixed=(isNaN(mese)?parseInt(mese.toString().replace(/[^0-9]/g, '')):mese);
       if(isNaN(mese_fixed) || mese_fixed=="" || (mese_fixed<1 || mese_fixed>12)){
         return alert ("Per favore compila il mese di partenza indicandolo nel formato a 2 cifre. Ad esempio 02 per indicare Febbraio.");
       }
@@ -197,12 +196,18 @@ export default function Richiesta_Dog({ navigation, route }) {
         "Soggetto":soggetto,
         "Opzioni_Servizio":opzionidog,
       }
-      // console.log('idutente', idutente);
-      // console.log('richiestaRichiesta', richiestaRichiesta);
+      if(opzionidog==="Visita dal veterinaio" || opzionidog==="Tolettatura"){
+        richiestaRichiesta.Indirizzo_Destinazione=viadestinazione;
+        richiestaRichiesta.Citta_Destinazione=cittadestinazione;
+      }
 
       if(metodo_pagamento==0 || metodo_pagamento=="0"){
         let acquisto=await richiesta(richiestaRichiesta,false,"https://ristostore.it/Pagamenti/AcquistoNCCHugo");
-        Linking.openURL(acquisto.PaginaAcquisto);
+        if(typeof(acquisto.PaginaAcquisto)!=="undefined" && acquisto.PaginaAcquisto!==null && acquisto.PaginaAcquisto!==""){
+          Linking.openURL(acquisto.PaginaAcquisto);
+        } else {
+          console.log('acquisto', acquisto);
+        }
       } else {
         let jrichiestaRichiesta = await richiesta(richiestaRichiesta);
         if(jrichiestaRichiesta){
@@ -273,7 +278,7 @@ export default function Richiesta_Dog({ navigation, route }) {
                         setgiorno("");
                         setmese("");
                         setnote("");
-                        setpasseggeri("");
+                        setpasseggeri(1);
                         setanno(23);
                         setduratasosta(0);
                         setopzionidog(opzionidog);
